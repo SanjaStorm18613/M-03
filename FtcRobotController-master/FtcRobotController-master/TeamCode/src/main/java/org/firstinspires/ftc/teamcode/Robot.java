@@ -4,10 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Subsystem.Elevador;
+import org.firstinspires.ftc.teamcode.Subsystem.Garra;
 
 @TeleOp(name="Robot", group="Linear Opmode")
 
@@ -18,13 +20,12 @@ public class Robot extends LinearOpMode {
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
     Elevador elevador = new Elevador(hardwareMap);
+    Garra garra = new Garra(hardwareMap);
 
-
-    @Override
     public void runOpMode() {
 
         elevador.subir(gamepad1.a, gamepad1.x, gamepad1.y, gamepad1.b);
-
+        garra.vg(gamepad1.dpad_left, gamepad1.dpad_up, gamepad1.dpad_down);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
