@@ -96,11 +96,11 @@ public class Garra {
                 }
             }
         }//criar funcao de cada botao. chamando para configurar...
-    }
-
-
-
 }
+
+
+
+
 
 
 

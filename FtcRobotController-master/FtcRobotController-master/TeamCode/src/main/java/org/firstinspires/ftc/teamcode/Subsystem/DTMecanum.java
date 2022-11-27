@@ -5,32 +5,82 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class DTMecanum {
 
+    Constantis.DTMecanum Const;
+
     DcMotor FE, FD, TE, TD;
-    DcMotor[] motors = {FE, TE, FD, TD};
+
+    ElapsedTime pidT;
+    PID pid = new PID();
+
 
     public DTMecanum (@NonNull HardwareMap hardwareMap) {
 
+
+        //pidT = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
+//Cria motores
         FE = hardwareMap.get(DcMotor.class, "FE");
         FD = hardwareMap.get(DcMotor.class, "FD");
         TE = hardwareMap.get(DcMotor.class, "TE");
         TD = hardwareMap.get(DcMotor.class, "TD");
+        DcMotor motors[] = {FE, TE, FD, TD};
 
-        for (int m = 0; m < motors.length; m++) {
+        FE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FD.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+/*
+        FE.setDirection(DcMotor.Direction.REVERSE);
+        FD.setDirection(DcMotor.Direction.FORWARD);
+        TE.setDirection(DcMotor.Direction.REVERSE);
+        TD.setDirection(DcMotor.Direction.FORWARD);
+*/
+//Aplica 'BREAK' e 'Direction' iterando pelos motores
+        for (int m = 0; m < 4; m++) {
             motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            motors[m].setDirection(m < 2 ? DcMotorSimple.Direction.FORWARD :
-                                            DcMotorSimple.Direction.REVERSE);
+            motors[m].setDirection(m > 1 ? DcMotor.Direction.FORWARD :
+                                            DcMotor.Direction.REVERSE);
+
         }
     }
 
+//Controle movimentação mecanum
     public void drive(double x, double y, double yaw) {
 
-        FE.setPower(y+x+yaw);
-        FD.setPower(y-x-yaw);
-        TE.setPower(y-x+yaw);
-        TD.setPower(y+x-yaw);
+        FE.setPower((y+x+yaw) * 0.8);
+        FD.setPower((y-x-yaw) * 0.8);
+        TE.setPower((y-x+yaw) * 0.8);
+        TD.setPower((y+x-yaw) * 0.8);
 
     }
+/*
+    public void andar(double dis, double rot, double mxvel) {
+
+        dis *= 28;
+        double encMed = (FE.getCurrentPosition() + FD.getCurrentPosition()) / 2;
+        double vel;
+
+        while (dis+10 > encMed && encMed > dis-10){
+
+            vel = pid.PIDCorrect(encMed, dis);
+            if (Math.abs(vel) > mxvel) vel = mxvel * sg(vel);
+
+
+            FE.setPower(vel);
+            FD.setPower(vel);
+            TE.setPower(vel);
+            TD.setPower(vel);
+
+        }
+
+
+    }
+
+
+//*/
 }
