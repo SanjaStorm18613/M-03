@@ -21,7 +21,7 @@ public class Braco {
 
     }
 
-    public void contl(){
+    public void Control(){
 
         //elv.pos = Posição do elevador (de 0 a 1)
         if (elv.ElvPos() < 100) {

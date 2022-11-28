@@ -1,33 +1,46 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
-import com.qualcomm.robotcore.hardware.DcMotor;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Garra {
-    boolean coletar;
-    boolean jjj;
-    boolean kkkk;
-    boolean fff;
-    Servo Roll;
-    DcMotor TD;
-    Servo Garra;
-    Servo Pitch;
 
-    public Garra(HardwareMap hardwareMap) {
+    boolean SPIN = true, COLEVERT = true, COLFRONT = true, COLSIDE = true;
+    boolean ElevNvCol = true;
+    double spinPos, sPos, iPos, cPos, inclPos, clawPos;
 
+    Servo roll, garra, pitch;
+    Elevador Elev;
 
-        Roll = hardwareMap.get(Servo.class, "Roll");
-        TD = hardwareMap.get(DcMotor.class, "TD");
-        Garra = hardwareMap.get(Servo.class, "Garra");
-        Pitch = hardwareMap.get(Servo.class, "Pitch");
+    public Garra(HardwareMap hardwareMap, Elevador e) {
+
+        roll = hardwareMap.get(Servo.class, "Roll");
+        garra = hardwareMap.get(Servo.class, "Garra");
+        pitch = hardwareMap.get(Servo.class, "Pitch");
+
+        Elev = e;
+    }
+
+    public void Control(boolean spin, boolean colVert, boolean colFront, boolean colSide) {
+
+        ElevNvCol = Elev.ElvPos() == 0;
+
+        if (spin){
+            if (SPIN && ElevNvCol){
+                sPos = sPos == 0 ? 1 : 0;
+            }
+        }
+
+        
+
     }
 
     public void roll(boolean a) {//boolean dpad_down, boolean dpad_left, boolean dpad_up) {
         // inverte roll
         if (a) {
-            Roll.setPosition(180 / 270);
+            roll.setPosition(180 / 270.0);
         } else {
-            Roll.setPosition(0);
+            roll.setPosition(0);
         }
     }
 
@@ -35,10 +48,10 @@ public class Garra {
     public void pincas(boolean b) {
         if (b) {
             if (TD.getTargetPosition() == 0) {
-                Garra.setPosition(1);
-                Garra.setPosition(0);
+                garra.setPosition(1);
+                garra.setPosition(0);
             } else {
-                Garra.setPosition(0);
+                garra.setPosition(0);
             }
         }
     }
@@ -47,8 +60,8 @@ public class Garra {
     public void ccf(boolean dpad_down) {
         if (jjj) {
             jjj = false;
-            Garra.setPosition(1);
-            Pitch.setPosition(135 / 270);
+            garra.setPosition(1);
+            pitch.setPosition(135 / 270.0);
             coletar = true;
         }
     }
@@ -59,43 +72,45 @@ public class Garra {
         if (dpad_left) {
             if (kkkk) {
                 jjj = true;
-                Garra.setPosition(1);
-                Roll.setPosition(90 / 270);
-                Pitch.setPosition(135 / 270);
+                garra.setPosition(1);
+                roll.setPosition(90 / 270.0);
+                pitch.setPosition(135 / 270.0);
                 coletar = true;
             }
         } else {
             jjj = true;
         }
     }
-        // cone em pe
-        public void ccp(boolean dpad_up){
-            if (dpad_up) {
-                if (fff) {
-                    fff = true;
-                    Garra.setPosition(1);
-                    Pitch.setPosition(90 / 270);
-                    coletar = true;
-                }
+
+    // cone em pe
+    public void ccp(boolean dpad_up) {
+        if (dpad_up) {
+            if (fff) {
+                fff = false;
+                garra.setPosition(1);
+                pitch.setPosition(90 / 270.0);
+                coletar = true;
+            }
+        } else {
+            fff = true;
+        }
+    }
+
+    // verific
+    public void vg(boolean dpad_left, boolean dpad_up, boolean dpad_down) {
+
+        if (TD.getTargetPosition() == 0) {
+            if (coletar == true) {
+                garra.setPosition(0);
+                pitch.setPosition(0);
+
             } else {
-                fff = true;
+                garra.setPosition(1);
+                pitch.setPosition(0);
+                garra.setPosition(0);
             }
         }
-        // verific
-        public void vg(boolean dpad_left, boolean dpad_up, boolean dpad_down) {
-
-            if (TD.getTargetPosition() == 0) {
-                if (coletar == true) {
-                    Garra.setPosition(0);
-                    Pitch.setPosition(0);
-
-                } else {
-                    Garra.setPosition(1);
-                    Pitch.setPosition(0);
-                    Garra.setPosition(0);
-                }
-            }
-        }//criar funcao de cada botao. chamando para configurar...
+    }//criar funcao de cada botao. chamando para configurar...
 }
 
 
