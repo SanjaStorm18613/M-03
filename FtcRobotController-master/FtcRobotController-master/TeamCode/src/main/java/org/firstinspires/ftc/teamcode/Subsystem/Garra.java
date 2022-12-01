@@ -1,16 +1,20 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Garra {
 
-    boolean SPIN = true, COLEVERT = true, COLFRONT = true, COLSIDE = true;
-    boolean ElevNvCol = true;
-    double spinPos, sPos, iPos, cPos, inclPos, clawPos;
+    boolean SPIN = true, COLEVERT = true, COLFRONT = true, COLSIDE = true, CLAW = true;
+    boolean ElevNvCol = true, statsCol = false;
+    double spinPos, clawPos, inclPos;
 
     Servo roll, garra, pitch;
     Elevador Elev;
+    ElapsedTime time;
 
     public Garra(HardwareMap hardwareMap, Elevador e) {
 
@@ -19,22 +23,112 @@ public class Garra {
         pitch = hardwareMap.get(Servo.class, "Pitch");
 
         Elev = e;
+        time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        time.startTime();
     }
 
-    public void Control(boolean spin, boolean colVert, boolean colFront, boolean colSide) {
+    public void Control(boolean spin, boolean colVert, boolean colFront, boolean colSide, boolean claw) {
 
         ElevNvCol = Elev.ElvPos() == 0;
 
-        if (spin){
-            if (SPIN && ElevNvCol){
-                sPos = sPos == 0 ? 1 : 0;
+        //#region ENTREGA
+
+        //Inverte cone se estiver em entrega
+        if (spin && !ElevNvCol) {
+            if (SPIN) {
+                spinPos = spinPos == 0 ? 1 : 0;
             }
         }
 
-        
+        //Solta e recolhe garra se estiver em entrega
+        if (!ElevNvCol) {
+
+            statsCol = false;
+            clawPos = 0;
+            inclPos = 0.5;
+
+            if (colFront || colSide || colVert) {
+
+                clawPos = 1;
+                inclPos = 0;
+                spinPos = 0;
+
+            }
+
+        }
+
+        //#endregion
+
+
+        //#region COLETA
+
+        if (colVert || colFront || colSide && ElevNvCol) {
+
+            //Apos coletado recolhe a garra
+            if (statsCol) {
+
+                if (COLFRONT && COLSIDE && COLEVERT) {
+
+                    statsCol = false;
+                    clawPos = 0;
+                    spinPos = 0;
+                    inclPos = 0;
+
+                    Elev.setAjt(true);
+                }
+
+            } else {
+
+                //Posiciona a garra para coleta
+                statsCol = true;
+                clawPos = 1;
+                spinPos = 0;
+                inclPos = 0.5;
+
+
+                if (colFront && COLFRONT) {
+                    inclPos = 1;
+
+                }
+
+                if (colSide && COLSIDE) {
+                    inclPos = 1;
+                    spinPos = 0.5;
+
+                }
+
+            }
+        }
+
+        if (claw && !ElevNvCol) {
+            if (CLAW) {
+                clawPos = clawPos == 0 ? 1 : 0;
+            }
+        }
+
+        COLSIDE = !colSide;
+        COLFRONT = !colFront;
+        COLEVERT = !colVert;
+        SPIN = !spin;
+        CLAW = !claw;
+
+
+
+        garra.setPosition(clawPos);
+        if (time.time() == 700){
+            roll.setPosition(spinPos);
+        } else if(time.time() == 1300) {
+            pitch.setPosition(inclPos);
+        } else if (time.time() == 2000) {
+            time.reset();
+            Elev.setAjt(false);
+        }
+
 
     }
 
+
+    /*
     public void roll(boolean a) {//boolean dpad_down, boolean dpad_left, boolean dpad_up) {
         // inverte roll
         if (a) {
@@ -111,6 +205,7 @@ public class Garra {
             }
         }
     }//criar funcao de cada botao. chamando para configurar...
+    //*/
 }
 
 
