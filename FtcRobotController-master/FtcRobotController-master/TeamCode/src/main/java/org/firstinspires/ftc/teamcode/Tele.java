@@ -15,7 +15,6 @@ import org.firstinspires.ftc.teamcode.Subsystem.Yaw;
 
 public class Tele extends LinearOpMode {
 
-    //
     //Garra garra = new Garra(hardwareMap);
     DTMecanum drive;
     Elevador elev;
@@ -26,11 +25,11 @@ public class Tele extends LinearOpMode {
     public void runOpMode() {
 
         drive = new DTMecanum(hardwareMap);
-        yaw = new Yaw(hardwareMap);
         elev = new Elevador(hardwareMap);
-        garra = new Garra(hardwareMap, elev);
         braco = new Braco(hardwareMap, elev);
-
+        /*yaw = new Yaw(hardwareMap, elev);
+        garra = new Garra(hardwareMap, elev);
+        //*/
         waitForStart();
 
 
@@ -41,14 +40,15 @@ public class Tele extends LinearOpMode {
                     -gamepad1.left_stick_y,
                     gamepad1.right_stick_x);
 
+
             elev.Control(
-                    gamepad2.dpad_up,
-                    gamepad2.dpad_down,
-                    gamepad1.dpad_up || gamepad2.y,
-                    gamepad1.dpad_down || gamepad2.x);
+                    gamepad2.y,
+                    gamepad2.x,
+                    gamepad1.dpad_up || gamepad2.dpad_up,
+                    gamepad1.dpad_down || gamepad2.dpad_down);
 
             braco.Control();
-
+/*
             yaw.Control(
                     gamepad2.right_bumper,
                     gamepad2.left_bumper,
@@ -61,7 +61,7 @@ public class Tele extends LinearOpMode {
                     gamepad2.a,
                     gamepad2.b,
                     gamepad1.a);
-
+            //*/
 
         }
         drive.drive(0, 0, 0);

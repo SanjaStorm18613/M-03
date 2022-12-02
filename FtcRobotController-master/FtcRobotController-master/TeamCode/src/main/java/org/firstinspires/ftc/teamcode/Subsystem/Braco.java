@@ -10,11 +10,15 @@ public class Braco {
 
     double pos;
 
+    int ePosAnt = 0;
+
     public Braco(HardwareMap hardwareMap, Elevador e) {
 
 //Servos direito e esquerdo do braço
-        E = hardwareMap.get(Servo.class, "L");
-        D = hardwareMap.get(Servo.class, "R");
+        E = hardwareMap.get(Servo.class, "E");
+        D = hardwareMap.get(Servo.class, "D");
+
+        D.setDirection(Servo.Direction.REVERSE);
 
         elv = e;
 
@@ -22,9 +26,20 @@ public class Braco {
 
     public void Control() {
 
-        pos = elv.ElvPos() == 0 ? 0.1 : 0.8;
+        if (elv.ElvPos() < 2){
+            pos = 0.5;
+        } else if (elv.ElvPos() == 2) {
+            pos = 0.25;
+        } else {
+            pos = 0.15;
+        }
 
-        E.setPosition(pos);
-        D.setPosition(1 - pos);
+        if (!elv.getBusy() || ePosAnt > elv.ElvPos()){
+            E.setPosition(pos);
+            D.setPosition(pos);
+        }
+
+        ePosAnt = elv.ElvPos();
+
     }
 }
