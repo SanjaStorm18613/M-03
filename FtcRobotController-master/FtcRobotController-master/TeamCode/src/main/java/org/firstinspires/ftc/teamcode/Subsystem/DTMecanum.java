@@ -3,9 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class DTMecanum {
@@ -34,13 +32,10 @@ public class DTMecanum {
         FD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         FD.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-/*
-        FE.setDirection(DcMotor.Direction.REVERSE);
-        FD.setDirection(DcMotor.Direction.FORWARD);
-        TE.setDirection(DcMotor.Direction.REVERSE);
-        TD.setDirection(DcMotor.Direction.FORWARD);
-*/
-//Aplica 'BREAK' e 'Direction' iterando pelos motores
+
+        TE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        TE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         for (int m = 0; m < 4; m++) {
             motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motors[m].setDirection(m > 1 ? DcMotor.Direction.FORWARD :
@@ -50,7 +45,7 @@ public class DTMecanum {
     }
 
 //Controle movimentação mecanum
-    public void drive(double x, double y, double yaw) {
+    public void Control(double x, double y, double yaw) {
 
         FE.setPower((y+x+yaw) * 0.8);
         FD.setPower((y-x-yaw) * 0.8);
