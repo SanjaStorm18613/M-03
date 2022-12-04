@@ -3,28 +3,23 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 public class Elevador {
 
     DcMotor Elev;
-    Telemetry telemetry;
 
     boolean UPCtr = true, UP = true, ODWCtr = true, DOW = true;
-    double ajt = 0, vel = 0, setAjt = 0;
+    double ajt = 0, vel = 0;
     double[] nv = {0, 0, 2, 3, 4};
-    int count = 0, pos = 0;
+    int count = 0, pos = 0, setAjt = 0;
     int convert = 1480;
     boolean mxLimt = false, mnLimt = false;
 
-    public Elevador(HardwareMap hardwareMap, Telemetry t) {
+    public Elevador(HardwareMap hardwareMap) {
 
         Elev = hardwareMap.get(DcMotor.class, "Elevador");
 
         Elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        telemetry = t;
 
     }
 
@@ -69,7 +64,6 @@ public class Elevador {
 
         pos = (int) (Math.max(nv[count] + ajt, setAjt) * convert);
 
-
         pos = Math.min(pos, (int) (nv[4] * convert));
         mxLimt = pos > (nv[4] * convert);
 
@@ -87,17 +81,9 @@ public class Elevador {
         return count;
     }
 
-    public void setAjt(boolean activ, double ajt) {
-        if (activ) {
-            vel = 0.7;
-            setAjt = ajt;
-        } else {
-            vel = 0.5;
-            setAjt = 0;
-        }
-    }
+    public void setAjt(boolean activ) {
 
-    public void setPos(double pos) {
+        setAjt = activ ? 2 : 0;
 
     }
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -13,7 +15,7 @@ import org.firstinspires.ftc.teamcode.Subsystem.Yaw;
 
 public class Tele extends LinearOpMode {
 
-    //
+    //Garra garra = new Garra(hardwareMap);
     DTMecanum drive;
     Elevador elev;
     Yaw yaw;
@@ -23,35 +25,21 @@ public class Tele extends LinearOpMode {
     public void runOpMode() {
 
         drive = new DTMecanum(hardwareMap);
-        elev = new Elevador(hardwareMap, telemetry);
+        elev = new Elevador(hardwareMap);
         braco = new Braco(hardwareMap, elev);
-        yaw = new Yaw(hardwareMap, elev, telemetry);
-        garra = new Garra(hardwareMap, elev, telemetry);
+        /*yaw = new Yaw(hardwareMap, elev);
+        garra = new Garra(hardwareMap, elev);
         //*/
-
         waitForStart();
 
 
         while (opModeIsActive()) {
 
-            drive.Control(
+            drive.drive(
                     gamepad1.left_stick_x,
                     -gamepad1.left_stick_y,
                     gamepad1.right_stick_x);
 
-            yaw.Control(
-                    gamepad2.right_bumper,
-                    gamepad2.left_bumper,
-                    gamepad2.dpad_right,
-                    gamepad2.dpad_left);
-
-            garra.Control(
-                    gamepad2.a,
-                    gamepad1.a,
-                    gamepad1.b,
-                    gamepad1.x,
-                    gamepad2.b,
-                    gamepad2.x);
 
             elev.Control(
                     gamepad2.y,
@@ -60,11 +48,22 @@ public class Tele extends LinearOpMode {
                     gamepad1.dpad_down || gamepad2.dpad_down);
 
             braco.Control();
+/*
+            yaw.Control(
+                    gamepad2.right_bumper,
+                    gamepad2.left_bumper,
+                    gamepad2.dpad_right,
+                    gamepad2.dpad_left);
+
+            garra.Control(
+                    gamepad2.right_stick_button,
+                    gamepad2.y,
+                    gamepad2.a,
+                    gamepad2.b,
+                    gamepad1.a);
             //*/
 
-            telemetry.update();
-
         }
-        drive.Control(0, 0, 0);
+        drive.drive(0, 0, 0);
     }
 }

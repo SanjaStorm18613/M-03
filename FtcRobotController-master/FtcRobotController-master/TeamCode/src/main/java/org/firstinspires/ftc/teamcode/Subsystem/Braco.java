@@ -29,9 +29,9 @@ public class Braco {
         if (elv.ElvPos() < 2){
             pos = 0.5;
         } else if (elv.ElvPos() == 2) {
-            pos = 0.22;
+            pos = 0.25;
         } else {
-            pos = 0.12;
+            pos = 0.15;
         }
 
         if (!elv.getBusy() || ePosAnt > elv.ElvPos()){
