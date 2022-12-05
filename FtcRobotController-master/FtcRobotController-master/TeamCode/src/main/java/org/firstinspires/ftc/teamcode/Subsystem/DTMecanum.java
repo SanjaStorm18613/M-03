@@ -47,10 +47,10 @@ public class DTMecanum {
 //Controle movimentação mecanum
     public void Control(double x, double y, double yaw) {
 
-        FE.setPower((y+x+yaw) * 0.8);
-        FD.setPower((y-x-yaw) * 0.8);
-        TE.setPower((y-x+yaw) * 0.8);
-        TD.setPower((y+x-yaw) * 0.8);
+        FE.setPower((y+x+yaw) * 0.6);
+        FD.setPower((y-x-yaw) * 0.6);
+        TE.setPower((y-x+yaw) * 0.6);
+        TD.setPower((y+x-yaw) * 0.6);
 
     }
 /*

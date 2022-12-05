@@ -12,7 +12,7 @@ public class Elevador {
 
     boolean UPCtr = true, UP = true, ODWCtr = true, DOW = true;
     double ajt = 0, vel = 0, setAjt = 0;
-    double[] nv = {0, 0, 2, 3, 4};
+    double[] nv = {0, 0, 1.9, 3.3, 4.2};
     int count = 0, pos = 0;
     int convert = 1480;
     boolean mxLimt = false, mnLimt = false;
@@ -83,7 +83,7 @@ public class Elevador {
 
     }
 
-    public int ElvPos() {
+    public int pos() {
         return count;
     }
 
@@ -97,7 +97,11 @@ public class Elevador {
         }
     }
 
-    public void setPos(double pos) {
+    public void setPos(double p, double v) {
+
+        Elev.setTargetPosition((int) (p * convert));
+        Elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Elev.setPower(v);
 
     }
 

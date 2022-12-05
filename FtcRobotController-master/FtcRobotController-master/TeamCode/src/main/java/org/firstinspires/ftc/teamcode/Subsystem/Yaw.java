@@ -10,15 +10,17 @@ public class Yaw {
 
     DcMotor yaw;
     Elevador Elev;
+    Garra garra;
+    Braco braco;
     Telemetry telemetry;
 
-    double ang = 0, ajt = 0;
-    int pos = 0;
+    double ang = 0, ajt = 0, posAnt;
+    int pos = 0, antElvPos = 0;
 
     boolean CW = false, CCW = true, CWCTRL = true, CCWCTRL = true;
     boolean mxLimt = false, mnLimt = false;
 
-    public Yaw(HardwareMap hardwareMap, Elevador e, Telemetry t) {
+    public Yaw(HardwareMap hardwareMap, Elevador e, Telemetry t, Garra g) {
 
         yaw = hardwareMap.get(DcMotor.class, "Yaw");
         yaw.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -27,20 +29,21 @@ public class Yaw {
 
         Elev = e;
         telemetry = t;
+        garra = g;
 
     }
 
     public void Control(boolean cw, boolean ccw, boolean cwCtrl, boolean ccwCtrl) {
 
         if (cwCtrl) {
-            if (CWCTRL && !mxLimt && Elev.ElvPos() > 1) {
+            if (CWCTRL && !mxLimt && Elev.pos() > 1) {
                 CWCTRL = false;
                 ajt += 0.25;
             }
         } else CWCTRL = true;
 
         if (ccwCtrl) {
-            if (CCWCTRL && !mnLimt && Elev.ElvPos() > 1) {
+            if (CCWCTRL && !mnLimt && Elev.pos() > 1) {
                 CCWCTRL = false;
                 ajt -= 0.25;
             }
@@ -54,7 +57,6 @@ public class Yaw {
                 ang++;
                 ajt = 0;
 
-                Elev.setAjt(true, 1.5);
 
             }
 
@@ -68,11 +70,12 @@ public class Yaw {
                 ang--;
                 ajt = 0;
 
-                Elev.setAjt(true, 1.5);
             }
 
         } else CCW = true;
 
+
+        antElvPos = Elev.pos();
 
         pos = (int) ((ang + ajt) * 400);
 
@@ -82,14 +85,18 @@ public class Yaw {
         pos = Math.max(-2000, pos);
         mnLimt = pos <= -2000;
 
-
         yaw.setTargetPosition(pos);
         yaw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         yaw.setPower(Elev.getBusy() ? 0 : 1);
 
-
-        if (!yaw.isBusy() && !Elev.getBusy()) Elev.setAjt(false, 0);
+        garra.setAjt(yaw.isBusy() && (posAnt != pos));
+        posAnt = pos;
 
     }
+
+    public boolean getBusy(){
+        return yaw.isBusy();
+    }
+
 
 }
