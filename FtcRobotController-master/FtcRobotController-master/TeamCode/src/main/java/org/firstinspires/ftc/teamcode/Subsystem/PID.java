@@ -7,24 +7,27 @@ public class PID {
     Constantis.DTMecanum Const;
 
     ElapsedTime pidT;
-    double erro, deltaEr, d, i = 0, antErro = 0;
+    double erro, deltaEr, d, i = 0, antErro = 0, Pg, Ig, Dg;
 
 
-    public PID (){
+    public PID (double p,double i, double d){
 
+        Pg = p;
+        Ig = i;
+        Dg = d;
 
     }
 
-    public double PIDCorrect(double status, double sp) {
+    public double PIDresult(double status, double sp) {
 
-        double erro    = sp - status;
-        double deltaEr = erro - antErro;
-        double d       = deltaEr / pidT.time();
+        erro    = sp - status;
+        deltaEr = erro - antErro;
+        d       = deltaEr / pidT.time();
         i       += erro * pidT.time();
 
-        double P = erro * Const.P;
-        double I = i    * Const.I;
-        double D = d    * Const.D;
+        double P = erro * Pg;
+        double I = i    * Ig;
+        double D = d    * Dg;
 
         antErro = erro;
 

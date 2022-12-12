@@ -8,10 +8,21 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Garra {
 
+    double cCls = Constantis.Garra.CLAW_CLOSE,
+            cOpn = Constantis.Garra.CLAW_OPEN,
+            pDrop = Constantis.Garra.PITCH_DROP,
+            pHorz = Constantis.Garra.HORIZONTAL,
+            pFlln = Constantis.Garra.PITCH_FALLEN,
+            pElevUp = Constantis.Garra.ELEV_UP,
+            rUpPos = Constantis.Garra.ROLL_UP,
+            rDwPos = Constantis.Garra.ROLL_DOWN,
+            rSide = Constantis.Garra.ROLL_SIDE_CONE;
+
+    double pAjt = 0;
+    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false;
+
     boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
-    boolean elevNvCol = true, statsCol = false, update = false;
-    double spinPos = 0, clawPos = 0, inclPos = 0.18, ajt = 0;
-    int elevNvAnt = 0;
+    boolean elevNvCol = true, statsCol = false;
 
     Servo roll, garra, pitch;
     Elevador elev;
@@ -19,7 +30,7 @@ public class Garra {
     ElapsedTime time;
     Telemetry telemetry;
 
-    public Garra(HardwareMap hardwareMap, Elevador e, Telemetry t, Braco b) {
+    public Garra(Telemetry t, HardwareMap hardwareMap, Elevador e, Braco b) {
 
         roll = hardwareMap.get(Servo.class, "Roll");
         garra = hardwareMap.get(Servo.class, "Garra");
@@ -41,35 +52,19 @@ public class Garra {
 
     public void Control(boolean spin, boolean colVert, boolean colFront, boolean colSide, boolean retain, boolean drop) {
 
-        elevNvCol = elev.pos() == 0;
-
-        update = elev.getBusy() && elev.pos() != elevNvAnt;
-        elevNvAnt = elev.pos();
-
-        if (update) {
-
-            if (elev.pos() > 2) inclPos = 0.5;
-            else if (elev.pos() == 2) inclPos = 0.4;
-            else inclPos = .2;
-
-        }
-
+        elevNvCol = elev.getNv() == 0;
 
         //#region ENTREGA
 
         if (!elevNvCol) {
 
-            if (spin && SPIN) spinPos = spinPos == 0 ? 0.35 : 0;
+            pAjt = braco.getPos() + pDrop; //braco.getPos() * 1.3 + pDropP;
 
-            if (retain && RETAIN) {
+            if (spin && SPIN) rUp = !rUp;
 
-                if (elev.pos() > 2) inclPos = inclPos != 0.8 ? 0.8 : 0.6;
-                else if (elev.pos() == 2) inclPos = inclPos != 0.8 ? 0.8 : 0.4;
-                else inclPos = inclPos != 0.2 ? 0.2 : 0.7;
+            if (retain && RETAIN) pUp = !pUp;
 
-            }
-
-            if (drop && DROP) clawPos = clawPos == 0 ? .5 : 0;
+            if (drop && DROP) cOpen = !cOpen;
 
         }
 
@@ -78,52 +73,54 @@ public class Garra {
 
         if ((colVert || colFront || colSide || retain) && elevNvCol) {
 
-            if (retain && RETAIN) {
-                statsCol = false;
-                clawPos = 0;
-                spinPos = 0.01;
-                inclPos = 0.2;
+            rUp = true;
 
-            }
-            //Apos coletado recolhe a garra
             if (statsCol) {
+
+                pUp = true;
 
                 if ((colVert && COLVERT) || (colFront && COLFRONT) || (colSide && COLSIDE)) {
                     statsCol = false;
-                    clawPos = clawPos == 0 ? 0.5 : 0;
+                    cOpen = !cOpen;
 
                 }
 
             } else {
 
+                pUp = false;
+
                 if (colVert && COLVERT) {
                     statsCol = true;
-
-                    spinPos = 0.01;
-                    inclPos = 0.73;
-                    clawPos = clawPos == 0 ? 0.5 : 0;
+                    pColet = false;
+                    rColet = false;
+                    cOpen = !cOpen;
 
                 } else if (colFront && COLFRONT) {
                     statsCol = true;
-
-                    spinPos = 0.01;
-                    inclPos = 1.0;
-                    clawPos = clawPos == 0 ? 0.5 : 0;
+                    pColet = true;
+                    rColet = false;
+                    cOpen = !cOpen;
 
                 } else if (colSide && COLSIDE) {
                     statsCol = true;
-
-                    spinPos = 0.2;
-                    inclPos = 1.0;
-                    clawPos = clawPos == 0 ? 0.5 : 0;
+                    pColet = true;
+                    rColet = true;
+                    cOpen = !cOpen;
 
                 }
             }
+
+            if (retain && RETAIN) {
+                statsCol = false;
+                cOpen = false;
+                pColet = false;
+                rColet = false;
+
+            }
         }
 
-        if ((inclPos == 1) && elevNvCol) {
-            elev.setAjt(true, 0.35);
-
+        if (pColet && elevNvCol) {
+            elev.setAjt(true, pElevUp);
         } else {
             elev.setAjt(false, 0);
         }
@@ -135,26 +132,16 @@ public class Garra {
         RETAIN = !retain;
         DROP = !drop;
 
-        inclPos = Math.min(ajt, inclPos);
+        garra.setPosition(cOpen ? cOpn : cCls);
+        roll.setPosition((rUp ? rUpPos : rDwPos) + (rColet ? rSide : 0));
 
-        garra.setPosition(clawPos);
-        roll.setPosition(spinPos);
-
-        if (time.time() >= 1500 || !elev.getBusy()) {
-            pitch.setPosition(inclPos);
-            time.reset();
+        if (!elev.getBusy()) {
+            pitch.setPosition((pUp ? pDrop : pHorz) + (pColet ? pFlln : 0) + pAjt);
         }
 
-
     }
 
-    public void setAjt(boolean activ) {
-
-        ajt = activ ? 0 : 1;
-
-    }
-
-    public void setPos (double p, double r, double c) {
+    public void setPos(double p, double r, double c) {
 
         garra.setPosition(c);
         roll.setPosition(r);

@@ -7,106 +7,111 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Elevador {
 
-    DcMotor Elev;
+    Constantis.Elevador eVar;
+    double  nv1 = Constantis.Elevador.NV_1,
+            nv2 = Constantis.Elevador.NV_2,
+            nv3 = Constantis.Elevador.NV_3,
+            convr = Constantis.Elevador.CONVR,
+            vUp = Constantis.Elevador.UP_S,
+            vDwn = Constantis.Elevador.DOWN_S;
+
+    DcMotor elev;
     Telemetry telemetry;
 
-    boolean UPCtr = true, UP = true, ODWCtr = true, DOW = true;
-    double ajt = 0, vel = 0, setAjt = 0;
-    double[] nv = {0, 0, 1.9, 3.3, 4.2};
+    boolean UPCtr = true, UP = true, DOWNCtr = true, DOWN = true, velUp = true;
+    double ajt = 0, setAjt = 0;
+
+    double[] nv = {0, nv1, nv2, nv3};
     int count = 0, pos = 0;
-    int convert = 1480;
     boolean mxLimt = false, mnLimt = false;
 
-    public Elevador(HardwareMap hardwareMap, Telemetry t) {
+    public Elevador(Telemetry t, HardwareMap hardwareMap) {
 
-        Elev = hardwareMap.get(DcMotor.class, "Elevador");
+        elev = hardwareMap.get(DcMotor.class, "Elevador");
 
-        Elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         telemetry = t;
 
     }
 
 
-    public void Control(boolean up, boolean dow, boolean upCtr, boolean dowCtr) {
+    public void Control(boolean up, boolean down, boolean upCtr, boolean dowCtr) {
 
-        if (upCtr) {
-            if (UPCtr && !mxLimt) {
-                UPCtr = false;
+        if (upCtr && UPCtr && !mxLimt) {
                 ajt += 0.25;
-            }
-        } else UPCtr = true;
+        }
 
-        if (dowCtr) {
-            if (ODWCtr && !mnLimt) {
-                ODWCtr = false;
+        if (dowCtr && DOWNCtr && !mnLimt) {
                 ajt -= 0.25;
-            }
-        } else ODWCtr = true;
+        }
 
 
-        if (up) {
-            if (UP) {
-                UP = false;
+        if (up && UP) {
                 count++;
-                count = Math.min(4, count);
+                count = Math.min(3, count);
                 ajt = 0;
-                vel = 0.7;
-            }
-        } else UP = true;
+                velUp = true;
+        }
 
-        if (dow) {
-            if (DOW) {
-                DOW = false;
+        if (down && DOWN) {
                 count--;
                 count = Math.max(0, count);
                 ajt = 0;
-                vel = 0.5;
-            }
-        } else DOW = true;
+                velUp = false;
+        }
 
 
-        pos = (int) (Math.max(nv[count] + ajt, setAjt) * convert);
+        UPCtr = !upCtr;
+        DOWNCtr = !dowCtr;
+        UP = !up;
+        DOWN = !down;
+
+        pos = (int) (Math.max(nv[count] + ajt, setAjt) * convr);
 
 
-        pos = Math.min(pos, (int) (nv[4] * convert));
-        mxLimt = pos > (nv[4] * convert);
+        pos = Math.min(pos, (int) (nv[3] * convr));
+        mxLimt = pos > (nv[3] * convr);
 
-        pos = Math.max(pos, (int) (nv[0] * convert));
-        mnLimt = pos < (nv[0] * convert);
+        pos = Math.max(pos, (int) (nv[0] * convr));
+        mnLimt = pos < (nv[0] * convr);
 
 
-        Elev.setTargetPosition(pos);
-        Elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Elev.setPower(vel);
+        elev.setTargetPosition(pos);
+        elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        elev.setPower(velUp ? vUp : vDwn);
 
     }
 
-    public int pos() {
+    public int getNv() {
         return count;
+    }
+
+    public int getCorrentPos() {
+        return elev.getCurrentPosition();
     }
 
     public void setAjt(boolean activ, double ajt) {
         if (activ) {
-            vel = 0.7;
+            velUp = true;
             setAjt = ajt;
         } else {
-            vel = 0.5;
+            velUp = false;
             setAjt = 0;
         }
     }
 
     public void setPos(double p, double v) {
 
-        Elev.setTargetPosition((int) (p * convert));
-        Elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Elev.setPower(v);
+        elev.setTargetPosition((int) (p * convr));
+        elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        elev.setPower(v);
 
     }
 
     public boolean getBusy() {
-        return Elev.isBusy();
+        return elev.isBusy();
     }
 
 }

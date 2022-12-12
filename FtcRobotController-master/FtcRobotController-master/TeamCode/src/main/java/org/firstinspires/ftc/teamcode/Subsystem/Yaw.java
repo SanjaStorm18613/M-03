@@ -8,26 +8,31 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Yaw {
 
+    int yLimit = Constantis.Yaw.LIMIT,
+        convr = Constantis.Yaw.CONVR;
+
+    double ajuste = Constantis.Yaw.AJUST;
+
     DcMotor yaw;
-    Elevador Elev;
+    Elevador elev;
     Garra garra;
     Braco braco;
     Telemetry telemetry;
 
     double ang = 0, ajt = 0, posAnt;
-    int pos = 0, antElvPos = 0;
+    int pos = 0;
 
     boolean CW = false, CCW = true, CWCTRL = true, CCWCTRL = true;
     boolean mxLimt = false, mnLimt = false;
 
-    public Yaw(HardwareMap hardwareMap, Elevador e, Telemetry t, Garra g) {
+    public Yaw(Telemetry t, HardwareMap hardwareMap, Elevador e, Garra g) {
 
         yaw = hardwareMap.get(DcMotor.class, "Yaw");
         yaw.setDirection(DcMotorSimple.Direction.REVERSE);
         yaw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         yaw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        Elev = e;
+        elev = e;
         telemetry = t;
         garra = g;
 
@@ -35,66 +40,56 @@ public class Yaw {
 
     public void Control(boolean cw, boolean ccw, boolean cwCtrl, boolean ccwCtrl) {
 
-        if (cwCtrl) {
-            if (CWCTRL && !mxLimt && Elev.pos() > 1) {
-                CWCTRL = false;
-                ajt += 0.25;
-            }
-        } else CWCTRL = true;
+        if (cwCtrl && CWCTRL && !mxLimt && elev.getNv() > 1) ajt += ajuste;
 
-        if (ccwCtrl) {
-            if (CCWCTRL && !mnLimt && Elev.pos() > 1) {
-                CCWCTRL = false;
-                ajt -= 0.25;
-            }
-        } else CCWCTRL = true;
+        if (ccwCtrl && CCWCTRL && !mnLimt && elev.getNv() > 1) ajt -= ajuste;
+
+        posAnt = ang;
+
+        if (cw && CW && !mxLimt) {
+            ang++;
+            ajt = 0;
+        }
 
 
-        if (cw) {
+        if (ccw && CCW && !mnLimt) {
+            ang--;
+            ajt = 0;
 
-            if (CW && !mxLimt) {
-                CW = false;
-                ang++;
-                ajt = 0;
+        }
 
-
-            }
-
-        } else CW = true;
-
-
-        if (ccw) {
-
-            if (CCW && !mnLimt) {
-                CCW = false;
-                ang--;
-                ajt = 0;
-
-            }
-
-        } else CCW = true;
+        CWCTRL = !cwCtrl;
+        CCWCTRL = !ccwCtrl;
+        CW = !cw;
+        CCW = !ccw;
 
 
-        antElvPos = Elev.pos();
+        pos = (int) ((ang + ajt) * convr);
 
-        pos = (int) ((ang + ajt) * 400);
+        pos = Math.min(yLimit, pos);
+        mxLimt = pos >= yLimit;
 
-        pos = Math.min(2000, pos);
-        mxLimt = pos >= 2000;
+        pos = Math.max(-yLimit, pos);
+        mnLimt = pos <= -yLimit;
 
-        pos = Math.max(-2000, pos);
-        mnLimt = pos <= -2000;
+        if (elev.getNv() == 0) {
+            yaw.setTargetPosition(0);
+            //braco braco braco
 
-        yaw.setTargetPosition(pos);
+        } else {
+            yaw.setTargetPosition(pos);
+
+        }
+
         yaw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        yaw.setPower(Elev.getBusy() ? 0 : 1);
+        yaw.setPower(elev.getBusy() ? 0 : 1);
 
-        garra.setAjt(yaw.isBusy() && (posAnt != pos));
-        posAnt = pos;
+
+        //garra.setAjt(yaw.isBusy() && (posAnt != pos)); setAjt
 
     }
 
-    public boolean getBusy(){
+    public boolean getBusy() {
         return yaw.isBusy();
     }
 

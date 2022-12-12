@@ -23,11 +23,11 @@ public class Aut extends LinearOpMode {
 
     public void runOpMode() {
 
-        drive = new DTMecanum(hardwareMap);
-        elev = new Elevador(hardwareMap, telemetry);
-        braco = new Braco(hardwareMap, telemetry, elev);
-        garra = new Garra(hardwareMap, elev, telemetry, braco);
-        yaw = new Yaw(hardwareMap, elev, telemetry, garra);
+        drive = new DTMecanum(telemetry, hardwareMap);
+        elev  = new Elevador (telemetry, hardwareMap);
+        braco = new Braco    (telemetry, hardwareMap, elev);
+        garra = new Garra    (telemetry, hardwareMap, elev, braco);
+        yaw   = new Yaw      (telemetry, hardwareMap, elev, garra);
 
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 

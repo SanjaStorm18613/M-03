@@ -7,15 +7,22 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Braco {
 
+    double  mnP   = Constantis.Braco.MIN_POS,
+            mxP   = Constantis.Braco.MAX_POS,
+            nv    = Constantis.Elevador.NV_2,
+            convr = Constantis.Elevador.CONVR;
+
     Servo E, D;
-    Elevador elv;
+    Elevador elev;
     Telemetry telemetry;
 
-    double pos, ajt = 0.1;
+    double pos, ajt;
 
     int ePosAnt = 0;
 
-    public Braco(HardwareMap hardwareMap, Telemetry t, Elevador e) {
+    public Braco(Telemetry t, HardwareMap hardwareMap, Elevador e) {
+
+        telemetry = t;
 
 //Servos direito e esquerdo do braço
         E = hardwareMap.get(Servo.class, "E");
@@ -24,37 +31,31 @@ public class Braco {
         D.setDirection(Servo.Direction.REVERSE);
         E.setDirection(Servo.Direction.FORWARD);
 
-        elv = e;
-        telemetry = t;
+        elev = e;
 
     }
 
     public void Control() {
 
-        if (elv.pos() < 2){
-            pos = 0.71;
-        } else if (elv.pos() == 2) {
-            pos = 0.5;
-        } else {
-            pos = 0.38;
-        }
+        pos = (elev.getCorrentPos() / nv * convr) * (mxP - mnP) + mnP;
+
+        pos = Math.min(pos, mxP);
 
         pos = Math.max(pos, ajt);
 
-        telemetry.addData("bracoPos", pos);
+        E.setPosition(pos);
+        D.setPosition(pos);
 
-        if (!elv.getBusy() || ePosAnt > elv.pos()){
-            E.setPosition(pos);
-            D.setPosition(pos);
-        }
-
-        ePosAnt = elv.pos();
+        ePosAnt = elev.getNv();
 
     }
 
-    public void setAjt(boolean activ) {
+    public double getPos(){
+        return E.getPosition();
+    }
 
-        ajt = activ ? 0.5 : 0;
 
+    public void setAjt(double p) {
+        ajt = p;
     }
 }

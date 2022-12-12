@@ -22,11 +22,11 @@ public class Tele extends LinearOpMode {
 
     public void runOpMode() {
 
-        drive = new DTMecanum(hardwareMap);
-        elev = new Elevador(hardwareMap, telemetry);
-        braco = new Braco(hardwareMap, telemetry, elev);
-        garra = new Garra(hardwareMap, elev, telemetry, braco);
-        yaw = new Yaw(hardwareMap, elev, telemetry, garra);
+        drive = new DTMecanum(telemetry, hardwareMap);
+        elev  = new Elevador (telemetry, hardwareMap);
+        braco = new Braco    (telemetry, hardwareMap, elev);
+        garra = new Garra    (telemetry, hardwareMap, elev, braco);
+        yaw   = new Yaw      (telemetry, hardwareMap, elev, garra);
         //*/
 
         waitForStart();
@@ -49,6 +49,7 @@ public class Tele extends LinearOpMode {
 
             garra.Control(
                     gamepad2.a,
+
                     gamepad1.a,
                     gamepad1.b,
                     gamepad1.x,
@@ -67,6 +68,5 @@ public class Tele extends LinearOpMode {
             telemetry.update();
 
         }
-        drive.Control(0, 0, 0);
     }
 }

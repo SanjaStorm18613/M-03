@@ -1,56 +1,66 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
-import androidx.annotation.NonNull;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class DTMecanum {
 
-    Constantis.DTMecanum Const;
+    Telemetry telemetry;
 
-    DcMotor FE, FD, TE, TD;
+    Constantis.DTMecanum dtMVar;
+
+    DcMotorEx FE, FD, TE, TD;
 
     ElapsedTime pidT;
-    PID pid = new PID();
+    PID pid;
 
+    public DTMecanum(Telemetry t,  HardwareMap hardwareMap) {
 
-    public DTMecanum (@NonNull HardwareMap hardwareMap) {
+        telemetry = t;
 
-
-        //pidT = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        //pid = new PID(0, 0, 0);
 
 //Cria motores
-        FE = hardwareMap.get(DcMotor.class, "FE");
-        FD = hardwareMap.get(DcMotor.class, "FD");
-        TE = hardwareMap.get(DcMotor.class, "TE");
-        TD = hardwareMap.get(DcMotor.class, "TD");
+        FE = hardwareMap.get(DcMotorEx.class, "FE");
+        FD = hardwareMap.get(DcMotorEx.class, "FD");
+        TE = hardwareMap.get(DcMotorEx.class, "TE");
+        TD = hardwareMap.get(DcMotorEx.class, "TD");
         DcMotor motors[] = {FE, TE, FD, TD};
 
-        FE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        FD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        FE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        FD.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        TE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        TE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         for (int m = 0; m < 4; m++) {
+
+            motors[m].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motors[m].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
             motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motors[m].setDirection(m > 1 ? DcMotor.Direction.FORWARD :
-                                            DcMotor.Direction.REVERSE);
+                    DcMotor.Direction.REVERSE);
+
 
         }
     }
 
-//Controle movimentação mecanum
+    //Controle movimentação mecanum
     public void Control(double x, double y, double yaw) {
 
-        FE.setPower((y+x+yaw) * 0.6);
-        FD.setPower((y-x-yaw) * 0.6);
-        TE.setPower((y-x+yaw) * 0.6);
-        TD.setPower((y+x-yaw) * 0.6);
+        yaw = Math.pow(yaw, 2.5) * dtMVar.SPEED * dtMVar.YAW_SPEED;
+        x   = Math.pow(x, 2.5) * dtMVar.SPEED;
+        y   = Math.pow(y, 2.5) * dtMVar.SPEED;
+
+       /*
+        yaw = s * 0.7;
+        x   = s;
+        y   = s;
+//*/
+        FE.setPower(y + x + yaw);
+        FD.setPower(y - x - yaw);
+        TE.setPower(y - x + yaw);
+        TD.setPower(y + x - yaw);
 
     }
 /*
