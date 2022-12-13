@@ -7,13 +7,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Elevador {
 
-    Constantis.Elevador eVar;
     double  nv1 = Constantis.Elevador.NV_1,
             nv2 = Constantis.Elevador.NV_2,
             nv3 = Constantis.Elevador.NV_3,
             convr = Constantis.Elevador.CONVR,
-            vUp = Constantis.Elevador.UP_S,
-            vDwn = Constantis.Elevador.DOWN_S;
+            vUp = Constantis.Elevador.UP_SPEED,
+            vDwn = Constantis.Elevador.DOWN_SPEED;
 
     DcMotor elev;
     Telemetry telemetry;
@@ -81,6 +80,9 @@ public class Elevador {
         elev.setTargetPosition(pos);
         elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         elev.setPower(velUp ? vUp : vDwn);
+
+        telemetry.addData("elev NV", elev.getTargetPosition());
+        telemetry.addData("elev Pos", getCorrentPos());
 
     }
 

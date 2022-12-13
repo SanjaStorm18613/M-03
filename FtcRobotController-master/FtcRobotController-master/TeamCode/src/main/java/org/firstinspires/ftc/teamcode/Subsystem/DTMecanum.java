@@ -11,7 +11,8 @@ public class DTMecanum {
 
     Telemetry telemetry;
 
-    Constantis.DTMecanum dtMVar;
+    double  s = Constantis.DTMecanum.SPEED,
+            sY = Constantis.DTMecanum.YAW_SPEED;
 
     DcMotorEx FE, FD, TE, TD;
 
@@ -29,7 +30,7 @@ public class DTMecanum {
         FD = hardwareMap.get(DcMotorEx.class, "FD");
         TE = hardwareMap.get(DcMotorEx.class, "TE");
         TD = hardwareMap.get(DcMotorEx.class, "TD");
-        DcMotor motors[] = {FE, TE, FD, TD};
+        DcMotor[] motors = {FE, TE, FD, TD};
 
 
         for (int m = 0; m < 4; m++) {
@@ -37,7 +38,7 @@ public class DTMecanum {
             motors[m].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motors[m].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            //motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motors[m].setDirection(m > 1 ? DcMotor.Direction.FORWARD :
                     DcMotor.Direction.REVERSE);
 
@@ -48,19 +49,20 @@ public class DTMecanum {
     //Controle movimentação mecanum
     public void Control(double x, double y, double yaw) {
 
-        yaw = Math.pow(yaw, 2.5) * dtMVar.SPEED * dtMVar.YAW_SPEED;
-        x   = Math.pow(x, 2.5) * dtMVar.SPEED;
-        y   = Math.pow(y, 2.5) * dtMVar.SPEED;
-
-       /*
-        yaw = s * 0.7;
-        x   = s;
-        y   = s;
+        yaw *= s * sY;
+        x   *= s;
+        y   *= s;
 //*/
         FE.setPower(y + x + yaw);
         FD.setPower(y - x - yaw);
         TE.setPower(y - x + yaw);
         TD.setPower(y + x - yaw);
+
+        telemetry.addData("FE", FE.getPower());
+        telemetry.addData("FD", FD.getPower());
+        telemetry.addData("TE", TE.getPower());
+        telemetry.addData("TD", TD.getPower());
+
 
     }
 /*

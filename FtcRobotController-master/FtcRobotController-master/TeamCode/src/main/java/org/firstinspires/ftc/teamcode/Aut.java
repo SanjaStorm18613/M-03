@@ -27,7 +27,7 @@ public class Aut extends LinearOpMode {
         elev  = new Elevador (telemetry, hardwareMap);
         braco = new Braco    (telemetry, hardwareMap, elev);
         garra = new Garra    (telemetry, hardwareMap, elev, braco);
-        yaw   = new Yaw      (telemetry, hardwareMap, elev, garra);
+        yaw   = new Yaw      (telemetry, hardwareMap, elev, garra, braco);
 
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
