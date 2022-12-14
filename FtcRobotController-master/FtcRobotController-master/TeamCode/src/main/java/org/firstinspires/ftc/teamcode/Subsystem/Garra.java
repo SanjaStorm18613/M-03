@@ -18,7 +18,7 @@ public class Garra {
             rDwPos = Constantis.Garra.ROLL_DOWN,
             rSide = Constantis.Garra.ROLL_SIDE_CONE;
 
-    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false;
+    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false, pGrand = false;
 
     boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
     boolean elevNvCol = true, statsCol = false;
@@ -53,32 +53,34 @@ public class Garra {
 
         elevNvCol = elev.getNv() == 0;
 
-        //#region ENTREGA
-
-        if (!elevNvCol) {
-            pColet = false;
-            rColet = false;
-
-            if (spin && SPIN) rUp = !rUp;
-            if (retain && RETAIN) pUp = !pUp;
-            if (drop && DROP) cOpen = !cOpen;
-
-        }
-
-        //#endregion
-        //#region COLETA
-        if (retain && RETAIN && elevNvCol) {
-            pUp = true;
-            rUp = true;
+        if (retain && RETAIN) {
+            pUp = !pUp;
+            pGrand = true;
             cOpen = false;
             pColet = false;
             rColet = false;
 
         }
 
+        //#region ENTREGA
+
+        if (!elevNvCol) {
+            pColet = false;
+            rColet = false;
+            pGrand = false;
+
+            if (spin && SPIN) rUp = !rUp;
+            if (drop && DROP) cOpen = !cOpen;
+
+        }
+
+        //#endregion
+        //#region COLETA
+
         if ((colVert || colFront || colSide) && elevNvCol) {
             pUp = false;
             rUp = true;
+            pGrand = false;
 
             if (colVert && COLVERT) {
                 pColet = false;
@@ -106,6 +108,7 @@ public class Garra {
             braco.setAjt(0);
         }
 
+
         COLSIDE = !colSide;
         COLFRONT = !colFront;
         COLVERT = !colVert;
@@ -117,13 +120,13 @@ public class Garra {
         roll.setPosition((rUp ? rUpPos : rDwPos) + (rColet ? rSide : 0));
 
         if (/*time.time() > 1500 || elev.getNv() != 0*/ true) {
-            pitch.setPosition((pUp ? pDrop : pHorz) + (pColet ? pFlln : 0) + braco.getPos() * 0.3);
+            pitch.setPosition(-(pGrand ? 0.2 : 0) + (pUp ? pDrop : pHorz) + (pColet ? pFlln : 0) + braco.getPos());
         }
 
         telemetry.addData("claw", claw.getPosition());
         telemetry.addData("roll", roll.getPosition());
         telemetry.addData("pitch", pitch.getPosition());
-        telemetry.addData("ppos", (pUp ? pDrop : pHorz) + (pColet ? pFlln : 0) + braco.getPos());
+        telemetry.addData("pGrand", pGrand);
 
     }
 

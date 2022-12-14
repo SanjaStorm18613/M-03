@@ -8,8 +8,9 @@ public class Constantis {
                                     I = 0,
                                     D = 0;
         //Tele
-        public static final double  SPEED = .5,
-                                    YAW_SPEED = .7;
+        public static final double  SPEED = .9,
+                                    YAW_SPEED = .7,
+                                    ACCELERATION = 2000; //Tempo para atingir setpoint de velocidade
 
     }
 

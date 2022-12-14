@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -12,18 +13,31 @@ public class DTMecanum {
     Telemetry telemetry;
 
     double  s = Constantis.DTMecanum.SPEED,
-            sY = Constantis.DTMecanum.YAW_SPEED;
+            sY = Constantis.DTMecanum.YAW_SPEED,
+            acclT = Constantis.DTMecanum.ACCELERATION;
 
+    Servo odmE, odmD;
     DcMotorEx FE, FD, TE, TD;
 
-    ElapsedTime pidT;
+    boolean odmActv = false;
+    double accl = 0;
+
+    ElapsedTime pidT, moveT;
     PID pid;
 
     public DTMecanum(Telemetry t,  HardwareMap hardwareMap) {
 
+        moveT = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        moveT.startTime();
         telemetry = t;
 
         //pid = new PID(0, 0, 0);
+
+        odmE = hardwareMap.get(Servo.class, "odmE");
+        odmD = hardwareMap.get(Servo.class, "odmD");
+
+        odmE.setDirection(Servo.Direction.FORWARD);
+        odmD.setDirection(Servo.Direction.FORWARD);
 
 //Cria motores
         FE = hardwareMap.get(DcMotorEx.class, "FE");
@@ -49,20 +63,41 @@ public class DTMecanum {
     //Controle movimentação mecanum
     public void Control(double x, double y, double yaw) {
 
+        if (!odmActv) {
+            odmE.setPosition(1);
+            odmD.setPosition(1);
+            odmActv = true;
+        }
+
         yaw *= s * sY;
         x   *= s;
         y   *= s;
+
+
+        if (Math.abs(x) < 0.04 && Math.abs(y) < 0.04 && Math.abs(yaw) < 0.08) {
+            accl = 0;
+            moveT.reset();
+        } else {
+            accl = moveT.time();
+        }
+
+        telemetry.addData("moveT", accl);
+
+        accl = Math.min(accl, acclT) / acclT;
+        accl = Math.round(accl * 1000.0) / 1000.0;
+
 //*/
-        FE.setPower(y + x + yaw);
-        FD.setPower(y - x - yaw);
-        TE.setPower(y - x + yaw);
-        TD.setPower(y + x - yaw);
+        FE.setPower((y + x + yaw) * accl);
+        FD.setPower((y - x - yaw) * accl);
+        TE.setPower((y - x + yaw) * accl);
+        TD.setPower((y + x - yaw) * accl);
 
         telemetry.addData("FE", FE.getPower());
         telemetry.addData("FD", FD.getPower());
         telemetry.addData("TE", TE.getPower());
         telemetry.addData("TD", TD.getPower());
 
+        telemetry.addData("accl", accl);
 
     }
 /*
@@ -84,10 +119,7 @@ public class DTMecanum {
             TD.setPower(vel);
 
         }
-
-
     }
-
 
 //*/
 }

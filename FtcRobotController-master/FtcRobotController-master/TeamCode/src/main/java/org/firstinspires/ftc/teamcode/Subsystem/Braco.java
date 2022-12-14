@@ -42,7 +42,7 @@ public class Braco {
 
         pos = Math.max(pos, ajt);
 
-        pos = (double) Math.round(pos * 1000)/1000;
+        pos = Math.round(pos * 1000.0) / 1000.0;
 
         E.setPosition(pos);
         D.setPosition(pos);
