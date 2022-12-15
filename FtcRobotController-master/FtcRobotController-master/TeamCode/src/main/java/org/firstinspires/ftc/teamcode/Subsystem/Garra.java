@@ -61,6 +61,7 @@ public class Garra {
             rColet = false;
 
         }
+        if (drop && DROP) cOpen = !cOpen;
 
         //#region ENTREGA
 
@@ -70,7 +71,6 @@ public class Garra {
             pGrand = false;
 
             if (spin && SPIN) rUp = !rUp;
-            if (drop && DROP) cOpen = !cOpen;
 
         }
 

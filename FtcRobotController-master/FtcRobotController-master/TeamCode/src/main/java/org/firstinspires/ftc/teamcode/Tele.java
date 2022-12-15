@@ -49,8 +49,8 @@ public class Tele extends LinearOpMode {
                     gamepad1.a,
                     gamepad1.b,
                     gamepad1.x,
-                    gamepad2.b,
-                    gamepad2.right_stick_button);
+                    gamepad2.b || gamepad1.right_bumper,
+                    gamepad2.right_stick_button || gamepad1.left_bumper);
 
             braco.Control();
 

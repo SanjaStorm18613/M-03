@@ -14,7 +14,9 @@ public class DTMecanum {
 
     double  s = Constantis.DTMecanum.SPEED,
             sY = Constantis.DTMecanum.YAW_SPEED,
-            acclT = Constantis.DTMecanum.ACCELERATION;
+            acclT = Constantis.DTMecanum.ACCELERATION,
+            precs = Constantis.DTMecanum.PRECISION;
+
 
     Servo odmE, odmD;
     DcMotorEx FE, FD, TE, TD;
@@ -73,8 +75,12 @@ public class DTMecanum {
         x   *= s;
         y   *= s;
 
+        yaw = Math.round(yaw/precs) * precs;
+        x   = Math.round(x/precs) * precs;
+        y   = Math.round(y/precs) * precs;
 
-        if (Math.abs(x) < 0.04 && Math.abs(y) < 0.04 && Math.abs(yaw) < 0.08) {
+
+        if (Math.abs(x) < 0.06 && Math.abs(y) < 0.06 && Math.abs(yaw) < 0.1) {
             accl = 0;
             moveT.reset();
         } else {
@@ -100,6 +106,8 @@ public class DTMecanum {
         telemetry.addData("accl", accl);
 
     }
+
+
 /*
     public void andar(double dis, double rot, double mxvel) {
 
