@@ -18,16 +18,18 @@ public class Garra {
             rDwPos = Constantis.Garra.ROLL_DOWN,
             rSide = Constantis.Garra.ROLL_SIDE_CONE;
 
-    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false, pGrand = false;
-
-    boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
-    boolean elevNvCol = true, statsCol = false;
-
     Servo roll, claw, pitch;
     Elevador elev;
     Braco braco;
     ElapsedTime time;
     Telemetry telemetry;
+
+    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false, pGrand = false;
+
+    boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
+    boolean elevNvCol = true;
+
+    double pTime = 0;
 
     public Garra(Telemetry t, HardwareMap hardwareMap, Elevador e, Braco b) {
 
@@ -101,11 +103,15 @@ public class Garra {
         }
 
 
-        if (pColet && elevNvCol) {
-            braco.setAjt(pBracoUp);
-            //time.reset();
+        if (pColet) {
+            elev.setAjt(true, (cOpen ? 0 : 0.25) + pBracoUp);
+            pTime = time.time();
+
         } else {
-            braco.setAjt(0);
+            elev.setAjt(false, 0);
+            time.reset();
+            pTime = 0;
+
         }
 
 
@@ -116,12 +122,19 @@ public class Garra {
         RETAIN = !retain;
         DROP = !drop;
 
-        claw.setPosition(cOpen ? cOpn : cCls);
         roll.setPosition((rUp ? rUpPos : rDwPos) + (rColet ? rSide : 0));
 
-        if (/*time.time() > 1500 || elev.getNv() != 0*/ true) {
-            pitch.setPosition(-(pGrand ? 0.2 : 0) + (pUp ? pDrop : pHorz) + (pColet ? pFlln : 0) + braco.getPos());
+        if (pTime > 1300 || !pColet) {
+            pitch.setPosition(  -(pGrand ? 0.2 : 0) +
+                                (pUp ? pDrop : pHorz) +
+                                (pColet ? pFlln : 0) +
+                                braco.getPos() * 0.7);
         }
+        if (!elev.getBusy() && pColet || !elevNvCol) {
+            claw.setPosition(cOpen ? cOpn : cCls);
+
+        }
+
 
         telemetry.addData("claw", claw.getPosition());
         telemetry.addData("roll", roll.getPosition());

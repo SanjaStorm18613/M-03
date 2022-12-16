@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -30,6 +31,8 @@ public class Elevador {
 
         elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        elev.setDirection(DcMotorSimple.Direction.REVERSE);
 
         telemetry = t;
 
@@ -81,7 +84,7 @@ public class Elevador {
         elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         elev.setPower(velUp ? vUp : vDwn);
 
-        telemetry.addData("elev NV", elev.getTargetPosition());
+        telemetry.addData("elev NV", getNv());
         telemetry.addData("elev Pos", getCorrentPos());
 
     }
