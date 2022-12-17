@@ -36,9 +36,10 @@ public class Braco {
 
     public void Control() {
 
-        pos = (elev.getCorrentPos() / (nv * convr)) * (mxP - mnP) + mnP;
+        pos = (elev.getCorrentPos() / ((nv/0.9) * convr)) * (mxP - mnP) + mnP;
 
         pos = Math.min(pos, mxP);
+        pos = Math.max(pos, mnP);
 
         pos = Math.max(pos, ajt);
 

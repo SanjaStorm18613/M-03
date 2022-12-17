@@ -24,7 +24,7 @@ public class Garra {
     ElapsedTime time;
     Telemetry telemetry;
 
-    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false, pGrand = false;
+    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false, pGrand = true;
 
     boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
     boolean elevNvCol = true;
@@ -104,7 +104,7 @@ public class Garra {
 
 
         if (pColet) {
-            elev.setAjt(true, (cOpen ? 0 : 0.25) + pBracoUp);
+            elev.setAjt(true, /*(cOpen ? 0 : 0.25)*/ + pBracoUp);
             pTime = time.time();
 
         } else {
@@ -123,17 +123,17 @@ public class Garra {
         DROP = !drop;
 
         roll.setPosition((rUp ? rUpPos : rDwPos) + (rColet ? rSide : 0));
+        claw.setPosition(cOpen ? cOpn : cCls);
 
         if (pTime > 1300 || !pColet) {
-            pitch.setPosition(  -(pGrand ? 0.2 : 0) +
-                                (pUp ? pDrop : pHorz) +
+            pitch.setPosition(  (pUp ? pDrop : (pHorz-(!elevNvCol ? 0.3 : 0))) +
                                 (pColet ? pFlln : 0) +
-                                braco.getPos() * 0.7);
+                                braco.getPos() * 0.8);
         }
-        if (!elev.getBusy() && pColet || !elevNvCol) {
-            claw.setPosition(cOpen ? cOpn : cCls);
+        //if (!elev.getBusy() && pColet || !elevNvCol) {
 
-        }
+
+        //}
 
 
         telemetry.addData("claw", claw.getPosition());

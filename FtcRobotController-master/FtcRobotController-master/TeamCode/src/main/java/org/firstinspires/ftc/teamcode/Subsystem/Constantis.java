@@ -10,23 +10,23 @@ public class Constantis {
         //Tele
         public static final double  SPEED = .7,
                                     YAW_SPEED = .7,
-                                    ACCELERATION = 3000, //Tempo para atingir setpoint de velocidade
+                                    ACCELERATION = 1500, //Tempo para atingir setpoint de velocidade
                                     PRECISION = 0.25;
     }
 
     public static class Braco {
 
-        public static final double  MIN_POS = .36,
-                                    MAX_POS = .77;
+        public static final double  MIN_POS = .23,
+                                    MAX_POS = .6;
 
     }
 
     public static class Elevador {
 
-        public static final double  NV_1 = 1,
-                                    NV_2 = 2,
-                                    NV_3 = 2.94,
-                                    CONVR = 4400,
+        public static final double  NV_1 = 1.5,
+                                    NV_2 = 3,
+                                    NV_3 = 4.65,
+                                    CONVR = 1500,
                                     UP_SPEED = .9,
                                     DOWN_SPEED = .7;
 
@@ -37,12 +37,12 @@ public class Constantis {
         public static final double  CLAW_CLOSE = 0.2,
                                     CLAW_OPEN = 0.7,
                                     PITCH_DROP = 0.0,
-                                    HORIZONTAL = 0.4,
+                                    HORIZONTAL = 0.45,
                                     PITCH_FALLEN = 0.15,
                                     BRACO_UP = 0.4,
-                                    ROLL_UP = 0.2,
-                                    ROLL_DOWN = 0.55,
-                                    ROLL_SIDE_CONE = (ROLL_DOWN-ROLL_UP)/2;
+                                    ROLL_UP = 0.5,
+                                    ROLL_DOWN = 0.2,
+                                    ROLL_SIDE_CONE = (ROLL_UP-ROLL_DOWN)/2;
 
     }
 

@@ -51,6 +51,10 @@ public class Yaw {
         if (cw && CW && !mxLimt && !elevColt) ajt += ctrl;
         if (ccw && CCW && !mnLimt && !elevColt) ajt -= ctrl;
 
+        if (elevColt) {
+            ajt = 0;
+        }
+
 /*
         posAnt = ang;
 

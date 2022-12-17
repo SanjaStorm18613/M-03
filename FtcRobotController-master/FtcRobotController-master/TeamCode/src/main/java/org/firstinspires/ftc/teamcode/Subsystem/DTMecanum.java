@@ -54,7 +54,7 @@ public class DTMecanum {
             motors[m].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motors[m].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            //motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motors[m].setDirection(m > 1 ? DcMotor.Direction.FORWARD :
                     DcMotor.Direction.REVERSE);
 
