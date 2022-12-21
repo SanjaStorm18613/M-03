@@ -16,7 +16,7 @@ public class Braco {
     Elevador elev;
     Telemetry telemetry;
 
-    double pos = 0, ajt = 0;
+    double pos = 0, ajt = 0, calPos = 0;
     int ePosAnt = 0;
 
     public Braco(Telemetry t, HardwareMap hardwareMap, Elevador e) {
@@ -41,9 +41,12 @@ public class Braco {
         pos = Math.min(pos, mxP);
         pos = Math.max(pos, mnP);
 
-        pos = Math.max(pos, ajt);
-
         pos = Math.round(pos * 1000.0) / 1000.0;
+
+        calPos = pos;
+
+        pos = Math.max(pos, ajt == -1 ? pos : ajt);
+
 
         E.setPosition(pos);
         D.setPosition(pos);
@@ -57,7 +60,7 @@ public class Braco {
     }
 
     public double getPos(){
-        return E.getPosition() - mnP;
+        return calPos - mnP;
     }
 
 

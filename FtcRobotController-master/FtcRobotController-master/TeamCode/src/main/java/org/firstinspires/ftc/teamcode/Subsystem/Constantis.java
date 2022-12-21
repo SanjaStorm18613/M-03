@@ -16,7 +16,7 @@ public class Constantis {
 
     public static class Braco {
 
-        public static final double  MIN_POS = .23,
+        public static final double  MIN_POS = .37,
                                     MAX_POS = .6;
 
     }
@@ -37,9 +37,9 @@ public class Constantis {
         public static final double  CLAW_CLOSE = 0.2,
                                     CLAW_OPEN = 0.7,
                                     PITCH_DROP = 0.0,
-                                    HORIZONTAL = 0.45,
-                                    PITCH_FALLEN = 0.15,
-                                    BRACO_UP = 0.4,
+                                    HORIZONTAL = 0.47,
+                                    PITCH_FALLEN = 0.87,
+                                    ELEVADOR_UP = 0.0,
                                     ROLL_UP = 0.5,
                                     ROLL_DOWN = 0.2,
                                     ROLL_SIDE_CONE = (ROLL_UP-ROLL_DOWN)/2;

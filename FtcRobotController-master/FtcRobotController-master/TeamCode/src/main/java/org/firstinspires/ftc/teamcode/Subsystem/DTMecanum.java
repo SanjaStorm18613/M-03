@@ -98,12 +98,6 @@ public class DTMecanum {
         TE.setPower((y - x + yaw) * accl);
         TD.setPower((y + x - yaw) * accl);
 
-        telemetry.addData("FE", FE.getPower());
-        telemetry.addData("FD", FD.getPower());
-        telemetry.addData("TE", TE.getPower());
-        telemetry.addData("TD", TD.getPower());
-
-        telemetry.addData("accl", accl);
 
     }
 
