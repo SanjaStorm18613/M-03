@@ -23,11 +23,11 @@ public class AutVision extends LinearOpMode {
         vision = new VisionCtrl(this, hardwareMap, telemetry);
 
         waitForStart();
+        vision.stopStreaming();
 
         while (opModeIsActive()) {
             telemetry.update();
         }
 
-        vision.stopStreaming();
     }
 }
