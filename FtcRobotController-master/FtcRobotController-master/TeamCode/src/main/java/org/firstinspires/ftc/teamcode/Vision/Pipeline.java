@@ -16,95 +16,101 @@ import java.util.ArrayList;
 public class Pipeline extends OpenCvPipeline {
 
     Telemetry telemetry;
-    double[] lowFlt = {40, 50, 50}, upFlt = {70, 100, 100};
 
+    Scalar low1;
+    Scalar up1;
+
+
+    Scalar green = new Scalar(0, 255, 0);
+
+    Mat mat = new Mat(), mat2 = new Mat();
+    Size s = new Size(3,3);
+
+    Mat input = new Mat();
 
     public Pipeline(Telemetry t){
         telemetry = t;
+
+        //0-180
+        low1 = new Scalar(0, 100, 0);
+        up1 = new Scalar(180, 180, 180);
     }
 
 
     @Override
     public Mat processFrame(Mat orgmInpt) {
 
-        ArrayList<ArrayList<MatOfPoint>> ctrss = new ArrayList<>();
-        Mat input = new Mat();
+        ArrayList<ArrayList<MatOfPoint>> elemsArr = new ArrayList<>();
 
         //orgmInpt.copyTo(input);
         Imgproc.cvtColor(orgmInpt, input, Imgproc.COLOR_BGR2HLS);
 
         //vai ser de 3 cores diferentes
-        ctrss.add(0, this.filter(orgmInpt, lowFlt, upFlt));
-        ctrss.add(1, this.filter(orgmInpt, lowFlt, upFlt));
-        ctrss.add(2, this.filter(orgmInpt, lowFlt, upFlt));
+        elemsArr.add(0, this.colorFilter(orgmInpt, low1, up1));
+        elemsArr.add(1, this.colorFilter(orgmInpt, low1, up1));
+        elemsArr.add(2, this.colorFilter(orgmInpt, low1, up1));
 
-        int elemt = -1, arrayElemt = -1;
-        double sizeElemt = 0;
+        //telemetry.addData("size elemsArr", elemsArr.size());
 
-        for (ArrayList<MatOfPoint> ctrs: ctrss) {
 
-            if (ctrs.size() == 0) continue;
+        Imgproc.cvtColor(input, input, Imgproc.COLOR_HLS2BGR);
 
-            for (MatOfPoint ctr : ctrs){
-                if (Imgproc.contourArea(ctr) > sizeElemt) {
-                    arrayElemt = ctrss.indexOf(ctrs);
-                    elemt = ctrs.indexOf(ctr);
-                    sizeElemt = Imgproc.contourArea(ctr);
+        int elementsIdx = -1, elementssIdx = -1;
+        double area = 0;
+
+        for (ArrayList<MatOfPoint> elems: elemsArr) {
+
+            for (MatOfPoint item : elems){
+
+                if (Imgproc.contourArea(item) > area) {
+
+                    elementssIdx = elemsArr.indexOf(elems);
+                    elementsIdx = elems.indexOf(item);
+                    area = Imgproc.contourArea(item);
+
+                    //telemetry.addData(elementsIdx + "", elems.size());
+                    //telemetry.addData("area", area);
+
                 }
             }
         }
 
-        if (arrayElemt != -1 && elemt != -1) {
+        if (elementsIdx != -1) {
 
-            if (sizeElemt > 50) {
-                Rect biggestRect = Imgproc.boundingRect(ctrss.get(arrayElemt).get(elemt));
+            if (area > 50) {
+                Rect rectRange = Imgproc.boundingRect(elemsArr.get(elementssIdx).get(elementsIdx));
 
-                Point supDir = new Point(biggestRect.x, biggestRect.y);
-                Point botEsc = new Point(biggestRect.x + biggestRect.width,
-                        biggestRect.y + biggestRect.height);
-
-                Scalar green = new Scalar(0, 255, 0);
+                Point supDir = new Point(rectRange.x, rectRange.y);
+                Point botEsc = new Point(rectRange.x + rectRange.width,
+                        rectRange.y + rectRange.height);
 
                 Imgproc.rectangle(input, supDir, botEsc, green, 5);
             }
         }
 
-        return orgmInpt;
+        return input;
     }
 
     //***
-    public ArrayList<MatOfPoint> filter(Mat input, double[] low, double[] hig){
-        Mat mat = new Mat();
+    public ArrayList<MatOfPoint> colorFilter(Mat input, Scalar low, Scalar up){
 
-        //0-180
-        Scalar lower = new Scalar(20, 10, 10);
-        Scalar upper = new Scalar(100, 100, 100);
-
-        //***
-        Core.inRange(input, lower, upper, mat);
+        Core.inRange(input, low, up, mat);
 
         //Structuring element
-        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
-
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, s);
 
         //*** opening
-        Imgproc.erode(mat, mat, kernel);
-        Imgproc.dilate(mat, mat, kernel);
-        Imgproc.GaussianBlur(mat, mat, new Size(3, 3), 10);
-        Imgproc.threshold(mat, mat, 20, 255, Imgproc.THRESH_BINARY);
+        Imgproc.morphologyEx(mat, mat, Imgproc.MORPH_OPEN, kernel);
+        Imgproc.GaussianBlur(mat, mat, s, 10);
 
         ArrayList<MatOfPoint> contr = new ArrayList<>();
-        //***deveria estar aqui?
-        Mat temp = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
-        //trocar temp por new mat??
-        Imgproc.findContours(mat, contr, temp, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
 
+        Imgproc.findContours(mat, contr, mat2, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
+
+        mat2.release();
+        mat.release();
         return contr;
     }
 }
 
-/*
-            Core.bitwise_and(mat, mat, result, input);
-            mat.release();
- //*/
 

@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode;
 
 
@@ -22,12 +23,21 @@ public class AutVision extends LinearOpMode {
 
         vision = new VisionCtrl(this, hardwareMap, telemetry);
 
+        while (!opModeInInit()) {
+            telemetry.update();
+
+            waitForStart();
+        }
+
         waitForStart();
-        vision.stopStreaming();
 
         while (opModeIsActive()) {
             telemetry.update();
         }
+        vision.stopStreaming();
 
     }
 }
+
+
+//*/

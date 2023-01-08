@@ -16,7 +16,7 @@ public class Constantis {
 
     public static class Braco {
 
-        public static final double  MIN_POS = .37,
+        public static final double  MIN_POS = .29,
                                     MAX_POS = .6;
 
     }
@@ -42,7 +42,7 @@ public class Constantis {
                                     ELEVADOR_UP = 0.0,
                                     ROLL_UP = 0.5,
                                     ROLL_DOWN = 0.2,
-                                    ROLL_SIDE_CONE = (ROLL_UP-ROLL_DOWN)/2;
+                                    ROLL_SIDE_CONE = Math.abs(ROLL_DOWN-ROLL_UP)/2;
 
     }
 
