@@ -27,7 +27,7 @@ public class Garra {
     boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false;
 
     boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
-    boolean elevNvCol = true, pColetSts = false;//statusE = false, prevStatusE = false;
+    boolean elevNvCol = true, pColetSts = false;
 
     double pVel = 0, elevAjst = 0, pPos = 0, pMid = 0, pTime = 0;
 
@@ -84,7 +84,6 @@ public class Garra {
             rUp = true;
 
 
-
             if (colVert && COLVERT) {
                 pColet = false;
                 rColet = false;
@@ -119,42 +118,6 @@ public class Garra {
         RETAIN = !retain;
         DROP = !drop;
 
-        /*
-        if (pColet) {
-            prevStatusE = statusE;
-
-            if (cOpen){
-                statusE = true;
-                elev.setAjt(true, 0.4 + pElevUp);
-                braco.setAjt(-1);
-
-            } else {
-                statusE = false;
-                elev.setAjt(true, pElevUp);
-                braco.setAjt(0.2);
-
-            }
-
-            if (prevStatusE == !statusE) {
-                time.reset();
-                pTime = 0;
-
-            } else {
-                pTime = time.time();
-
-            }
-
-
-        } else {
-            elev.setAjt(false, 0);
-            time.reset();
-            pTime = 0;
-            braco.setAjt(-1);
-
-        }
-
-         */
-//problema com pUp = true
 
         if (pColetSts == !pColet) time.reset();
         pColetSts = pColet;
@@ -166,8 +129,7 @@ public class Garra {
 
         pPos = (pFlln - pHorz) * Math.abs((pColet ? 0 : 1) - pVel);
         pPos += (pUp ? pDrop : (pHorz-(!elevNvCol ? 0.3 : 0)));
-        pPos += braco.getPos() * 0.8;
-
+        pPos += braco.getPos() * 0.9;
 
         pMid = (pFlln - pHorz)/2.0;
         elevAjst = 1-Math.round(Math.abs((pPos - (pHorz + pMid)) / pMid) * 1000) / 1000.0;
@@ -175,9 +137,22 @@ public class Garra {
 
         telemetry.addData("elevAjst", elevAjst);
 
+/*
+        if (pColet) {
 
-        elev.setAjt(elevNvCol, elevAjst * 2);
+            if (cOpen) {
 
+                elev.setAjt(elevNvCol, pElevUp);
+
+            } else {
+
+                elev.setAjt(elevNvCol, elevAjst * 2);
+
+            }
+
+
+        }
+//*/
 
         roll.setPosition((rUp ? rUpPos : rDwPos) + (rColet ? rSide : 0));
         pitch.setPosition(pPos);

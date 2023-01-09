@@ -17,23 +17,25 @@ public class Pipeline extends OpenCvPipeline {
 
     Telemetry telemetry;
 
-    Scalar low1;
-    Scalar up1;
+    Scalar low1, up1, green;
+    Mat mat, mat2, input;
+    Size s;
 
-
-    Scalar green = new Scalar(0, 255, 0);
-
-    Mat mat = new Mat(), mat2 = new Mat();
-    Size s = new Size(3,3);
-
-    Mat input = new Mat();
 
     public Pipeline(Telemetry t){
         telemetry = t;
 
-        //0-180
-        low1 = new Scalar(0, 100, 0);
+
+        mat = new Mat();
+        mat2 = new Mat();
+        input = new Mat();
+
+        green = new Scalar(0, 255, 0);
+        low1 = new Scalar(0, 100, 0); //0-180
         up1 = new Scalar(180, 180, 180);
+
+        s = new Size(3,3);
+
     }
 
 
@@ -47,13 +49,13 @@ public class Pipeline extends OpenCvPipeline {
 
         //vai ser de 3 cores diferentes
         elemsArr.add(0, this.colorFilter(orgmInpt, low1, up1));
-        elemsArr.add(1, this.colorFilter(orgmInpt, low1, up1));
-        elemsArr.add(2, this.colorFilter(orgmInpt, low1, up1));
+        //elemsArr.add(1, this.colorFilter(orgmInpt, low1, up1));
+        //elemsArr.add(2, this.colorFilter(orgmInpt, low1, up1));
 
         //telemetry.addData("size elemsArr", elemsArr.size());
 
-
         Imgproc.cvtColor(input, input, Imgproc.COLOR_HLS2BGR);
+
 
         int elementsIdx = -1, elementssIdx = -1;
         double area = 0;

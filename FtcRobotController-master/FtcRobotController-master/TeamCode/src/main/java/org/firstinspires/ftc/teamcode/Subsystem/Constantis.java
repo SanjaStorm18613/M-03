@@ -16,15 +16,15 @@ public class Constantis {
 
     public static class Braco {
 
-        public static final double  MIN_POS = .29,
-                                    MAX_POS = .6;
+        public static final double  MIN_POS = .23,
+                                    MAX_POS = .65;
 
     }
 
     public static class Elevador {
 
         public static final double  NV_1 = 1.5,
-                                    NV_2 = 3,
+                                    NV_2 = 3.2,
                                     NV_3 = 4.65,
                                     CONVR = 1500,
                                     UP_SPEED = .9,
@@ -38,10 +38,10 @@ public class Constantis {
                                     CLAW_OPEN = 0.7,
                                     PITCH_DROP = 0.0,
                                     HORIZONTAL = 0.47,
-                                    PITCH_FALLEN = 0.87,
-                                    ELEVADOR_UP = 0.0,
-                                    ROLL_UP = 0.5,
-                                    ROLL_DOWN = 0.2,
+                                    PITCH_FALLEN = 0.9,
+                                    ELEVADOR_UP = 1,
+                                    ROLL_UP = 0.2,
+                                    ROLL_DOWN = 0.6,
                                     ROLL_SIDE_CONE = Math.abs(ROLL_DOWN-ROLL_UP)/2;
 
     }
