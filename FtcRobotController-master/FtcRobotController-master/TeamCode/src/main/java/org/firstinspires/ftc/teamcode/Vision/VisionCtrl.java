@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
@@ -14,7 +15,8 @@ public class VisionCtrl {
 
     HardwareMap hardwareMap;
     OpenCvWebcam webcam;
-    Pipeline detector;
+    //OpenCvCamera webcam;
+    Pipl detector;
     LinearOpMode opMode;
     Telemetry telemetry;
 
@@ -36,14 +38,15 @@ public class VisionCtrl {
                                         hardwareMap.get
                                         (WebcamName.class, "Webcam 1")
                                         , cameraMonitorViewId);
+ //*/
+        //webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
-        detector = new Pipeline(telemetry);
+        detector = new Pipl();
         initDetectionElement();
     }
 
     private void initDetectionElement() {
 
-        webcam.setPipeline(detector);
         webcam.setMillisecondsPermissionTimeout(2500);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -65,11 +68,18 @@ public class VisionCtrl {
             }
         });
 
+        webcam.setPipeline(detector);
+
     }
 
     public void stopStreaming(){
         webcam.stopStreaming();
     }
 
-
+    public double getcontourArea() {
+        return detector.getcontourArea();
+    }
+    public String getColorDetected() {
+        return detector.getColorDetected();
+    }
 }

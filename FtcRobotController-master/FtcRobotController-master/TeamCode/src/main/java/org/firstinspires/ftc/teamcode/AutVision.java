@@ -23,15 +23,18 @@ public class AutVision extends LinearOpMode {
 
         vision = new VisionCtrl(this, hardwareMap, telemetry);
 
-        while (!opModeInInit()) {
+
+        while (!isStarted()) {
+            telemetry.addData("color", vision.getColorDetected());
+            telemetry.addData("Area", vision.getcontourArea());
             telemetry.update();
 
-            waitForStart();
         }
-
         waitForStart();
 
         while (opModeIsActive()) {
+            telemetry.addData("color", vision.getColorDetected());
+            telemetry.addData("Area", vision.getcontourArea());
             telemetry.update();
         }
         vision.stopStreaming();
