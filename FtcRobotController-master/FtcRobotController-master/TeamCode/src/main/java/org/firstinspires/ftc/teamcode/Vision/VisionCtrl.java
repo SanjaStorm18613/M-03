@@ -14,8 +14,8 @@ import org.openftc.easyopencv.OpenCvWebcam;
 public class VisionCtrl {
 
     HardwareMap hardwareMap;
-    OpenCvWebcam webcam;
-    //OpenCvCamera webcam;
+    //OpenCvWebcam webcam;
+    OpenCvCamera webcam;
     Pipl detector;
     LinearOpMode opMode;
     Telemetry telemetry;
@@ -33,13 +33,13 @@ public class VisionCtrl {
                                 .getIdentifier("cameraMonitorViewId"
                                                 , "id"
                                                 , hardwareMap.appContext.getPackageName());
-
+/*
         webcam = OpenCvCameraFactory.getInstance().createWebcam(
                                         hardwareMap.get
                                         (WebcamName.class, "Webcam 1")
                                         , cameraMonitorViewId);
  //*/
-        //webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
         detector = new Pipl();
         initDetectionElement();
@@ -47,7 +47,7 @@ public class VisionCtrl {
 
     private void initDetectionElement() {
 
-        webcam.setMillisecondsPermissionTimeout(2500);
+        //webcam.setMillisecondsPermissionTimeout(2500);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 

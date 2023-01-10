@@ -19,13 +19,17 @@ public class DTMecanum {
 
 
     Servo odmE, odmD;
-    DcMotorEx FE, FD, TE, TD;
+    DcMotorEx FE, FD, TE, TD, encE, encD;
 
     boolean odmActv = false;
     double accl = 0;
 
     ElapsedTime pidT, moveT;
     PID pid;
+
+    double giro, pos, setPoint = 0;
+    ElapsedTime acel;
+    boolean moveIsBusy = false;
 
     public DTMecanum(Telemetry t,  HardwareMap hardwareMap) {
 
@@ -46,6 +50,7 @@ public class DTMecanum {
         FD = hardwareMap.get(DcMotorEx.class, "FD");
         TE = hardwareMap.get(DcMotorEx.class, "TE");
         TD = hardwareMap.get(DcMotorEx.class, "TD");
+
         DcMotor[] motors = {FE, TE, FD, TD};
 
 
@@ -57,9 +62,13 @@ public class DTMecanum {
             motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motors[m].setDirection(m > 1 ? DcMotor.Direction.FORWARD :
                     DcMotor.Direction.REVERSE);
-
-
         }
+
+        encE = hardwareMap.get(DcMotorEx.class, "encE");
+        encD = hardwareMap.get(DcMotorEx.class, "encE");
+
+        resetEnc();
+
     }
 
     //Controle movimentação mecanum
@@ -101,6 +110,51 @@ public class DTMecanum {
 
     }
 
+    public boolean move(double maxVel, double acelTime, double p, double sp) {
+
+        if (!moveIsBusy) {
+            resetEnc();
+            setPoint = sp;
+            moveIsBusy = true;
+        }
+        pos = (encE.getCurrentPosition() + encE.getCurrentPosition()) / 2.0;
+
+        while (pos < setPoint + 10 || pos > setPoint - 10) {
+
+            giro = (encE.getCurrentPosition() - encD.getCurrentPosition()) / p * 100;
+            pos = pos / p * 100;
+            setPower(pos, giro);
+
+        }
+
+
+
+        setPower(0);
+
+
+        return moveIsBusy;
+    }
+
+    public void resetEnc(){
+        encE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        encE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        encD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        encD.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void setPower(double p){
+        FE.setPower(p);
+        FD.setPower(p);
+        TE.setPower(p);
+        TD.setPower(p);
+    }
+
+    public void setPower(double p, double g){
+        FE.setPower(p + g);
+        FD.setPower(p - g);
+        TE.setPower(p + g);
+        TD.setPower(p - g);
+    }
 
 /*
     public void andar(double dis, double rot, double mxvel) {

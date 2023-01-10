@@ -18,7 +18,7 @@ public class Pipl extends OpenCvPipeline {
 
 
     Scalar low0, up0, low1, up1, low2, up2, green;
-    Mat mat, mat2, input;
+    Mat input, mat, mat2;
     Size s;
     MatOfPoint objtDetc;
     ArrayList<ArrayList<MatOfPoint>> elemsArr;
@@ -33,14 +33,15 @@ public class Pipl extends OpenCvPipeline {
 
         green = new Scalar(0, 255, 0);
 
-        low1 = new Scalar(0, 50, 60); //0-180
-        up1 = new Scalar(30, 255, 100);
+        //0-180
+        low0 = new Scalar(40, 64, 100);
+        up0 = new Scalar(90, 192, 255);//green
 
-        low0 = new Scalar(60, 50, 60); //0-180
-        up0 = new Scalar(90, 255, 100);
+        low1 = new Scalar(25, 64, 127);
+        up1 = new Scalar(35, 192, 255);//cian
 
-        low2 = new Scalar(110, 50, 60); //0-180
-        up2 = new Scalar(140, 255, 100);
+        low2 = new Scalar(0, 0, 0);
+        up2 = new Scalar(180, 30, 30);//black
 
         s = new Size(3, 3);
         elemsArr = new ArrayList<>();
@@ -56,9 +57,9 @@ public class Pipl extends OpenCvPipeline {
 
         elemsArr.clear();
 
-        elemsArr.add(0, colorFilter(low0, up0));
-        elemsArr.add(1, colorFilter(low1, up1));
-        elemsArr.add(2, colorFilter(low2, up2));
+        elemsArr.add(colorFilter(low0, up0));
+        elemsArr.add(colorFilter(low1, up1));
+        //elemsArr.add(colorFilter(low2, up2));
 
         orgmInpt.copyTo(input);
 
@@ -70,19 +71,18 @@ public class Pipl extends OpenCvPipeline {
 
             for (MatOfPoint item : elms) {
 
-                if (objtDetc == null || Imgproc.contourArea(item) > Imgproc.contourArea(objtDetc)) {
+                if (objtDetc == null ||(Imgproc.contourArea(item) > Imgproc.contourArea(objtDetc))) {
                     ObjtDetcColor = i;
                     objtDetc = item;
-
                 }
             }
             i++;
         }
 
+
         if (objtDetc != null && Imgproc.contourArea(objtDetc) > 50) {
 
             Rect rectRange = Imgproc.boundingRect(objtDetc);
-
             Point supDir = new Point(rectRange.x, rectRange.y);
             Point botEsc = new Point(rectRange.x + rectRange.width,
                     rectRange.y + rectRange.height);
@@ -109,14 +109,16 @@ public class Pipl extends OpenCvPipeline {
 
         mat.release();
         mat2.release();
-        return contourArr;
+        return(ArrayList<MatOfPoint>) contourArr.clone();
     }
 
     public double getcontourArea() {
         if (objtDetc == null) {
-            return -1;
+            return 0;
         }
-        return ObjtDetcColor;
+
+        return Imgproc.contourArea(objtDetc);
+
     }
 
     public String getColorDetected() {
@@ -126,10 +128,8 @@ public class Pipl extends OpenCvPipeline {
                 return "Green";
             case 1:
                 return "Yellow";
-            case 2:
-                return "Black";
             default:
-                return "Not Found";
+                return "Black";
         }
 
     }

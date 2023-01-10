@@ -30,7 +30,7 @@ public class AutVision extends LinearOpMode {
             telemetry.update();
 
         }
-        waitForStart();
+        //waitForStart();
 
         while (opModeIsActive()) {
             telemetry.addData("color", vision.getColorDetected());
