@@ -79,7 +79,7 @@ public class VisionCtrl {
     public double getcontourArea() {
         return detector.getcontourArea();
     }
-    public String getColorDetected() {
+    public Pipl.DetectionColor getColorDetected() {
         return detector.getColorDetected();
     }
 }

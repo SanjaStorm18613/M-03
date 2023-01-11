@@ -12,7 +12,7 @@ public class DTMecanum {
 
     Telemetry telemetry;
 
-    double  s = Constantis.DTMecanum.SPEED,
+    double s = Constantis.DTMecanum.SPEED,
             sY = Constantis.DTMecanum.YAW_SPEED,
             acclT = Constantis.DTMecanum.ACCELERATION,
             precs = Constantis.DTMecanum.PRECISION;
@@ -21,23 +21,16 @@ public class DTMecanum {
     Servo odmE, odmD;
     DcMotorEx FE, FD, TE, TD, encE, encD;
 
-    boolean odmActv = false;
-    double accl = 0;
+    boolean odmActv = false, moveIsBusy = false;
+    double yaw, pos, accl = 0, setPoint = 0, direction = 0;
+    ElapsedTime acelTime;
 
-    ElapsedTime pidT, moveT;
-    PID pid;
+    Gyro gyro;
 
-    double giro, pos, setPoint = 0;
-    ElapsedTime acel;
-    boolean moveIsBusy = false;
+    public DTMecanum(Telemetry t, HardwareMap hardwareMap) {
 
-    public DTMecanum(Telemetry t,  HardwareMap hardwareMap) {
-
-        moveT = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        moveT.startTime();
         telemetry = t;
-
-        //pid = new PID(0, 0, 0);
+        gyro = new Gyro(hardwareMap);
 
         odmE = hardwareMap.get(Servo.class, "odmE");
         odmD = hardwareMap.get(Servo.class, "odmD");
@@ -69,6 +62,9 @@ public class DTMecanum {
 
         resetEnc();
 
+        acelTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        acelTime.startTime();
+
     }
 
     //Controle movimentação mecanum
@@ -81,19 +77,19 @@ public class DTMecanum {
         }
 
         yaw *= s * sY;
-        x   *= s;
-        y   *= s;
+        x *= s;
+        y *= s;
 
-        yaw = Math.round(yaw/precs) * precs;
-        x   = Math.round(x/precs) * precs;
-        y   = Math.round(y/precs) * precs;
+        yaw = Math.round(yaw / precs) * precs;
+        x = Math.round(x / precs) * precs;
+        y = Math.round(y / precs) * precs;
 
 
         if (Math.abs(x) < 0.06 && Math.abs(y) < 0.06 && Math.abs(yaw) < 0.1) {
             accl = 0;
-            moveT.reset();
+            acelTime.reset();
         } else {
-            accl = moveT.time();
+            accl = acelTime.time();
         }
 
         telemetry.addData("moveT", accl);
@@ -110,72 +106,122 @@ public class DTMecanum {
 
     }
 
-    public boolean move(double maxVel, double acelTime, double p, double sp) {
+    public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist) {
 
-        if (!moveIsBusy) {
+        double erro, yawErro, acT;
+
+        propc *= 10;
+
+        if (dist != setPoint) {
+            setPoint = dist;
+            acelTime.reset();
             resetEnc();
-            setPoint = sp;
             moveIsBusy = true;
         }
+
         pos = (encE.getCurrentPosition() + encE.getCurrentPosition()) / 2.0;
+        erro = setPoint - pos;
+        yawErro = encE.getCurrentPosition() - encD.getCurrentPosition();
 
-        while (pos < setPoint + 10 || pos > setPoint - 10) {
+        telemetry.addData("setPoint", setPoint);
+        telemetry.addData("erro", erro);
 
-            giro = (encE.getCurrentPosition() - encD.getCurrentPosition()) / p * 100;
-            pos = pos / p * 100;
-            setPower(pos, giro);
+        if ((erro > setPoint - 10 && erro < setPoint + 10) || yawErro > 5) {
 
+            moveIsBusy = true;
+
+            acT = Math.min(1, acelTime.time() / acelT);
+            pos = (erro * acT) / propc;
+            pos = Math.min(maxVel, pos);
+            yaw = (yawErro * acT) / propc;
+            yaw = Math.min(maxVel, yaw);
+
+            setPower(pos, yaw, sideMove);
+
+        } else {
+            moveIsBusy = false;
+            setPower(0);
         }
-
-
-
-        setPower(0);
-
-
-        return moveIsBusy;
     }
 
-    public void resetEnc(){
+
+    public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist, double ang) {
+
+        double erro, yawErro, acT;
+        propc *= 10;
+
+        if (dist != setPoint) {
+            setPoint = dist;
+            acelTime.reset();
+            resetEnc();
+            moveIsBusy = true;
+        }
+
+        if (direction != direction + ang) {
+            direction += ang;
+            acelTime.reset();
+        }
+
+        pos = (encE.getCurrentPosition() + encE.getCurrentPosition()) / 2.0;
+        erro = setPoint - pos;
+        yawErro = direction - gyro.getContinuousAngle();
+
+        if ((erro > setPoint - 10 && erro < setPoint + 10) || yawErro > 5) {
+
+            moveIsBusy = true;
+
+            acT = Math.min(1, acelTime.time() / acelT);
+            pos = (erro * acT) / propc;
+            pos = Math.min(maxVel, pos);
+            yaw = (yawErro * acT) / propc;
+            yaw = Math.min(maxVel, yaw);
+
+            setPower(pos, yaw, sideMove);
+
+        } else {
+            moveIsBusy = false;
+            setPower(0);
+        }
+    }
+
+    public void resetEnc() {
         encE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         encE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         encD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         encD.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void setPower(double p){
+    public void setPower(double p) {
         FE.setPower(p);
         FD.setPower(p);
         TE.setPower(p);
         TD.setPower(p);
     }
 
-    public void setPower(double p, double g){
-        FE.setPower(p + g);
-        FD.setPower(p - g);
-        TE.setPower(p + g);
-        TD.setPower(p - g);
-    }
+    public void setPower(double p, double g, boolean side) {
 
-/*
-    public void andar(double dis, double rot, double mxvel) {
-
-        dis *= 28;
-        double encMed = (FE.getCurrentPosition() + FD.getCurrentPosition()) / 2;
-        double vel;
-
-        while (dis+10 > encMed && encMed > dis-10){
-
-            vel = pid.PIDCorrect(encMed, dis);
-            if (Math.abs(vel) > mxvel) vel = mxvel * sg(vel);
-
-
-            FE.setPower(vel);
-            FD.setPower(vel);
-            TE.setPower(vel);
-            TD.setPower(vel);
-
+        if (side) {
+            FE.setPower(p + g);
+            FD.setPower(-p - g);
+            TE.setPower(-p + g);
+            TD.setPower(p - g);
+        } else {
+            FE.setPower(p + g);
+            FD.setPower(p - g);
+            TE.setPower(p + g);
+            TD.setPower(p - g);
         }
+
     }
 
-//*/
+    public boolean isBusy() {
+        return moveIsBusy;
+    }
+
+    public void getTelemetry() {
+        telemetry.addData("FE", FE.getPower());
+        telemetry.addData("FD", FD.getPower());
+        telemetry.addData("TE", TE.getPower());
+        telemetry.addData("TD", TD.getPower());
+    }
 }
