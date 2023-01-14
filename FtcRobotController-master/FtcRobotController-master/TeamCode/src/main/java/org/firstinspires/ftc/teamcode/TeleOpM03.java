@@ -9,9 +9,9 @@ import org.firstinspires.ftc.teamcode.Subsystem.Elevador;
 import org.firstinspires.ftc.teamcode.Subsystem.Garra;
 import org.firstinspires.ftc.teamcode.Subsystem.Yaw;
 
-@TeleOp(name = "TeleOp_M-03", group = "Linear Opmode")
+@TeleOp(name = "TeleOpM03", group = "Linear Opmode")
 
-public class Tele extends LinearOpMode {
+public class TeleOpM03 extends LinearOpMode {
     
     DTMecanum drive;
     Elevador elev;
@@ -36,7 +36,7 @@ public class Tele extends LinearOpMode {
             drive.Control(
                     gamepad1.left_stick_x,
                     -gamepad1.left_stick_y,
-                    gamepad1.right_stick_x);
+                    0);//gamepad1.right_stick_x);
 
             yaw.Control(
                     gamepad2.right_bumper,

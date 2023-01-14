@@ -33,6 +33,9 @@ public class Garra {
 
     int stausC = 0, prevStatusC = 0;
 
+    double cCorrentPos = 0;
+    boolean cIsBusy = true;
+
     public Garra(Telemetry t, HardwareMap hardwareMap, Elevador e, Braco b) {
 
         roll = hardwareMap.get(Servo.class, "Roll");
@@ -128,7 +131,7 @@ public class Garra {
         pVel = elevNvCol ? pVel : 1;
 
         pPos = (pFlln - pHorz) * Math.abs((pColet ? 0 : 1) - pVel);
-        pPos += (pUp ? pDrop : (pHorz-(!elevNvCol ? 0.3 : 0)));
+        pPos += (pUp ? pDrop : (pHorz-(elevNvCol ? 0 : 0.3)));
         pPos += braco.getPos() * 0.9;
 
         pMid = (pFlln - pHorz)/2.0;
@@ -167,16 +170,30 @@ public class Garra {
         //telemetry.addData("claw", claw.getPosition());
         //telemetry.addData("roll", roll.getPosition());
         //telemetry.addData("pitch", pitch.getPosition());
-        telemetry.addData("pVel", pVel);
 
     }
 
-    public void setPos(double p, double r, double c) {
+    public void setClaw(double c, int t) {
 
-        claw.setPosition(c);
-        roll.setPosition(r);
-        pitch.setPosition(p);
+        claw.setPosition(c == 1.0 ? cOpn : cCls);
+        roll.setPosition(rUpPos);
+        pitch.setPosition(pDrop + 0.1);
 
+        if (cCorrentPos != claw.getPosition() && !cIsBusy) {
+            time.reset();
+            cIsBusy = true;
+        }
+        cCorrentPos = claw.getPosition();
+
+        cIsBusy = time.time() < t;
+
+        telemetry.addData("cCorrentPos", cCorrentPos);
+        telemetry.addData("time", time.time());
+
+    }
+
+    public boolean getBusy(){
+        return cIsBusy;
     }
 
 }

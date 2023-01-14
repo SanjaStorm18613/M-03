@@ -13,18 +13,20 @@ public class ElevadorCtrl extends LinearOpMode {
 
     public void runOpMode() {
 
-        e = hardwareMap.get(DcMotor.class, "FE");
-        d = hardwareMap.get(DcMotor.class, "FD");
+        e = hardwareMap.get(DcMotor.class, "Elevador");
+        //d = hardwareMap.get(DcMotor.class, "FD");
 
         e.setDirection(DcMotorSimple.Direction.FORWARD);
-        d.setDirection(DcMotorSimple.Direction.REVERSE);
+        //d.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
 
         while (opModeIsActive()) {
 
-            e.setPower(gamepad1.left_stick_y);
-            d.setPower(gamepad1.left_stick_y);
+            if (gamepad1.dpad_up || gamepad2.dpad_up) e.setPower(0.4);
+            else if (gamepad1.dpad_down || gamepad2.dpad_down) e.setPower(-0.4);
+            else e.setPower(0.0);
+
 
         }
     }

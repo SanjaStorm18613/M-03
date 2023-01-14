@@ -3,12 +3,10 @@ package org.firstinspires.ftc.teamcode.Vision;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.openftc.easyopencv.OpenCvWebcam;
 
 
 public class VisionCtrl {
@@ -16,7 +14,7 @@ public class VisionCtrl {
     HardwareMap hardwareMap;
     //OpenCvWebcam webcam;
     OpenCvCamera webcam;
-    Pipl detector;
+    PipelineColors detector;
     LinearOpMode opMode;
     Telemetry telemetry;
 
@@ -41,7 +39,7 @@ public class VisionCtrl {
  //*/
         webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
-        detector = new Pipl();
+        detector = new PipelineColors();
         initDetectionElement();
     }
 
@@ -79,7 +77,7 @@ public class VisionCtrl {
     public double getcontourArea() {
         return detector.getcontourArea();
     }
-    public Pipl.DetectionColor getColorDetected() {
+    public PipelineColors.DetectionColor getColorDetected() {
         return detector.getColorDetected();
     }
 }

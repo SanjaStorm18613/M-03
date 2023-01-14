@@ -2,6 +2,14 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 
 public class Constantis {
 
+    public static class Pipeline {
+
+        public static final int[][] COLOR_LOW = {{40, 64, 100},  {25, 64, 127}},//HLS
+                                    COLOR_UP =  {{90, 192, 255}, {35, 192, 255}};
+        public static final int TOLERANCE_AREA = 50;
+
+    }
+
     public static class DTMecanum {
         //Autonomo
         public static final double  P = 0,
@@ -11,7 +19,10 @@ public class Constantis {
         public static final double  SPEED = .7,
                                     YAW_SPEED = .7,
                                     ACCELERATION = 1500, //Tempo para atingir setpoint de velocidade
-                                    PRECISION = 0.25;
+                                    PRECISION = 0.25,
+                                    TOLERANCE_DISTANCE = 100,
+                                    TOLERANCE_ANGLE = 100,
+                                    COVERTION = 50;
     }
 
     public static class Braco {
@@ -28,7 +39,10 @@ public class Constantis {
                                     NV_3 = 4.65,
                                     CONVR = 1500,
                                     UP_SPEED = .9,
-                                    DOWN_SPEED = .7;
+                                    DOWN_SPEED = .7,
+                                    AJUSTE = 0.25;
+
+        public static final int TOLERANCE = 100;
 
     }
 

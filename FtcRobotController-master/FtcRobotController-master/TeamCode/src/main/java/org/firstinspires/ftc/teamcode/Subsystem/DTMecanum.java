@@ -15,7 +15,10 @@ public class DTMecanum {
     double s = Constantis.DTMecanum.SPEED,
             sY = Constantis.DTMecanum.YAW_SPEED,
             acclT = Constantis.DTMecanum.ACCELERATION,
-            precs = Constantis.DTMecanum.PRECISION;
+            precs = Constantis.DTMecanum.PRECISION,
+            tolDist = Constantis.DTMecanum.TOLERANCE_DISTANCE,
+            tolAngle = Constantis.DTMecanum.TOLERANCE_ANGLE,
+            covt = Constantis.DTMecanum.COVERTION;
 
 
     Servo odmE, odmD;
@@ -60,7 +63,7 @@ public class DTMecanum {
         encE = hardwareMap.get(DcMotorEx.class, "encE");
         encD = hardwareMap.get(DcMotorEx.class, "encE");
 
-        resetEnc();
+        //resetEnc();
 
         acelTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         acelTime.startTime();
@@ -94,7 +97,7 @@ public class DTMecanum {
 
         telemetry.addData("moveT", accl);
 
-        accl = Math.min(accl, acclT) / acclT;
+        accl = Math.min(1, accl / acclT);
         accl = Math.round(accl * 1000.0) / 1000.0;
 
 //*/
@@ -110,7 +113,8 @@ public class DTMecanum {
 
         double erro, yawErro, acT;
 
-        propc *= 10;
+        propc *= covt;
+        dist *= covt;
 
         if (dist != setPoint) {
             setPoint = dist;
@@ -119,22 +123,30 @@ public class DTMecanum {
             moveIsBusy = true;
         }
 
-        pos = (encE.getCurrentPosition() + encE.getCurrentPosition()) / 2.0;
+        if (sideMove) {
+            pos = (TD.getCurrentPosition() - FD.getCurrentPosition());
+        } else {
+            pos = (FE.getCurrentPosition() + FD.getCurrentPosition());
+        }
+        pos /= 2.0;
+
         erro = setPoint - pos;
-        yawErro = encE.getCurrentPosition() - encD.getCurrentPosition();
+        yawErro = encE.getCurrentPosition() - encD.getCurrentPosition();//enc
 
-        telemetry.addData("setPoint", setPoint);
-        telemetry.addData("erro", erro);
 
-        if ((erro > setPoint - 10 && erro < setPoint + 10) || yawErro > 5) {
+        if ((Math.abs(erro) > tolDist) || yawErro > tolAngle) {
 
             moveIsBusy = true;
 
             acT = Math.min(1, acelTime.time() / acelT);
-            pos = (erro * acT) / propc;
-            pos = Math.min(maxVel, pos);
-            yaw = (yawErro * acT) / propc;
+
+            pos = erro / propc;
+            pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
+            pos *= acT;
+
+            yaw = yawErro / propc;
             yaw = Math.min(maxVel, yaw);
+            yaw *= acT;
 
             setPower(pos, yaw, sideMove);
 
@@ -148,7 +160,9 @@ public class DTMecanum {
     public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist, double ang) {
 
         double erro, yawErro, acT;
-        propc *= 10;
+
+        propc *= covt;
+        dist *= covt;
 
         if (dist != setPoint) {
             setPoint = dist;
@@ -162,19 +176,30 @@ public class DTMecanum {
             acelTime.reset();
         }
 
-        pos = (encE.getCurrentPosition() + encE.getCurrentPosition()) / 2.0;
+        if (sideMove) {
+            pos = (TD.getCurrentPosition() - FD.getCurrentPosition());
+        } else {
+            pos = (FE.getCurrentPosition() + FD.getCurrentPosition());
+        }
+        pos /= 2.0;
+
         erro = setPoint - pos;
         yawErro = direction - gyro.getContinuousAngle();
 
-        if ((erro > setPoint - 10 && erro < setPoint + 10) || yawErro > 5) {
+
+        if ((Math.abs(erro) > tolDist) || yawErro > tolAngle) {
 
             moveIsBusy = true;
 
             acT = Math.min(1, acelTime.time() / acelT);
-            pos = (erro * acT) / propc;
-            pos = Math.min(maxVel, pos);
-            yaw = (yawErro * acT) / propc;
+
+            pos = erro / propc;
+            pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
+            pos *= acT;
+
+            yaw = yawErro / propc;
             yaw = Math.min(maxVel, yaw);
+            yaw *= acT;
 
             setPower(pos, yaw, sideMove);
 
@@ -185,10 +210,20 @@ public class DTMecanum {
     }
 
     public void resetEnc() {
-        encE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        /*encE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         encE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         encD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         encD.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+         */
+        FD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FD.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        TD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        TD.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        TE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        TE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
     public void setPower(double p) {
@@ -214,14 +249,16 @@ public class DTMecanum {
 
     }
 
-    public boolean isBusy() {
+    public boolean getBusy() {
         return moveIsBusy;
     }
-
+/*
     public void getTelemetry() {
         telemetry.addData("FE", FE.getPower());
         telemetry.addData("FD", FD.getPower());
         telemetry.addData("TE", TE.getPower());
         telemetry.addData("TD", TD.getPower());
     }
+ */
+
 }

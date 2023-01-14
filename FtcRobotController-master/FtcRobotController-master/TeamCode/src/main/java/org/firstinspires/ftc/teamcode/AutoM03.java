@@ -12,6 +12,9 @@ import org.firstinspires.ftc.teamcode.Subsystem.Garra;
 import org.firstinspires.ftc.teamcode.Subsystem.Yaw;
 import org.firstinspires.ftc.teamcode.Vision.VisionCtrl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 @Autonomous(name = "AutoM03", group = "Linear Opmode")
 public class AutoM03 extends LinearOpMode {
 
@@ -23,10 +26,7 @@ public class AutoM03 extends LinearOpMode {
     ElapsedTime time;
     VisionCtrl vision;
 
-    double[] distances = {100, 50, -50, 20, 0};
-    double[] rotations = {90, -90};
-
-    int step = 0;
+    double parkArea = 0;
 
     public void runOpMode() {
 
@@ -37,36 +37,105 @@ public class AutoM03 extends LinearOpMode {
         yaw = new Yaw(telemetry, hardwareMap, eleve, garra, braco);
 
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        time.startTime();
 /*
         vision = new VisionCtrl(this, hardwareMap, telemetry);
 
         while (!isStarted() && !isStopRequested()) {
             switch (vision.getColorDetected()) {
                 case GREEN:
-                    distances[4] = -50;
+                    parkArea = -50;
                 case BLACK:
-                    distances[4] = 0;
+                    parkArea = 0;
                 case CIAN:
-                    distances[4] = 50;
+                    parkArea = 50;
             }
             telemetry.addData("Color Detected", vision.getColorDetected());
             telemetry.update();
         }
- */
+ //*/
+
+        ArrayList<Double> steps = new ArrayList<>(Arrays.asList(
+                1.,//yw
+                50.,//dr
+                0.,//yw
+                -50.,//dr
+                -1.//yw
+        ));
+
+        ArrayList<Boolean> forward = new ArrayList<>(Arrays.asList(
+                false,
+                false,
+                false,
+                false,
+                true
+        ));
+
+        ArrayList<Integer> stepCtrl = new ArrayList<>(Arrays.asList(
+                //0-dr, 1-el, 2-cl, 3-yw
+                3,
+                0,
+                3,
+                0,
+                3
+        ));
+
+
         waitForStart();
 
-        while (opModeIsActive()) {
 
-            drive.move(false, 0.9, 1500, 10, distances[0]);
+        while (opModeIsActive() && stepCtrl.size() != 0) {
 
-            if (!drive.isBusy()) {
-                step = Math.min(distances.length - 1, step + 1);
+            switch (stepCtrl.get(0)) {
+
+                case 0:
+                    drive.move(forward.get(0), 0.5, 1500, 10, steps.get(0));
+                    if (!drive.getBusy() && stepCtrl.size() > 0) {
+                        stepCtrl.remove(0);
+                        steps.remove(0);
+                        forward.remove(0);
+                    }
+                    break;
+
+                case 1:
+                    eleve.setPos(steps.get(0), 0.7);
+                    if (!eleve.getBusy() && stepCtrl.size() > 0) {
+                        stepCtrl.remove(0);
+                        steps.remove(0);
+                    }
+                    break;
+
+                case 2:
+                    garra.setClaw(steps.get(0), 2000);
+                    if (!garra.getBusy() && stepCtrl.size() > 0) {
+                        stepCtrl.remove(0);
+                        steps.remove(0);
+                    }
+                    break;
+
+                case 3:
+                    yaw.setPos(steps.get(0), .9);
+                    if (!yaw.getBusy() && stepCtrl.size() > 0) {
+                        stepCtrl.remove(0);
+                        steps.remove(0);
+                    }
+                    break;
             }
+            //*/
 
-            telemetry.addData("IDX", step);
-            telemetry.addData("isBusy", drive.isBusy());
-            drive.getTelemetry();
             telemetry.update();
         }
     }
 }
+/*
+            .3,//el
+            .0,//cl
+            50.0,//dr-f
+            .5,//el
+            -20.0,//dr-t
+            1.0,//cl
+            20.0,//dr-t
+            .0,//el
+            20.0,//dr-f
+            parkArea//dr-t
+ */

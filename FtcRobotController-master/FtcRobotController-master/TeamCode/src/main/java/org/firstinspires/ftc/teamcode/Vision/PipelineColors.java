@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Vision;
 
+import org.firstinspires.ftc.teamcode.Subsystem.Constantis;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -12,9 +13,14 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
-public class Pipl extends OpenCvPipeline {
+public class PipelineColors extends OpenCvPipeline {
 
-    Scalar low0, up0, low1, up1, low2, up2, green;
+    int[][] cUp = Constantis.Pipeline.COLOR_UP,
+            cLw = Constantis.Pipeline.COLOR_LOW;
+
+    int tolerance = Constantis.Pipeline.TOLERANCE_AREA;
+
+    Scalar low0, up0, low1, up1, up2, green;
     Mat input, mat, mat2;
     Size s;
     MatOfPoint objtDetc;
@@ -22,7 +28,8 @@ public class Pipl extends OpenCvPipeline {
     ArrayList<MatOfPoint> contourArr;
     int ObjtDetcColor = -1;
 
-    public Pipl() {
+
+    public PipelineColors() {
 
         mat = new Mat();
         mat2 = new Mat();
@@ -31,14 +38,11 @@ public class Pipl extends OpenCvPipeline {
         green = new Scalar(0, 255, 0);
 
         //0-180
-        low0 = new Scalar(40, 64, 100);
-        up0 = new Scalar(90, 192, 255);//green
+        low0 = new Scalar(cLw[0][0], cLw[0][1], cLw[0][2]);
+        up0 = new Scalar(cUp[0][0], cUp[0][1], cUp[0][2]);//green
 
-        low1 = new Scalar(25, 64, 127);
-        up1 = new Scalar(35, 192, 255);//cian
-
-        low2 = new Scalar(0, 0, 0);
-        up2 = new Scalar(180, 30, 30);//black
+        low1 = new Scalar(cLw[1][0], cLw[1][1], cLw[1][2]);
+        up2 = new Scalar(cUp[1][0], cUp[1][1], cUp[1][2]);//cian
 
         s = new Size(3, 3);
         elemsArr = new ArrayList<>();
@@ -55,7 +59,6 @@ public class Pipl extends OpenCvPipeline {
 
         elemsArr.add(colorFilter(low0, up0));
         elemsArr.add(colorFilter(low1, up1));
-        //elemsArr.add(colorFilter(low2, up2));
 
         orgmInpt.copyTo(input);
 
@@ -76,7 +79,7 @@ public class Pipl extends OpenCvPipeline {
         }
 
 
-        if (objtDetc != null && Imgproc.contourArea(objtDetc) > 50) {
+        if (objtDetc != null && Imgproc.contourArea(objtDetc) > tolerance) {
 
             Rect rectRange = Imgproc.boundingRect(objtDetc);
             Point supDir = new Point(rectRange.x, rectRange.y);

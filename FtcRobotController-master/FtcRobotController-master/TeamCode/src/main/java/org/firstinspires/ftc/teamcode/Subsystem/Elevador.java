@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -13,9 +14,11 @@ public class Elevador {
             nv3 = Constantis.Elevador.NV_3,
             convr = Constantis.Elevador.CONVR,
             vUp = Constantis.Elevador.UP_SPEED,
-            vDwn = Constantis.Elevador.DOWN_SPEED;
+            vDwn = Constantis.Elevador.DOWN_SPEED,
+            ajuste = Constantis.Elevador.AJUSTE;
+    int tolerance = Constantis.Elevador.TOLERANCE;
 
-    DcMotor elev;
+    DcMotorEx elev;
     Telemetry telemetry;
 
     boolean UPCtr = true, UP = true, DOWNCtr = true, DOWN = true, velUp = true;
@@ -27,12 +30,13 @@ public class Elevador {
 
     public Elevador(Telemetry t, HardwareMap hardwareMap) {
 
-        elev = hardwareMap.get(DcMotor.class, "Elevador");
+        elev = hardwareMap.get(DcMotorEx.class, "Elevador");
 
         elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         elev.setDirection(DcMotorSimple.Direction.REVERSE);
+        elev.setTargetPositionTolerance(tolerance);
 
         telemetry = t;
 
@@ -42,11 +46,11 @@ public class Elevador {
     public void Control(boolean up, boolean down, boolean upCtr, boolean dowCtr) {
 
         if (upCtr && UPCtr && !mxLimt) {
-                ajt += 0.25;
+                ajt += ajuste;
         }
 
         if (dowCtr && DOWNCtr && !mnLimt) {
-                ajt -= 0.25;
+                ajt -= ajuste;
         }
 
 
@@ -91,6 +95,10 @@ public class Elevador {
 
     public int getNv() {
         return count;
+    }
+
+    public double getTargetPosition() {
+        return elev.getTargetPosition();
     }
 
     public int getCorrentPos() {
