@@ -102,7 +102,7 @@ public class Yaw {
         yaw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         yaw.setPower(1);
 
-        telemetry.addData("yaw", yaw.getTargetPosition());
+        //telemetry.addData("yaw", yaw.getTargetPosition());
     }
 
     public boolean getBusy() {

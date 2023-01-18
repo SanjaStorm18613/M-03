@@ -11,10 +11,7 @@ public class Constantis {
     }
 
     public static class DTMecanum {
-        //Autonomo
-        public static final double  P = 0,
-                                    I = 0,
-                                    D = 0;
+
         //Tele
         public static final double  SPEED = .7,
                                     YAW_SPEED = .7,
@@ -49,14 +46,15 @@ public class Constantis {
     public static class Garra {
 
         public static final double  CLAW_CLOSE = 0.2,
-                                    CLAW_OPEN = 0.7,
-                                    PITCH_DROP = 0.0,
+                                    CLAW_OPEN = 0.5,
+                                    PITCH_DROP = 0.1,
                                     HORIZONTAL = 0.47,
-                                    PITCH_FALLEN = 0.9,
-                                    ELEVADOR_UP = 1,
+                                    PITCH_FALLEN = 0.8,
+                                    ELEVADOR_UP = .8,
                                     ROLL_UP = 0.2,
                                     ROLL_DOWN = 0.6,
-                                    ROLL_SIDE_CONE = Math.abs(ROLL_DOWN-ROLL_UP)/2;
+                                    ROLL_SIDE_CONE = Math.abs(ROLL_DOWN-ROLL_UP)/2,
+                                    TRANSITION_TIME = 1500;
 
     }
 

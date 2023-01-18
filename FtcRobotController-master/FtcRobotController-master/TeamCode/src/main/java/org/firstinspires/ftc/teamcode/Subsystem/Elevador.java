@@ -88,7 +88,7 @@ public class Elevador {
         elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         elev.setPower(velUp ? vUp : vDwn);
 
-        telemetry.addData("elev NV", getNv());
+        //telemetry.addData("getTargetPosition", elev.getTargetPosition());
         telemetry.addData("elev Pos", getCorrentPos());
 
     }

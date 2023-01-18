@@ -95,7 +95,7 @@ public class DTMecanum {
             accl = acelTime.time();
         }
 
-        telemetry.addData("moveT", accl);
+        //telemetry.addData("moveT", accl);
 
         accl = Math.min(1, accl / acclT);
         accl = Math.round(accl * 1000.0) / 1000.0;

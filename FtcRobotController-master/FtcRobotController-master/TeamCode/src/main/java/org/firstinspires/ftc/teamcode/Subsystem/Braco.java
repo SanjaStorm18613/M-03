@@ -52,11 +52,13 @@ public class Braco {
         D.setPosition(pos);
 
         ePosAnt = elev.getNv();
-
+/*
         telemetry.addData("braco", E.getPosition());
         telemetry.addData("pos", pos);
         telemetry.addData("getPos", getPos());
 
+
+// */
     }
 
     public double getPos(){
