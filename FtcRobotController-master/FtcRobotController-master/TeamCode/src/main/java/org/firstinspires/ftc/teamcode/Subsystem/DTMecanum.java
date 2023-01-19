@@ -12,34 +12,32 @@ public class DTMecanum {
 
     Telemetry telemetry;
 
-    double s = Constantis.DTMecanum.SPEED,
-            sY = Constantis.DTMecanum.YAW_SPEED,
-            acclT = Constantis.DTMecanum.ACCELERATION,
+    double speed = Constantis.DTMecanum.SPEED,
             precs = Constantis.DTMecanum.PRECISION,
             tolDist = Constantis.DTMecanum.TOLERANCE_DISTANCE,
             tolAngle = Constantis.DTMecanum.TOLERANCE_ANGLE,
-            covt = Constantis.DTMecanum.COVERTION;
+            covert = Constantis.DTMecanum.COVERTION;
 
 
-    Servo odmE, odmD;
+    Servo sOdmE, sOdmD;
     DcMotorEx FE, FD, TE, TD, encE, encD;
-
-    boolean odmActv = false, moveIsBusy = false;
-    double yaw, pos, accl = 0, setPoint = 0, direction = 0;
-    ElapsedTime acelTime;
-
     Gyro gyro;
+    ElapsedTime acelT;
+
+    boolean sOdmActv = false, moveIsBusy = false;
+    double turn, pos, accl = 0, setPoint = 0, direction = 0;
+
 
     public DTMecanum(Telemetry t, HardwareMap hardwareMap) {
 
         telemetry = t;
         gyro = new Gyro(hardwareMap);
 
-        odmE = hardwareMap.get(Servo.class, "odmE");
-        odmD = hardwareMap.get(Servo.class, "odmD");
+        sOdmE = hardwareMap.get(Servo.class, "odmE");
+        sOdmD = hardwareMap.get(Servo.class, "odmD");
 
-        odmE.setDirection(Servo.Direction.FORWARD);
-        odmD.setDirection(Servo.Direction.FORWARD);
+        encE = hardwareMap.get(DcMotorEx.class, "encE");
+        encD = hardwareMap.get(DcMotorEx.class, "encE");
 
 //Cria motores
         FE = hardwareMap.get(DcMotorEx.class, "FE");
@@ -57,54 +55,54 @@ public class DTMecanum {
 
             motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motors[m].setDirection(m > 1 ? DcMotor.Direction.FORWARD :
-                    DcMotor.Direction.REVERSE);
+                                            DcMotor.Direction.REVERSE);
         }
 
-        encE = hardwareMap.get(DcMotorEx.class, "encE");
-        encD = hardwareMap.get(DcMotorEx.class, "encE");
+        sOdmE.setDirection(Servo.Direction.FORWARD);
+        sOdmD.setDirection(Servo.Direction.FORWARD);
 
         //resetEnc();
 
-        acelTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        acelTime.startTime();
+        acelT = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        acelT.startTime();
 
     }
 
     //Controle movimentação mecanum
-    public void Control(double x, double y, double yaw) {
+    public void Control(double x, double y, double t) {
 
-        if (!odmActv) {
-            odmE.setPosition(1);
-            odmD.setPosition(1);
-            odmActv = true;
+        if (!sOdmActv) {
+            sOdmE.setPosition(1);
+            sOdmD.setPosition(1);
+            sOdmActv = true;
         }
 
-        yaw *= s * sY;
-        x *= s;
-        y *= s;
+        t *= speed * Constantis.DTMecanum.YAW_SPEED;
+        x *= speed;
+        y *= speed;
 
-        yaw = Math.round(yaw / precs) * precs;
+        t = Math.round(t / precs) * precs;
         x = Math.round(x / precs) * precs;
         y = Math.round(y / precs) * precs;
 
 
-        if (Math.abs(x) < 0.06 && Math.abs(y) < 0.06 && Math.abs(yaw) < 0.1) {
+        if (Math.abs(x) < 0.06 && Math.abs(y) < 0.06 && Math.abs(t) < 0.1) {
             accl = 0;
-            acelTime.reset();
+            acelT.reset();
         } else {
-            accl = acelTime.time();
+            accl = acelT.time();
         }
 
         //telemetry.addData("moveT", accl);
 
-        accl = Math.min(1, accl / acclT);
+        accl = Math.min(1, accl / Constantis.DTMecanum.ACCELERATION);
         accl = Math.round(accl * 1000.0) / 1000.0;
 
 //*/
-        FE.setPower((y + x + yaw) * accl);
-        FD.setPower((y - x - yaw) * accl);
-        TE.setPower((y - x + yaw) * accl);
-        TD.setPower((y + x - yaw) * accl);
+        FE.setPower((y + x + t) * accl);
+        FD.setPower((y - x - t) * accl);
+        TE.setPower((y - x + t) * accl);
+        TD.setPower((y + x - t) * accl);
 
 
     }
@@ -113,12 +111,12 @@ public class DTMecanum {
 
         double erro, yawErro, acT;
 
-        propc *= covt;
-        dist *= covt;
+        propc *= covert;
+        dist *= covert;
 
         if (dist != setPoint) {
             setPoint = dist;
-            acelTime.reset();
+            this.acelT.reset();
             resetEnc();
             moveIsBusy = true;
         }
@@ -138,17 +136,17 @@ public class DTMecanum {
 
             moveIsBusy = true;
 
-            acT = Math.min(1, acelTime.time() / acelT);
+            acT = Math.min(1, this.acelT.time() / acelT);
 
             pos = erro / propc;
             pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
             pos *= acT;
 
-            yaw = yawErro / propc;
-            yaw = Math.min(maxVel, yaw);
-            yaw *= acT;
+            turn = yawErro / propc;
+            turn = Math.min(maxVel, turn);
+            turn *= acT;
 
-            setPower(pos, yaw, sideMove);
+            setPower(pos, turn, sideMove);
 
         } else {
             moveIsBusy = false;
@@ -161,19 +159,19 @@ public class DTMecanum {
 
         double erro, yawErro, acT;
 
-        propc *= covt;
-        dist *= covt;
+        propc *= covert;
+        dist *= covert;
 
         if (dist != setPoint) {
             setPoint = dist;
-            acelTime.reset();
+            this.acelT.reset();
             resetEnc();
             moveIsBusy = true;
         }
 
         if (direction != direction + ang) {
             direction += ang;
-            acelTime.reset();
+            this.acelT.reset();
         }
 
         if (sideMove) {
@@ -191,17 +189,17 @@ public class DTMecanum {
 
             moveIsBusy = true;
 
-            acT = Math.min(1, acelTime.time() / acelT);
+            acT = Math.min(1, this.acelT.time() / acelT);
 
             pos = erro / propc;
             pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
             pos *= acT;
 
-            yaw = yawErro / propc;
-            yaw = Math.min(maxVel, yaw);
-            yaw *= acT;
+            turn = yawErro / propc;
+            turn = Math.min(maxVel, turn);
+            turn *= acT;
 
-            setPower(pos, yaw, sideMove);
+            setPower(pos, turn, sideMove);
 
         } else {
             moveIsBusy = false;

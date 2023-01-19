@@ -90,10 +90,10 @@ public class Yaw {
 
 
         if (Math.abs(yaw.getCurrentPosition()) > 100) {
-            braco.setAjt(bracoUp);
+            braco.setAjt(Math.max(bracoUp, braco.getCorrentPos()));
             elev.setAjt(true, 0.35);
         } else {
-            braco.setAjt(0);
+            braco.setAjt(-1);
             elev.setAjt(false, 0);
 
         }

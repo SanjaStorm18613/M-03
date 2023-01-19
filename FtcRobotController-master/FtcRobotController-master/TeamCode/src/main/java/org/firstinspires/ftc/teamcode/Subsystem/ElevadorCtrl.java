@@ -16,7 +16,8 @@ public class ElevadorCtrl extends LinearOpMode {
         e = hardwareMap.get(DcMotor.class, "Elevador");
         //d = hardwareMap.get(DcMotor.class, "FD");
 
-        e.setDirection(DcMotorSimple.Direction.FORWARD);
+        e.setDirection(DcMotorSimple.Direction.REVERSE);
+        e.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //d.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
@@ -27,6 +28,8 @@ public class ElevadorCtrl extends LinearOpMode {
             else if (gamepad1.dpad_down || gamepad2.dpad_down) e.setPower(-0.4);
             else e.setPower(0.0);
 
+            telemetry.addData("pos", e.getCurrentPosition() / Constantis.Elevador.CONVR);
+            telemetry.update();
 
         }
     }
