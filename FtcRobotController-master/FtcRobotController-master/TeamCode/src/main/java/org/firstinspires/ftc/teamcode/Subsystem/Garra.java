@@ -20,7 +20,7 @@ public class Garra {
     ElapsedTime time;
     Telemetry telemetry;
 
-    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false;
+    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false, pDrop = false;
     boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
     boolean elevNvCol = true, pColetSts = false, init, cIsBusy = true;
 
@@ -63,6 +63,7 @@ public class Garra {
             cOpen = false;
             pColet = false;
             rColet = false;
+            pDrop = !pDrop;
 
         }
         if (drop && DROP) cOpen = !cOpen;
@@ -71,11 +72,10 @@ public class Garra {
 
         //#region ENTREGA
 
-        if (!elevNvCol) {
+        if (spin && SPIN) {
             pColet = false;
             rColet = false;
-
-            if (spin && SPIN) rUp = !rUp;
+            rUp = !rUp;
 
         }
 
@@ -85,7 +85,8 @@ public class Garra {
 
         if ((colVert || colFront || colSide) && elevNvCol) {
             pUp = false;
-            rUp = true;
+            pDrop = false;
+            //rUp = true;
 
 
             if (colVert && COLVERT) {
@@ -128,7 +129,7 @@ public class Garra {
         pColetSts = pColet;
 
         pTranstTime = Constantis.Garra.TRANSITION_TIME;
-        if (pUp) pTranstTime += 1000;
+        if (pUp) pTranstTime += 500;
 
         pTime = Math.min(time.time(), pTranstTime);
 
@@ -170,15 +171,17 @@ public class Garra {
         // Controle do pitch
         pPos = (Constantis.Garra.PITCH_FALLEN - pHorzPos) * pVel; // Abaixa/levanta o pitch para coleta caido/horizontal pelo tempo
         if (pUp) pPos += pDropPos + pHorzPos * pVel; // Guarda a garra
-        else if (elevNvCol) pPos += pHorzPos; // Abaixa para coleta horizontal
-        else pPos += pHorzPos -.3; // Abaixa a garra para entrega
+        else if (pDrop) pPos += pHorzPos -.3; // Abaixa para coleta horizontal
+        else pPos += pHorzPos; // Abaixa a garra para entrega
         pPos += braco.getPos(); // Controle proporcinal ao braço
 
         pitch.setPosition(pPos);
 
         // Controla roll apos movimento do pitch
         if (pTime >= pTranstTime || !elevNvCol || init) {
-            roll.setPosition((rUp ? rUpPos : Constantis.Garra.ROLL_DOWN) + (rColet ? Constantis.Garra.ROLL_SIDE_CONE : 0));
+            if (rColet) roll.setPosition(Constantis.Garra.ROLL_SIDE_CONE);
+            else roll.setPosition(rUp ? rUpPos : Constantis.Garra.ROLL_DOWN);
+
         }
 
 /*

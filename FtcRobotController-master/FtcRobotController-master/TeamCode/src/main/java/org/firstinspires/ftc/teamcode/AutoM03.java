@@ -30,11 +30,12 @@ public class AutoM03 extends LinearOpMode {
 
     public void runOpMode() {
 
-        drive = new DTMecanum(telemetry, hardwareMap);
         eleve = new Elevador(telemetry, hardwareMap);
         braco = new Braco(telemetry, hardwareMap, eleve);
         garra = new Garra(telemetry, hardwareMap, eleve, braco);
         yaw = new Yaw(telemetry, hardwareMap, eleve, garra, braco);
+        drive = new DTMecanum(telemetry, hardwareMap, yaw);
+
 
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         time.startTime();

@@ -23,15 +23,17 @@ public class DTMecanum {
     DcMotorEx FE, FD, TE, TD, encE, encD;
     Gyro gyro;
     ElapsedTime acelT;
+    Yaw yaw;
 
     boolean sOdmActv = false, moveIsBusy = false;
     double turn, pos, accl = 0, setPoint = 0, direction = 0;
 
 
-    public DTMecanum(Telemetry t, HardwareMap hardwareMap) {
+    public DTMecanum(Telemetry t, HardwareMap hardwareMap, Yaw y) {
 
         telemetry = t;
         gyro = new Gyro(hardwareMap);
+        yaw = y;
 
         sOdmE = hardwareMap.get(Servo.class, "odmE");
         sOdmD = hardwareMap.get(Servo.class, "odmD");
@@ -66,16 +68,22 @@ public class DTMecanum {
         acelT = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         acelT.startTime();
 
+
     }
 
     //Controle movimentação mecanum
-    public void Control(double x, double y, double t) {
+    public void Control(double x, double y, double t, boolean slw) {
 
         if (!sOdmActv) {
             sOdmE.setPosition(1);
             sOdmD.setPosition(1);
             sOdmActv = true;
         }
+
+        if (slw) speed = Constantis.DTMecanum.SPEED / 2.0;
+        else speed = Constantis.DTMecanum.SPEED;
+
+        if (yaw.getInverted()) speed *= -1;
 
         t *= speed * Constantis.DTMecanum.YAW_SPEED;
         x *= speed;
@@ -104,6 +112,7 @@ public class DTMecanum {
         TE.setPower((y - x + t) * accl);
         TD.setPower((y + x - t) * accl);
 
+        getTelemetry();
 
     }
 
@@ -250,13 +259,13 @@ public class DTMecanum {
     public boolean getBusy() {
         return moveIsBusy;
     }
-/*
+
     public void getTelemetry() {
         telemetry.addData("FE", FE.getPower());
         telemetry.addData("FD", FD.getPower());
         telemetry.addData("TE", TE.getPower());
         telemetry.addData("TD", TD.getPower());
     }
- */
+ //*/
 
 }

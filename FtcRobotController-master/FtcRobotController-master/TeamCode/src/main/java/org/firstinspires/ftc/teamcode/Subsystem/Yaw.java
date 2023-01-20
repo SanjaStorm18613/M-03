@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -20,9 +21,10 @@ public class Yaw {
     Garra garra;
     Braco braco;
     Telemetry telemetry;
+    ElapsedTime time;
 
-    double ang = 0, ajt = 0, posAnt = 0;
-    int pos = 0;
+    double ajt = 0, relationPos = 0, t1 = 0;
+    int pos = 0, cont = 0;
 
     boolean CW = false, CCW = true, CWCTRL = true, CCWCTRL = true;
     boolean mxLimt = false, mnLimt = false, elevColt = true;
@@ -39,47 +41,32 @@ public class Yaw {
         garra = g;
         telemetry = t;
 
+        time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     }
 
     public void Control(boolean cw, boolean ccw, boolean cwCtrl, boolean ccwCtrl) {
 
         elevColt = elev.getNv() == 0;
 
-        if (cwCtrl && CWCTRL && !mxLimt && !elevColt) ajt += ajuste;
-        if (ccwCtrl && CCWCTRL && !mnLimt && !elevColt) ajt -= ajuste;
-
-        if (cw && CW && !mxLimt && !elevColt) ajt += ctrl;
-        if (ccw && CCW && !mnLimt && !elevColt) ajt -= ctrl;
-
-        if (elevColt) {
-            ajt = 0;
-        }
-
-/*
-        posAnt = ang;
-
-        if (cw && CW && !mxLimt) {
-            ang++;
-            ajt = 0;
+        if (!cw && !ccw && !cwCtrl && !ccwCtrl) {
+            time.reset();
+            t1 = 0;
+        } else if (t1 + 100 < time.time()) {
+            t1 += 100;
         }
 
 
-        if (ccw && CCW && !mnLimt) {
-            ang--;
-            ajt = 0;
+        if (cwCtrl && !mxLimt && !elevColt) ajt = t1 * ajuste / 100;
+        if (ccwCtrl && !mnLimt && !elevColt) ajt = t1 * ajuste / 100;
 
-        }
-
-        CW = !cw;
-        CCW = !ccw;
-*/
+        if (cw && CW && !mxLimt && !elevColt) ajt = ctrl;
+        if (ccw && CCW && !mnLimt && !elevColt) ajt = ctrl;
 
         CWCTRL = !cwCtrl;
         CCWCTRL = !ccwCtrl;
         CW = !cw;
         CCW = !ccw;
 
-        //pos = (int) ((ang + ajt) * convr);
         pos = (int) (ajt * convr);
 
         pos = Math.min(yLimit, pos);
@@ -88,21 +75,26 @@ public class Yaw {
         pos = Math.max(-yLimit, pos);
         mnLimt = pos <= -yLimit;
 
+        if (getInverted()) relationPos = braco.getCorrentPos() - ctrl * 4;
+        else relationPos = braco.getCorrentPos();
+        relationPos = Math.abs(relationPos);
 
-        if (Math.abs(yaw.getCurrentPosition()) > 100) {
-            braco.setAjt(Math.max(bracoUp, braco.getCorrentPos()));
-            elev.setAjt(true, 0.35);
-        } else {
-            braco.setAjt(-1);
-            elev.setAjt(false, 0);
+        if (relationPos > 100) elev.setAjt(true, 1.0);
+        else elev.setAjt(false, 0);
 
-        }
 
-        yaw.setTargetPosition(elevColt ? 0 : pos);
+        if (elevColt) {
+            if (getInverted()) yaw.setTargetPosition((int) ctrl * 4);
+            else yaw.setTargetPosition(0);
+
+        } else yaw.setTargetPosition(pos);
+
         yaw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         yaw.setPower(1);
 
-        //telemetry.addData("yaw", yaw.getTargetPosition());
+        telemetry.addData("yaw", yaw.getTargetPosition());
+        telemetry.addData("posyaw", pos);
+
     }
 
     public boolean getBusy() {
@@ -114,6 +106,13 @@ public class Yaw {
         yaw.setTargetPosition((int) (p * convr));
         yaw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         yaw.setPower(v);
+
+    }
+
+    public boolean getInverted() {
+
+        if (Math.abs(yaw.getCurrentPosition()) > ctrl * 2 && Math.abs(yaw.getCurrentPosition()) < ctrl * 6) return true;
+        else return false;
 
     }
 

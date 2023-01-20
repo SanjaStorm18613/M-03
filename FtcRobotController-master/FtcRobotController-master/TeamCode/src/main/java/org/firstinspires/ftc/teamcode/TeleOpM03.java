@@ -21,11 +21,12 @@ public class TeleOpM03 extends LinearOpMode {
 
     public void runOpMode() {
 
-        drive = new DTMecanum(telemetry, hardwareMap);
         elev  = new Elevador (telemetry, hardwareMap);
         braco = new Braco    (telemetry, hardwareMap, elev);
         garra = new Garra    (telemetry, hardwareMap, elev, braco);
         yaw   = new Yaw      (telemetry, hardwareMap, elev, garra, braco);
+        drive = new DTMecanum(telemetry, hardwareMap, yaw);
+
         //*/
 
         waitForStart();
@@ -36,7 +37,8 @@ public class TeleOpM03 extends LinearOpMode {
             drive.Control(
                     gamepad1.left_stick_x,
                     -gamepad1.left_stick_y,
-                    0);//gamepad1.right_stick_x);
+                    gamepad1.right_stick_x,
+                    gamepad1.right_trigger > 0.1);
 
             yaw.Control(
                     gamepad2.right_bumper,

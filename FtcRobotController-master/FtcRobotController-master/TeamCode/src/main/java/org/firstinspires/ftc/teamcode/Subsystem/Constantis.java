@@ -33,7 +33,7 @@ public class Constantis {
 
         public static final double  NV_1 = 1.5,
                                     NV_2 = 3.2,
-                                    NV_3 = 4.78,
+                                    NV_3 = 4.8,
                                     CONVR = 1500,
                                     UP_SPEED = .9,
                                     DOWN_SPEED = .7,
@@ -60,7 +60,7 @@ public class Constantis {
 
     public static class Yaw {
 
-        public static final int     LIMIT = 2000,
+        public static final int     LIMIT = 5000,
                                     CONVR = 400;
         public static final double  AJUST = 0.06,
                                     CONTROL = .3,
