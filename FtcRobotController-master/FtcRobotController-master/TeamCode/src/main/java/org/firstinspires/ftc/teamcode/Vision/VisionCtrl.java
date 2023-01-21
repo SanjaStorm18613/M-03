@@ -74,10 +74,8 @@ public class VisionCtrl {
         webcam.stopStreaming();
     }
 
-    public double getcontourArea() {
-        return detector.getcontourArea();
+    public PipelineColors getPipeline() {
+        return detector;
     }
-    public PipelineColors.DetectionColor getColorDetected() {
-        return detector.getColorDetected();
-    }
+
 }

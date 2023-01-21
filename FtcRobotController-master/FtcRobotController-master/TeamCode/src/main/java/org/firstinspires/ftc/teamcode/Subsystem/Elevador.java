@@ -34,6 +34,7 @@ public class Elevador {
 
         elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        elev.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         elev.setDirection(DcMotorSimple.Direction.REVERSE);
         elev.setTargetPositionTolerance(tolerance);
@@ -45,13 +46,9 @@ public class Elevador {
 
     public void Control(boolean up, boolean down, boolean upCtr, boolean dowCtr) {
 
-        if (upCtr && UPCtr && !mxLimt) {
-                ajt += ajuste;
-        }
+        if (upCtr && UPCtr && !mxLimt) ajt += ajuste;
 
-        if (dowCtr && DOWNCtr && !mnLimt) {
-                ajt -= ajuste;
-        }
+        if (dowCtr && DOWNCtr && !mnLimt) ajt -= ajuste;
 
 
         if (up && UP) {
@@ -86,7 +83,9 @@ public class Elevador {
 
         elev.setTargetPosition(pos);
         elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        elev.setPower(velUp ? vUp : vDwn);
+
+        if (elev.isBusy()) elev.setPower(velUp ? vUp : vDwn);
+        else elev.setPower(0);
 
         //telemetry.addData("getTargetPosition", elev.getTargetPosition());
         telemetry.addData("elev Pos", getCorrentPos());

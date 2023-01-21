@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.Subsystem.DTMecanum;
 import org.firstinspires.ftc.teamcode.Subsystem.Elevador;
 import org.firstinspires.ftc.teamcode.Subsystem.Garra;
 import org.firstinspires.ftc.teamcode.Subsystem.Yaw;
+import org.firstinspires.ftc.teamcode.Vision.PipelineColors;
 import org.firstinspires.ftc.teamcode.Vision.VisionCtrl;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class AutoM03 extends LinearOpMode {
         eleve = new Elevador(telemetry, hardwareMap);
         braco = new Braco(telemetry, hardwareMap, eleve);
         garra = new Garra(telemetry, hardwareMap, eleve, braco);
-        yaw = new Yaw(telemetry, hardwareMap, eleve, garra, braco);
+        yaw = new Yaw(telemetry, hardwareMap, eleve);
         drive = new DTMecanum(telemetry, hardwareMap, yaw);
 
 
@@ -41,6 +42,7 @@ public class AutoM03 extends LinearOpMode {
         time.startTime();
 /*
         vision = new VisionCtrl(this, hardwareMap, telemetry);
+
 
         while (!isStarted() && !isStopRequested()) {
             switch (vision.getColorDetected()) {

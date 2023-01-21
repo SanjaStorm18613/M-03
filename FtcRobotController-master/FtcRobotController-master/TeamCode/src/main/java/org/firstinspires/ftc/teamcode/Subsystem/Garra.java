@@ -8,26 +8,23 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Garra {
 
-    double pDropPos = Constantis.Garra.PITCH_DROP,
-            pHorzPos = Constantis.Garra.HORIZONTAL,
-            pElevPos = Constantis.Garra.ELEVADOR_UP,
-            rUpPos = Constantis.Garra.ROLL_UP,
-            pTranstTime = Constantis.Garra.TRANSITION_TIME;
-
     Servo roll, clawD, clawE, pitch;
     Elevador elev;
     Braco braco;
     ElapsedTime time;
     Telemetry telemetry;
 
-    boolean cOpen = false, pUp = true, rUp = true, pColet = false, rColet = false, pDrop = false;
-    boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
-    boolean elevNvCol = true, pColetSts = false, init, cIsBusy = true;
+    double  pDropPos = Constantis.Garra.PITCH_DROP,
+            pFallenPos = Constantis.Garra.PITCH_FALLEN,
+            pTranstTime = Constantis.Garra.TRANSITION_TIME;
 
-    double cTargetPos = 0, pVel = 0, elevAjst = 0, pPos = 0, pTime = 0;
+    double pVel = 0, elevAjst = 0, pPos = 0, pTime = 0, pPrevPos = 0, rPos = 0, cTargetPos = 0;
+
+    boolean cOpen = false;
+    boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
+    boolean elevNvCol = true, cIsBusy = false, init;
 
     int cStatus = 0, cPrevStatus = 0;
-
 
     public Garra(Telemetry t, HardwareMap hardwareMap, Elevador e, Braco b) {
 
@@ -54,65 +51,52 @@ public class Garra {
     }
 
     public void Control(boolean spin, boolean colVert, boolean colFront, boolean colSide, boolean retain, boolean drop) {
-
         elevNvCol = elev.getNv() == 0;
+        pPrevPos = pPos;
 
-        //#region ENTREGA E COLETA
+        //#region COPILOTO
         if (retain && RETAIN) {
-            pUp = !pUp;
             cOpen = false;
-            pColet = false;
-            rColet = false;
-            pDrop = !pDrop;
+            if (elev.getTargetPosition() > 0 && elevNvCol) pPos = pPos != pDropPos ? pDropPos : pDropPos + .3;
+            else pPos = pPos != pDropPos ? pDropPos : pFallenPos;
 
         }
         if (drop && DROP) cOpen = !cOpen;
 
-        //#endregion
-
-        //#region ENTREGA
-
         if (spin && SPIN) {
-            pColet = false;
-            rColet = false;
-            rUp = !rUp;
-
+            rPos = rPos != Constantis.Garra.ROLL_UP ? Constantis.Garra.ROLL_UP : Constantis.Garra.ROLL_DOWN;
+            cOpen = false;
         }
-
         //#endregion
 
-        //#region COLETA
-
+        //#region PILOTO
         if ((colVert || colFront || colSide) && elevNvCol) {
-            pUp = false;
-            pDrop = false;
-            //rUp = true;
-
 
             if (colVert && COLVERT) {
-                pColet = false;
-                rColet = false;
+                rPos = rPos == Constantis.Garra.ROLL_SIDE_CONE ? Constantis.Garra.ROLL_UP : rPos;
                 cOpen = !cOpen;
                 cPrevStatus = cStatus;
                 cStatus = 1;
+                pPos = Constantis.Garra.HORIZONTAL;
 
             } else if (colFront && COLFRONT) {
-                pColet = true;
-                rColet = false;
+                rPos = rPos == Constantis.Garra.ROLL_SIDE_CONE ? Constantis.Garra.ROLL_UP : rPos;
                 cOpen = !cOpen;
                 cPrevStatus = cStatus;
                 cStatus = 2;
+                pPos = pFallenPos;
 
             } else if (colSide && COLSIDE) {
-                pColet = true;
-                rColet = true;
+                rPos = Constantis.Garra.ROLL_SIDE_CONE;
                 cOpen = !cOpen;
                 cPrevStatus = cStatus;
                 cStatus = 3;
-
+                pPos = pFallenPos;
             }
         }
         //#endregion
+
+        cOpen = cOpen || cStatus != cPrevStatus;
 
         COLSIDE = !colSide;
         COLFRONT = !colFront;
@@ -121,84 +105,51 @@ public class Garra {
         RETAIN = !retain;
         DROP = !drop;
 
-        // Controle de velocidade por tempo
-        if (pColetSts == !pColet) {
-            time.reset();
-            init = false;
+        if (pPrevPos != pPos) {
+            if (pPos == pFallenPos || pPrevPos == pFallenPos) {
+                time.reset();
+                init = false;
+            }
         }
-        pColetSts = pColet;
 
-        pTranstTime = Constantis.Garra.TRANSITION_TIME;
-        if (pUp) pTranstTime += 500;
-
+        pTranstTime = Constantis.Garra.TRANSITION_TIME * Math.abs(pPos - pitch.getPosition()) / pFallenPos;
         pTime = Math.min(time.time(), pTranstTime);
-
-        if (elevNvCol && !init) {
-            pVel = Math.round(Math.min(pTime / pTranstTime, 1) * 1000)/1000.0;
-
-            if (!pColet) pVel = 1 - pVel;
-
-        } else pVel = 0;
+        if (elevNvCol && !init) pVel = Math.round(Math.min(pTime / pTranstTime, 1) * 1000) / 1000.0;
+        else pVel = 1;
 
 
-        // Controle do elevador para coletar cone caido
         double pMid = pTranstTime / 2.0;
         elevAjst = -Math.abs(pTime - pMid) / pMid + 1;
         elevAjst = Math.max(elevAjst, 0);
 
-
-        // Controle da garra para fechar em cima do cone caido
-        cOpen = cOpen || cStatus != cPrevStatus;
-
-        if (pColet) {
-            if (elev.getCorrentPos() < 500) braco.setAjt(.18);
-            else braco.setAjt(-1);
-
+        if (pPos == pFallenPos) {
             if (cOpen) {
-                elevAjst = pElevPos;
+                elevAjst = Constantis.Garra.ELEVADOR_UP;
                 claw(true);
-            } else if (elev.getCorrentPos() < 80) claw(false);
+            }
+
+            if (elev.getCorrentPos() < 80) claw(false);
+            else if (elev.getCorrentPos() < 500) braco.setAjt(.18);
+            else braco.setAjt(-1);
 
         } else {
             claw(cOpen);
             braco.setAjt(-1);
         }
 
-        // Aplica o controle do elevador
-        if (!init) elev.setAjt(elevNvCol, elevAjst * pElevPos);
+        if (!init) elev.setAjt(elevNvCol, elevAjst * Constantis.Garra.ELEVADOR_UP);
 
+        pPos += braco.getPos();
+        pitch.setPosition(pitch.getPosition() + (pPos - pitch.getPosition()) * pVel);
+        if (pTime >= pTranstTime || !elevNvCol || init) roll.setPosition(rPos);
 
-        // Controle do pitch
-        pPos = (Constantis.Garra.PITCH_FALLEN - pHorzPos) * pVel; // Abaixa/levanta o pitch para coleta caido/horizontal pelo tempo
-        if (pUp) pPos += pDropPos + pHorzPos * pVel; // Guarda a garra
-        else if (pDrop) pPos += pHorzPos -.3; // Abaixa para coleta horizontal
-        else pPos += pHorzPos; // Abaixa a garra para entrega
-        pPos += braco.getPos(); // Controle proporcinal ao braço
-
-        pitch.setPosition(pPos);
-
-        // Controla roll apos movimento do pitch
-        if (pTime >= pTranstTime || !elevNvCol || init) {
-            if (rColet) roll.setPosition(Constantis.Garra.ROLL_SIDE_CONE);
-            else roll.setPosition(rUp ? rUpPos : Constantis.Garra.ROLL_DOWN);
-
-        }
-
-/*
-        telemetry.addData("elevAjst", elevAjst);
-        telemetry.addData("cOpen", cOpen);
-        telemetry.addData("pVel", pVel);
-        telemetry.addData("claw", clawD.getPosition());
-        telemetry.addData("roll", roll.getPosition());
-        telemetry.addData("pitch", pitch.getPosition());
-//*/
     }
 
     public void setClaw(double c, int t) {
 
         claw(c == 1.0);
 
-        roll.setPosition(rUpPos);
+        roll.setPosition(Constantis.Garra.ROLL_UP);
         pitch.setPosition(pDropPos + 0.1);
 
         if (cTargetPos != clawD.getPosition() && !cIsBusy) {
@@ -208,9 +159,6 @@ public class Garra {
         cTargetPos = clawD.getPosition();
 
         cIsBusy = time.time() < t;
-
-        telemetry.addData("cCorrentPos", cTargetPos);
-        telemetry.addData("time", time.time());
 
     }
 

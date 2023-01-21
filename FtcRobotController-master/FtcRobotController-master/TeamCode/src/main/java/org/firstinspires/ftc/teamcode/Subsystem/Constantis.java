@@ -54,7 +54,7 @@ public class Constantis {
                                     ROLL_UP = 0.2,
                                     ROLL_DOWN = 0.6,
                                     ROLL_SIDE_CONE = Math.abs(ROLL_DOWN-ROLL_UP)/2,
-                                    TRANSITION_TIME = 1000;
+                                    TRANSITION_TIME = 1500;
 
     }
 

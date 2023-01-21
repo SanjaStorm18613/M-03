@@ -83,9 +83,9 @@ public class DTMecanum {
         if (slw) speed = Constantis.DTMecanum.SPEED / 2.0;
         else speed = Constantis.DTMecanum.SPEED;
 
-        if (yaw.getInverted()) speed *= -1;
-
         t *= speed * Constantis.DTMecanum.YAW_SPEED;
+
+        if (yaw.getInverted()) speed *= -1;
         x *= speed;
         y *= speed;
 

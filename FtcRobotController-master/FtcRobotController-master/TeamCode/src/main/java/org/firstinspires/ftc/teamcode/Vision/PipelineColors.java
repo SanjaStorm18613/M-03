@@ -37,22 +37,20 @@ public class PipelineColors extends OpenCvPipeline {
 
         green = new Scalar(0, 255, 0);
 
-        //0-180
+        s = new Size(3, 3);
+        elemsArr = new ArrayList<>();
+        contourArr = new ArrayList<>();
+
         low0 = new Scalar(cLw[0][0], cLw[0][1], cLw[0][2]);
         up0 = new Scalar(cUp[0][0], cUp[0][1], cUp[0][2]);//green
 
         low1 = new Scalar(cLw[1][0], cLw[1][1], cLw[1][2]);
         up2 = new Scalar(cUp[1][0], cUp[1][1], cUp[1][2]);//cian
-
-        s = new Size(3, 3);
-        elemsArr = new ArrayList<>();
-        contourArr = new ArrayList<>();
     }
 
 
     @Override
     public Mat processFrame(Mat orgmInpt) {
-
         Imgproc.cvtColor(orgmInpt, input, Imgproc.COLOR_BGR2HLS);
 
         elemsArr.clear();

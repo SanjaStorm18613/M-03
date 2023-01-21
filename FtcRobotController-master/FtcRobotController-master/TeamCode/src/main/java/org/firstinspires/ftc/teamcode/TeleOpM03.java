@@ -24,7 +24,7 @@ public class TeleOpM03 extends LinearOpMode {
         elev  = new Elevador (telemetry, hardwareMap);
         braco = new Braco    (telemetry, hardwareMap, elev);
         garra = new Garra    (telemetry, hardwareMap, elev, braco);
-        yaw   = new Yaw      (telemetry, hardwareMap, elev, garra, braco);
+        yaw   = new Yaw      (telemetry, hardwareMap, elev);
         drive = new DTMecanum(telemetry, hardwareMap, yaw);
 
         //*/
