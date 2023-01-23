@@ -18,7 +18,7 @@ public class Garra {
             pFallenPos = Constantis.Garra.PITCH_FALLEN,
             pTranstTime = Constantis.Garra.TRANSITION_TIME;
 
-    double pVel = 0, elevAjst = 0, pPos = 0, pTime = 0, pPrevPos = 0, rPos = 0, cTargetPos = 0;
+    double pVel = 0, elevAjst = 0, pPos = Constantis.Garra.PITCH_DROP, pTime = 0, pPrevPos = Constantis.Garra.PITCH_DROP, rPos = Constantis.Garra.ROLL_UP, cTargetPos = 0;
 
     boolean cOpen = false;
     boolean SPIN = true, COLVERT = true, COLFRONT = true, COLSIDE = true, RETAIN = true, DROP = true;
@@ -44,7 +44,6 @@ public class Garra {
         braco = b;
 
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        time.startTime();
 
         init = true;
 
@@ -52,12 +51,11 @@ public class Garra {
 
     public void Control(boolean spin, boolean colVert, boolean colFront, boolean colSide, boolean retain, boolean drop) {
         elevNvCol = elev.getNv() == 0;
-        pPrevPos = pPos;
 
         //#region COPILOTO
         if (retain && RETAIN) {
             cOpen = false;
-            if (elev.getTargetPosition() > 0 && elevNvCol) pPos = pPos != pDropPos ? pDropPos : pDropPos + .3;
+            if (Math.abs(elev.getTargetPosition()) > 0) pPos = pPos != pDropPos ? pDropPos : pDropPos + .3;
             else pPos = pPos != pDropPos ? pDropPos : pFallenPos;
 
         }
@@ -106,14 +104,17 @@ public class Garra {
         DROP = !drop;
 
         if (pPrevPos != pPos) {
+            init = false;
             if (pPos == pFallenPos || pPrevPos == pFallenPos) {
                 time.reset();
-                init = false;
             }
         }
+        pPrevPos = pPos;
 
-        pTranstTime = Constantis.Garra.TRANSITION_TIME * Math.abs(pPos - pitch.getPosition()) / pFallenPos;
+        if (Math.abs(pPos-pPrevPos) == Math.abs(pDropPos-pFallenPos)) pTranstTime = Constantis.Garra.TRANSITION_TIME;
+        else pTranstTime = Constantis.Garra.TRANSITION_TIME / 1.5;
         pTime = Math.min(time.time(), pTranstTime);
+
         if (elevNvCol && !init) pVel = Math.round(Math.min(pTime / pTranstTime, 1) * 1000) / 1000.0;
         else pVel = 1;
 
@@ -124,11 +125,9 @@ public class Garra {
 
         if (pPos == pFallenPos) {
             if (cOpen) {
-                elevAjst = Constantis.Garra.ELEVADOR_UP;
+                elevAjst = 1;
                 claw(true);
-            }
-
-            if (elev.getCorrentPos() < 80) claw(false);
+            } else if (elev.getCorrentPos() < 80) claw(false);
             else if (elev.getCorrentPos() < 500) braco.setAjt(.18);
             else braco.setAjt(-1);
 
@@ -139,9 +138,21 @@ public class Garra {
 
         if (!init) elev.setAjt(elevNvCol, elevAjst * Constantis.Garra.ELEVADOR_UP);
 
-        pPos += braco.getPos();
-        pitch.setPosition(pitch.getPosition() + (pPos - pitch.getPosition()) * pVel);
+        if (init) pitch.setPosition(Constantis.Garra.PITCH_DROP);
+        else pitch.setPosition(pitch.getPosition() + (pPos - pitch.getPosition()) * pVel + braco.getPos());
+
         if (pTime >= pTranstTime || !elevNvCol || init) roll.setPosition(rPos);
+
+        //telemetry.addData("pitch", pitch.getPosition());
+        //telemetry.addData("roll", roll.getPosition());
+        telemetry.addData("time", time.time());
+        telemetry.addData("pVel", pVel);
+        telemetry.addData("pPrevPos", pPrevPos);
+        telemetry.addData("pPos", pPos);
+        telemetry.addData("init", init);
+        telemetry.addData("getTargetPosition", elev.getTargetPosition());
+
+
 
     }
 

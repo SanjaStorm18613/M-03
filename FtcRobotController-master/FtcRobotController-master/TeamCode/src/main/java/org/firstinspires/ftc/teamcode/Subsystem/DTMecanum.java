@@ -112,7 +112,7 @@ public class DTMecanum {
         TE.setPower((y - x + t) * accl);
         TD.setPower((y + x - t) * accl);
 
-        getTelemetry();
+        //getTelemetry();
 
     }
 

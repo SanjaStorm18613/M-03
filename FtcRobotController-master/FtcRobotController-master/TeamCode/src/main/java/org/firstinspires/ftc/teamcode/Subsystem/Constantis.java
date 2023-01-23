@@ -47,14 +47,14 @@ public class Constantis {
 
         public static final double  CLAW_CLOSE = 0.2,
                                     CLAW_OPEN = 0.45,
-                                    PITCH_DROP = 0.1,
+                                    PITCH_DROP = 0.0,
                                     HORIZONTAL = 0.56,
-                                    PITCH_FALLEN = 0.95,
+                                    PITCH_FALLEN = 0.85,
                                     ELEVADOR_UP = 1,
                                     ROLL_UP = 0.2,
                                     ROLL_DOWN = 0.6,
-                                    ROLL_SIDE_CONE = Math.abs(ROLL_DOWN-ROLL_UP)/2,
-                                    TRANSITION_TIME = 1500;
+                                    ROLL_SIDE_CONE = ROLL_UP + Math.abs(ROLL_DOWN-ROLL_UP)/2,
+                                    TRANSITION_TIME = 3000;
 
     }
 
