@@ -24,7 +24,7 @@ public class Constantis {
 
     public static class Braco {
 
-        public static final double  MIN_POS = .21,
+        public static final double  MIN_POS = .23,
                                     MAX_POS = .6;
 
     }
@@ -33,7 +33,7 @@ public class Constantis {
 
         public static final double  NV_1 = 1.5,
                                     NV_2 = 3.2,
-                                    NV_3 = 4.8,
+                                    NV_3 = 4.65,
                                     CONVR = 1500,
                                     UP_SPEED = .9,
                                     DOWN_SPEED = .7,
@@ -47,21 +47,22 @@ public class Constantis {
 
         public static final double  CLAW_CLOSE = 0.2,
                                     CLAW_OPEN = 0.45,
-                                    PITCH_DROP = 0.0,
-                                    HORIZONTAL = 0.56,
-                                    PITCH_FALLEN = 0.85,
+                                    PITCH_DROP = 0.05,
+                                    HORIZONTAL = 0.53,
+                                    PITCH_FALLEN = 0.9,
                                     ELEVADOR_UP = 1,
                                     ROLL_UP = 0.2,
                                     ROLL_DOWN = 0.6,
                                     ROLL_SIDE_CONE = ROLL_UP + Math.abs(ROLL_DOWN-ROLL_UP)/2,
-                                    TRANSITION_TIME = 3000;
+                                    TRANSITION_TIME = 2000;
 
     }
 
     public static class Yaw {
 
         public static final int     LIMIT = 5000,
-                                    CONVR = 400;
+                                    CONVR = 400,
+                                    LAP_COUNTS = 1000;
         public static final double  AJUST = 0.06,
                                     CONTROL = .3,
                                     BRACO_UP = Braco.MIN_POS + 0.2;

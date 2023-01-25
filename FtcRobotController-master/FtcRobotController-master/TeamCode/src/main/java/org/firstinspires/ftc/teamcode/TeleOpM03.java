@@ -41,8 +41,6 @@ public class TeleOpM03 extends LinearOpMode {
                     gamepad1.right_trigger > 0.1);
 
             yaw.Control(
-                    gamepad2.right_bumper,
-                    gamepad2.left_bumper,
                     gamepad2.dpad_right,
                     gamepad2.dpad_left);
 
@@ -52,7 +50,9 @@ public class TeleOpM03 extends LinearOpMode {
                     gamepad1.b,
                     gamepad1.x,
                     gamepad2.b || gamepad1.right_bumper,
-                    gamepad2.right_trigger > 0.1 || gamepad1.left_bumper);
+                    gamepad2.right_trigger > 0.1 || gamepad1.left_bumper,
+                    gamepad2.left_trigger);
+            //*/
 
             braco.Control();
 

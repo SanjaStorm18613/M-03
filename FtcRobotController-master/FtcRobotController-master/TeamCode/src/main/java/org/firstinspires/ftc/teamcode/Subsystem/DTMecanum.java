@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -39,7 +40,10 @@ public class DTMecanum {
         sOdmD = hardwareMap.get(Servo.class, "odmD");
 
         encE = hardwareMap.get(DcMotorEx.class, "encE");
-        encD = hardwareMap.get(DcMotorEx.class, "encE");
+        encD = hardwareMap.get(DcMotorEx.class, "encD");
+
+        encE.setDirection(DcMotorSimple.Direction.FORWARD);
+        encD.setDirection(DcMotorSimple.Direction.REVERSE);
 
 //Cria motores
         FE = hardwareMap.get(DcMotorEx.class, "FE");

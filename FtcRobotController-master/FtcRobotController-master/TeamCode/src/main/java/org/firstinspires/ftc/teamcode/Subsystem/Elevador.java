@@ -16,7 +16,6 @@ public class Elevador {
             vUp = Constantis.Elevador.UP_SPEED,
             vDwn = Constantis.Elevador.DOWN_SPEED,
             ajuste = Constantis.Elevador.AJUSTE;
-    int tolerance = Constantis.Elevador.TOLERANCE;
 
     DcMotorEx elev;
     Telemetry telemetry;
@@ -37,7 +36,7 @@ public class Elevador {
         elev.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         elev.setDirection(DcMotorSimple.Direction.REVERSE);
-        elev.setTargetPositionTolerance(tolerance);
+        elev.setTargetPositionTolerance(Constantis.Elevador.TOLERANCE);
 
         telemetry = t;
 

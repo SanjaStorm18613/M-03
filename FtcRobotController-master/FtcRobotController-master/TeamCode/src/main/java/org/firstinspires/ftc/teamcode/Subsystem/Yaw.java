@@ -20,7 +20,7 @@ public class Yaw {
     Telemetry telemetry;
     ElapsedTime time;
 
-    double ajt = 0, relationPos = 0, t = 0;
+    double y = 0, x = 0, vel = 0;
     int pos = 0;
 
     boolean CW = false, CCW = true, CWCTRL = true, CCWCTRL = true;
@@ -30,8 +30,6 @@ public class Yaw {
 
         yaw = hardwareMap.get(DcMotor.class, "Yaw");
         yaw.setDirection(DcMotorSimple.Direction.REVERSE);
-        yaw.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        yaw.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         yaw.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         elev = e;
@@ -40,57 +38,26 @@ public class Yaw {
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     }
 
-    public void Control(boolean cw, boolean ccw, boolean cwCtrl, boolean ccwCtrl) {
+    public void Control(boolean cw, boolean ccw) {
 
         elevColt = elev.getNv() == 0;
 
-        if (cwCtrl && CWCTRL && !mxLimt && !elevColt) ajt += ajuste;
-        if (ccwCtrl && CCWCTRL && !mnLimt && !elevColt) ajt -= ajuste;
-
-        if (cw && CW && !mxLimt && !elevColt) ajt += ctrl;
-        if (ccw && CCW && !mnLimt && !elevColt) ajt -= ctrl;
-
-        if (!cw && !ccw && !cwCtrl && !ccwCtrl) {
+        if (!cw && !ccw || elevColt) {
             time.reset();
-            t = 0;
-        } else if (t + 100 < time.time()) {
-            t += 100;
-
-            if (cwCtrl) ajt += ajuste;
-            else if (ccwCtrl) ajt -= ajuste;
-            else if (cw) ajt += ctrl;
-            else ajt -= ctrl;
+            vel = 0;
+        } else {
+            vel = Math.min(time.time() / 3000, 1);
         }
 
-        CWCTRL = !cwCtrl;
-        CCWCTRL = !ccwCtrl;
-        CW = !cw;
-        CCW = !ccw;
+        if (cw && yaw.getCurrentPosition() > -3000) yaw.setPower(1 * vel);
+        else if (ccw && yaw.getCurrentPosition() < 3000) yaw.setPower(1 * -vel);
+        else yaw.setPower(0);
 
-        pos = (int) (ajt * convr);
+        x = Math.abs(-Math.abs((yaw.getCurrentPosition() - 3000/4.) / 3000/4.)+2)-1;
+        y = Math.abs((x-3000/2.)/3000/4.)-1;
 
-        pos = Math.min(yLimit, pos);
-        mxLimt = pos >= yLimit;
-
-        pos = Math.max(-yLimit, pos);
-        mnLimt = pos <= -yLimit;
-
-        if (getInverted()) relationPos = elev.getCorrentPos() - ctrl * 4;
-        else relationPos = elev.getCorrentPos();
-        relationPos = Math.abs(relationPos);
-
-        if (relationPos > 100) elev.setAjt(true, 1.0);
+        if (Math.abs(y) > .25 && Math.abs(y) < .75) elev.setAjt(true, 1.0);
         else elev.setAjt(false, 0);
-
-
-        if (elevColt) {
-            if (getInverted()) yaw.setTargetPosition((int) ctrl * 4);
-            else yaw.setTargetPosition(0);
-
-        } else yaw.setTargetPosition(pos);
-
-        yaw.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        yaw.setPower(yaw.isBusy() ? 1 : 0);
 
         telemetry.addData("yaw", yaw.getTargetPosition());
         telemetry.addData("posyaw", pos);
@@ -109,6 +76,11 @@ public class Yaw {
 
     public boolean getInverted() {
         return Math.abs(yaw.getCurrentPosition()) > ctrl * 2 && Math.abs(yaw.getCurrentPosition()) < ctrl * 6;
+
+    }
+
+    public double[] getCorrectionCoord () {
+        return new double[] {1, -1};
 
     }
 
