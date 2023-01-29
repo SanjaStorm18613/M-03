@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode.Vision;
+package org.firstinspires.ftc.team18613.Vision;
 
-import org.firstinspires.ftc.teamcode.Subsystem.Constantis;
+import org.firstinspires.ftc.team18613.Constants;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -15,10 +15,10 @@ import java.util.ArrayList;
 
 public class PipelineColors extends OpenCvPipeline {
 
-    int[][] cUp = Constantis.Pipeline.COLOR_UP,
-            cLw = Constantis.Pipeline.COLOR_LOW;
+    int[][] cUp = Constants.Pipeline.COLOR_UP,
+            cLw = Constants.Pipeline.COLOR_LOW;
 
-    int tolerance = Constantis.Pipeline.TOLERANCE_AREA;
+    int tolerance = Constants.Pipeline.TOLERANCE_AREA;
 
     Scalar low0, up0, low1, up1, up2, green;
     Mat input, mat, mat2;

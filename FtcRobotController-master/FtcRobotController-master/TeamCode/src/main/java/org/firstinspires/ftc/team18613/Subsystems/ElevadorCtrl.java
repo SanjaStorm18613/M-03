@@ -1,9 +1,11 @@
-package org.firstinspires.ftc.teamcode.Subsystem;
+package org.firstinspires.ftc.team18613.Subsystems;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.team18613.Constants;
 
 @TeleOp(name = "ElevadorCtrl", group = "Linear Opmode")
 
@@ -28,7 +30,7 @@ public class ElevadorCtrl extends LinearOpMode {
             else if (gamepad1.dpad_down || gamepad2.dpad_down) e.setPower(-0.4);
             else e.setPower(0.0);
 
-            telemetry.addData("pos", e.getCurrentPosition() / Constantis.Elevador.CONVR);
+            telemetry.addData("pos", e.getCurrentPosition() / Constants.Elevador.CONVR);
             telemetry.update();
 
         }

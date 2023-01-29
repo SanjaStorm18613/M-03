@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode.Subsystem;
+package org.firstinspires.ftc.team18613;
 
-public class Constantis {
+public class Constants {
 
     public static class Pipeline {
 
@@ -19,21 +19,22 @@ public class Constantis {
                                     PRECISION = 0.25,
                                     TOLERANCE_DISTANCE = 100,
                                     TOLERANCE_ANGLE = 100,
-                                    COVERTION = 50;
+                                    CONVERTION = 50;
     }
 
     public static class Braco {
 
         public static final double  MIN_POS = .23,
-                                    MAX_POS = .6;
+                                    MAX_POS = .65;
 
     }
 
     public static class Elevador {
 
-        public static final double  NV_1 = 1.5,
+        public static final double  NV_0 = 0,
+                                    NV_1 = 1.5,
                                     NV_2 = 3.2,
-                                    NV_3 = 4.65,
+                                    NV_3 = 4.62,
                                     CONVR = 1500,
                                     UP_SPEED = .9,
                                     DOWN_SPEED = .7,
@@ -65,7 +66,7 @@ public class Constantis {
                                     LAP_COUNTS = 1000;
         public static final double  AJUST = 0.06,
                                     CONTROL = .3,
-                                    BRACO_UP = Braco.MIN_POS + 0.2;
-
+                                    BRACO_UP = Braco.MIN_POS + 0.2,
+                                    SPEED = 1;
     }
 }

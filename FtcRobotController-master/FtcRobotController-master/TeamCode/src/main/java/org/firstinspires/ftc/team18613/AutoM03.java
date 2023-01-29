@@ -1,17 +1,16 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.team18613;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Subsystem.Braco;
-import org.firstinspires.ftc.teamcode.Subsystem.DTMecanum;
-import org.firstinspires.ftc.teamcode.Subsystem.Elevador;
-import org.firstinspires.ftc.teamcode.Subsystem.Garra;
-import org.firstinspires.ftc.teamcode.Subsystem.Yaw;
-import org.firstinspires.ftc.teamcode.Vision.PipelineColors;
-import org.firstinspires.ftc.teamcode.Vision.VisionCtrl;
+import org.firstinspires.ftc.team18613.Subsystems.Braco;
+import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
+import org.firstinspires.ftc.team18613.Subsystems.Elevador;
+import org.firstinspires.ftc.team18613.Subsystems.Garra;
+import org.firstinspires.ftc.team18613.Subsystems.Turret;
+import org.firstinspires.ftc.team18613.Vision.VisionCtrl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,8 +19,8 @@ import java.util.Arrays;
 public class AutoM03 extends LinearOpMode {
 
     DTMecanum drive;
-    Elevador eleve;
-    Yaw yaw;
+    Elevador elev;
+    Turret yaw;
     Garra garra;
     Braco braco;
     ElapsedTime time;
@@ -31,11 +30,11 @@ public class AutoM03 extends LinearOpMode {
 
     public void runOpMode() {
 
-        eleve = new Elevador(telemetry, hardwareMap);
-        braco = new Braco(telemetry, hardwareMap, eleve);
-        garra = new Garra(telemetry, hardwareMap, eleve, braco);
-        yaw = new Yaw(telemetry, hardwareMap, eleve);
-        drive = new DTMecanum(telemetry, hardwareMap, yaw);
+        elev  = new Elevador  ();
+        braco = new Braco     (elev);
+        garra = new Garra     (elev, braco);
+        yaw   = new Turret(elev, garra);
+        drive = new DTMecanum (yaw);
 
 
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
@@ -101,8 +100,8 @@ public class AutoM03 extends LinearOpMode {
                     break;
 
                 case 1:
-                    eleve.setPos(steps.get(0), 0.7);
-                    if (!eleve.getBusy() && stepCtrl.size() > 0) {
+                    elev.setPos(steps.get(0), 0.7);
+                    if (!elev.getBusy() && stepCtrl.size() > 0) {
                         stepCtrl.remove(0);
                         steps.remove(0);
                     }

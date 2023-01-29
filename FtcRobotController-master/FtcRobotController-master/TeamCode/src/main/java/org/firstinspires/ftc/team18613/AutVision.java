@@ -1,19 +1,12 @@
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.team18613;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Subsystem.Braco;
-import org.firstinspires.ftc.teamcode.Subsystem.Constantis;
-import org.firstinspires.ftc.teamcode.Subsystem.DTMecanum;
-import org.firstinspires.ftc.teamcode.Subsystem.Elevador;
-import org.firstinspires.ftc.teamcode.Subsystem.Garra;
-import org.firstinspires.ftc.teamcode.Subsystem.Yaw;
-import org.firstinspires.ftc.teamcode.Vision.PipelineColors;
-import org.firstinspires.ftc.teamcode.Vision.VisionCtrl;
+import org.firstinspires.ftc.team18613.Vision.PipelineColors;
+import org.firstinspires.ftc.team18613.Vision.VisionCtrl;
 
 @Autonomous(name = "AutVision", group = "Linear Opmode")
 public class AutVision extends LinearOpMode {
@@ -37,13 +30,13 @@ public class AutVision extends LinearOpMode {
             telemetry.addLine();
 
             telemetry.addLine("Color 0 -");
-            telemetry.addData("Up", Constantis.Pipeline.COLOR_UP[0]);
-            telemetry.addData("Low", Constantis.Pipeline.COLOR_LOW[0]);
+            telemetry.addData("Up", Constants.Pipeline.COLOR_UP[0]);
+            telemetry.addData("Low", Constants.Pipeline.COLOR_LOW[0]);
             telemetry.addLine();
 
             telemetry.addLine("Color 1 -");
-            telemetry.addData("Up", Constantis.Pipeline.COLOR_UP[1]);
-            telemetry.addData("Low", Constantis.Pipeline.COLOR_LOW[1]);
+            telemetry.addData("Up", Constants.Pipeline.COLOR_UP[1]);
+            telemetry.addData("Low", Constants.Pipeline.COLOR_LOW[1]);
 
         }
         //waitForStart();
@@ -55,13 +48,13 @@ public class AutVision extends LinearOpMode {
             telemetry.addLine();
 
             telemetry.addLine("Color 0 -");
-            telemetry.addData("Up", Constantis.Pipeline.COLOR_UP[0]);
-            telemetry.addData("Low", Constantis.Pipeline.COLOR_LOW[0]);
+            telemetry.addData("Up", Constants.Pipeline.COLOR_UP[0]);
+            telemetry.addData("Low", Constants.Pipeline.COLOR_LOW[0]);
             telemetry.addLine();
 
             telemetry.addLine("Color 1 -");
-            telemetry.addData("Up", Constantis.Pipeline.COLOR_UP[1]);
-            telemetry.addData("Low", Constantis.Pipeline.COLOR_LOW[1]);
+            telemetry.addData("Up", Constants.Pipeline.COLOR_UP[1]);
+            telemetry.addData("Low", Constants.Pipeline.COLOR_LOW[1]);
             telemetry.update();
 
         }

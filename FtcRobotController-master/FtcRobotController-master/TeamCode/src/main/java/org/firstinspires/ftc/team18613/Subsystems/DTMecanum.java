@@ -1,61 +1,50 @@
-package org.firstinspires.ftc.teamcode.Subsystem;
+package org.firstinspires.ftc.team18613.Subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.team18613.Constants;
+import org.firstinspires.ftc.team18613.Subsystem;
+import org.firstinspires.ftc.team18613.TeleOpM03;
 
-public class DTMecanum {
+public class DTMecanum  extends Subsystem {
 
-    Telemetry telemetry;
+    private final Servo sOdmE, sOdmD;
+    private final DcMotorEx FE, FD, TE, TD, encE, encD;
+    private final Gyro gyro;
+    private final ElapsedTime acelT;
+    private final Turret yaw;
 
-    double speed = Constantis.DTMecanum.SPEED,
-            precs = Constantis.DTMecanum.PRECISION,
-            tolDist = Constantis.DTMecanum.TOLERANCE_DISTANCE,
-            tolAngle = Constantis.DTMecanum.TOLERANCE_ANGLE,
-            covert = Constantis.DTMecanum.COVERTION;
+    private boolean sOdmActv = false, moveIsBusy = false;
+    private double turn, pos, setPoint = 0, direction = 0;
 
+    public DTMecanum(Turret yaw) {
 
-    Servo sOdmE, sOdmD;
-    DcMotorEx FE, FD, TE, TD, encE, encD;
-    Gyro gyro;
-    ElapsedTime acelT;
-    Yaw yaw;
+        gyro = new Gyro();
+        this.yaw = yaw;
 
-    boolean sOdmActv = false, moveIsBusy = false;
-    double turn, pos, accl = 0, setPoint = 0, direction = 0;
+        sOdmE = TeleOpM03.hm.get(Servo.class, "odmE");
+        sOdmD = TeleOpM03.hm.get(Servo.class, "odmD");
 
-
-    public DTMecanum(Telemetry t, HardwareMap hardwareMap, Yaw y) {
-
-        telemetry = t;
-        gyro = new Gyro(hardwareMap);
-        yaw = y;
-
-        sOdmE = hardwareMap.get(Servo.class, "odmE");
-        sOdmD = hardwareMap.get(Servo.class, "odmD");
-
-        encE = hardwareMap.get(DcMotorEx.class, "encE");
-        encD = hardwareMap.get(DcMotorEx.class, "encD");
+        encE = TeleOpM03.hm.get(DcMotorEx.class, "encE");
+        encD = TeleOpM03.hm.get(DcMotorEx.class, "encD");
 
         encE.setDirection(DcMotorSimple.Direction.FORWARD);
         encD.setDirection(DcMotorSimple.Direction.REVERSE);
 
-//Cria motores
-        FE = hardwareMap.get(DcMotorEx.class, "FE");
-        FD = hardwareMap.get(DcMotorEx.class, "FD");
-        TE = hardwareMap.get(DcMotorEx.class, "TE");
-        TD = hardwareMap.get(DcMotorEx.class, "TD");
+        //Cria motores
+        FE = TeleOpM03.hm.get(DcMotorEx.class, "FE");
+        FD = TeleOpM03.hm.get(DcMotorEx.class, "FD");
+        TE = TeleOpM03.hm.get(DcMotorEx.class, "TE");
+        TD = TeleOpM03.hm.get(DcMotorEx.class, "TD");
 
         DcMotor[] motors = {FE, TE, FD, TD};
 
 
         for (int m = 0; m < 4; m++) {
-
             motors[m].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motors[m].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -76,7 +65,8 @@ public class DTMecanum {
     }
 
     //Controle movimentação mecanum
-    public void Control(double x, double y, double t, boolean slw) {
+    public void control(double x, double y, double turn, boolean marcha) {
+        double speed;
 
         if (!sOdmActv) {
             sOdmE.setPosition(1);
@@ -84,21 +74,22 @@ public class DTMecanum {
             sOdmActv = true;
         }
 
-        if (slw) speed = Constantis.DTMecanum.SPEED / 2.0;
-        else speed = Constantis.DTMecanum.SPEED;
+        if (marcha) speed = Constants.DTMecanum.SPEED / 2.0;
+        else speed = Constants.DTMecanum.SPEED;
 
-        t *= speed * Constantis.DTMecanum.YAW_SPEED;
+        turn *= speed * Constants.DTMecanum.YAW_SPEED;
 
         if (yaw.getInverted()) speed *= -1;
         x *= speed;
         y *= speed;
 
-        t = Math.round(t / precs) * precs;
-        x = Math.round(x / precs) * precs;
-        y = Math.round(y / precs) * precs;
+        turn = Math.round(turn / Constants.DTMecanum.PRECISION) * Constants.DTMecanum.PRECISION;
+        x = Math.round(x / Constants.DTMecanum.PRECISION) * Constants.DTMecanum.PRECISION;
+        y = Math.round(y / Constants.DTMecanum.PRECISION) * Constants.DTMecanum.PRECISION;
 
 
-        if (Math.abs(x) < 0.06 && Math.abs(y) < 0.06 && Math.abs(t) < 0.1) {
+        double accl;
+        if (Math.abs(x) < 0.06 && Math.abs(y) < 0.06 && Math.abs(turn) < 0.1) {
             accl = 0;
             acelT.reset();
         } else {
@@ -107,14 +98,13 @@ public class DTMecanum {
 
         //telemetry.addData("moveT", accl);
 
-        accl = Math.min(1, accl / Constantis.DTMecanum.ACCELERATION);
+        accl = Math.min(1, accl / Constants.DTMecanum.ACCELERATION);
         accl = Math.round(accl * 1000.0) / 1000.0;
 
-//*/
-        FE.setPower((y + x + t) * accl);
-        FD.setPower((y - x - t) * accl);
-        TE.setPower((y - x + t) * accl);
-        TD.setPower((y + x - t) * accl);
+        FE.setPower((y + x + turn) * accl);
+        FD.setPower((y - x - turn) * accl);
+        TE.setPower((y - x + turn) * accl);
+        TD.setPower((y + x - turn) * accl);
 
         //getTelemetry();
 
@@ -124,8 +114,8 @@ public class DTMecanum {
 
         double erro, yawErro, acT;
 
-        propc *= covert;
-        dist *= covert;
+        propc *= Constants.DTMecanum.CONVERTION;
+        dist *= Constants.DTMecanum.CONVERTION;
 
         if (dist != setPoint) {
             setPoint = dist;
@@ -145,7 +135,7 @@ public class DTMecanum {
         yawErro = encE.getCurrentPosition() - encD.getCurrentPosition();//enc
 
 
-        if ((Math.abs(erro) > tolDist) || yawErro > tolAngle) {
+        if ((Math.abs(erro) > Constants.DTMecanum.TOLERANCE_DISTANCE) || yawErro > Constants.DTMecanum.TOLERANCE_ANGLE) {
 
             moveIsBusy = true;
 
@@ -172,8 +162,8 @@ public class DTMecanum {
 
         double erro, yawErro, acT;
 
-        propc *= covert;
-        dist *= covert;
+        propc *= Constants.DTMecanum.CONVERTION;
+        dist *= Constants.DTMecanum.CONVERTION;
 
         if (dist != setPoint) {
             setPoint = dist;
@@ -198,7 +188,7 @@ public class DTMecanum {
         yawErro = direction - gyro.getContinuousAngle();
 
 
-        if ((Math.abs(erro) > tolDist) || yawErro > tolAngle) {
+        if ((Math.abs(erro) > Constants.DTMecanum.TOLERANCE_DISTANCE) || yawErro > Constants.DTMecanum.TOLERANCE_ANGLE) {
 
             moveIsBusy = true;
 
@@ -265,10 +255,10 @@ public class DTMecanum {
     }
 
     public void getTelemetry() {
-        telemetry.addData("FE", FE.getPower());
-        telemetry.addData("FD", FD.getPower());
-        telemetry.addData("TE", TE.getPower());
-        telemetry.addData("TD", TD.getPower());
+        TeleOpM03.tel.addData("FE", FE.getPower());
+        TeleOpM03.tel.addData("FD", FD.getPower());
+        TeleOpM03.tel.addData("TE", TE.getPower());
+        TeleOpM03.tel.addData("TD", TD.getPower());
     }
  //*/
 

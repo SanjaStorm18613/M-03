@@ -1,25 +1,26 @@
-package org.firstinspires.ftc.teamcode.Subsystem;
+package org.firstinspires.ftc.team18613.Subsystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.team18613.Subsystem;
+import org.firstinspires.ftc.team18613.TeleOpM03;
 
-public class Gyro {
+public class Gyro extends Subsystem {
 
-    BNO055IMU imu;
+    private final BNO055IMU imu;
 
-    double anguloAtual, anguloAnterior;
-    int    revoluecoes;
+    private double anguloAnterior;
+    private int revolucoes;
 
 
-    public Gyro(HardwareMap hwM){
+    public Gyro(){
 
         BNO055IMU.Parameters GYRO_imu_parameters;
 
-        imu = hwM.get(BNO055IMU.class, "imu2");
+        imu = TeleOpM03.hm.get(BNO055IMU.class, "imu2");
 
         GYRO_imu_parameters                = new BNO055IMU.Parameters();
         GYRO_imu_parameters.mode           = BNO055IMU.SensorMode.GYRONLY;
@@ -29,26 +30,26 @@ public class Gyro {
         imu.initialize(GYRO_imu_parameters);
 
         anguloAnterior = 0;
-        revoluecoes    = 0;
+        revolucoes = 0;
     }
 
     public double getContinuousAngle() {
 
-        anguloAtual = getPeriodicAngle();
+        double anguloAtual = getPeriodicAngle();
 
         if (180 < Math.abs(anguloAnterior - anguloAtual)) {
 
-            if (anguloAnterior > anguloAtual) revoluecoes++;
-            else revoluecoes--;
+            if (anguloAnterior > anguloAtual) revolucoes++;
+            else revolucoes--;
 
         }
         anguloAnterior = anguloAtual;
 
-        return revoluecoes * 360 + anguloAtual;
+        return revolucoes * 360 + anguloAtual;
 
     }
 
-    public double getPeriodicAngle(){
+    private double getPeriodicAngle(){
 
         return -imu.getAngularOrientation(AxesReference
                 .INTRINSIC, AxesOrder
