@@ -6,15 +6,15 @@ import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
 import org.firstinspires.ftc.team18613.TeleOpM03;
 
-public class Braco extends Subsystem {
+public class Arm extends Subsystem {
 
     private final Servo E, D;
-    private final Elevador elev;
+    private final Elevator elev;
 
     private double ajt = -1;
     private double calPos = 0;
 
-    public Braco(Elevador elev) {
+    public Arm(Elevator elev) {
 
         //Servos direito e esquerdo do braço
         E = TeleOpM03.hm.get(Servo.class, "E");

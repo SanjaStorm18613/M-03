@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.team18613.commands;
 
 import org.firstinspires.ftc.team18613.Command;
-import org.firstinspires.ftc.team18613.Subsystems.Garra;
-import org.firstinspires.ftc.team18613.TeleOpM03;
+import org.firstinspires.ftc.team18613.Subsystems.Claw;
 
-public class AbrirGarra extends Command {
+public class ClawOpen extends Command {
 
-    Garra m_garra;
+    Claw m_garra;
 
-    public AbrirGarra(Garra garra){
+    public ClawOpen(Claw garra){
         m_garra = garra;
     }
 

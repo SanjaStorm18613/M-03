@@ -5,64 +5,76 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.team18613.Subsystems.Braco;
+import org.firstinspires.ftc.team18613.Subsystems.Arm;
 import org.firstinspires.ftc.team18613.Subsystems.Controller;
 import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
-import org.firstinspires.ftc.team18613.Subsystems.Elevador;
-import org.firstinspires.ftc.team18613.Subsystems.Garra;
+import org.firstinspires.ftc.team18613.Subsystems.Elevator;
+import org.firstinspires.ftc.team18613.Subsystems.Claw;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
+import org.firstinspires.ftc.team18613.commands.DriveMove;
+import org.firstinspires.ftc.team18613.commands.DriveSlow;
+import org.firstinspires.ftc.team18613.commands.DriveTurn;
+import org.firstinspires.ftc.team18613.commands.ElevatorAdjustStage;
+import org.firstinspires.ftc.team18613.commands.ElevatorShiftStage;
 import org.firstinspires.ftc.team18613.commands.StopTurret;
 import org.firstinspires.ftc.team18613.commands.TurnTurret;
+import org.firstinspires.ftc.team18613.utils.FloatPair;
 
 @TeleOp(name = "TeleOpM03", group = "Linear Opmode")
 
 public class TeleOpM03 extends LinearOpMode {
     
     DTMecanum drive;
-    Elevador elev;
+    Elevator elev;
     Turret turret;
-    Garra garra;
-    Braco braco;
+    Claw garra;
+    Arm braco;
 
     public static Telemetry tel;
     public static HardwareMap hm;
 
-    public static Controller controller1, controller2;
+    public static Controller pilot, copilot;
 
     public void runOpMode() {
         tel = telemetry;
         hm = hardwareMap;
-        //controller1 = new Controller(gamepad1);
-        controller2 = new Controller(gamepad2);
+        pilot = new Controller(gamepad1);
+        copilot = new Controller(gamepad2);
 
-        elev  = new Elevador  ();
-        braco = new Braco     (elev);
-        garra = new Garra     (elev, braco);
+        elev  = new Elevator();
+        braco = new Arm(elev);
+        garra = new Claw(elev, braco);
         turret = new Turret(elev, garra);
         drive = new DTMecanum (turret);
+
+
 
         waitForStart();
         
         while (opModeIsActive()) {
 
-            controller2.whilePressed(Controller.left, new TurnTurret(turret, false));
-            controller2.onReleased(Controller.left, new StopTurret(turret));
+            copilot.whilePressed(Controller.left, new TurnTurret(turret, false));
+            copilot.onReleased(Controller.left, new StopTurret(turret));
 
-            controller2.whilePressed(Controller.right, new TurnTurret(turret, true));
-            controller2.onReleased(Controller.right, new StopTurret(turret));
+            copilot.whilePressed(Controller.right, new TurnTurret(turret, true));
+            copilot.onReleased(Controller.right, new StopTurret(turret));
 
-            drive.control(
-                    gamepad1.left_stick_x,
-                    -gamepad1.left_stick_y,
-                    gamepad1.right_stick_x,
-                    gamepad1.right_trigger > 0.1);
+            copilot.onPressed(Controller.y, new ElevatorShiftStage(elev, true));
+            copilot.onPressed(Controller.x, new ElevatorShiftStage(elev, false));
 
+            copilot.onPressed(Controller.up, new ElevatorAdjustStage(elev, true));
+            copilot.onPressed(Controller.down, new ElevatorAdjustStage(elev, false));
 
+            pilot.stick(Controller.left_stick_x, Controller.left_stick_y, (FloatPair val) -> new DriveMove(drive, val.firstValue(), val.secondValue()));
+            pilot.stick(Controller.right_stick_x, (Float val) -> new DriveTurn(drive, val));
+            pilot.trigger(Controller.right_trigger, (Float val) -> new DriveSlow(drive, val));
+
+//            drive.control(
+//                    gamepad1.left_stick_x,
+//                    -gamepad1.left_stick_y,
+//                    gamepad1.right_stick_x,
+//                    gamepad1.right_trigger > 0.1);
 /*
-            turret.Control(
-                    gamepad2.dpad_right,
-                    gamepad2.dpad_left);*/
-
             garra.Control(
                     gamepad2.a,
                     gamepad1.a,
@@ -72,15 +84,12 @@ public class TeleOpM03 extends LinearOpMode {
                     gamepad2.right_trigger > 0.1,
                     gamepad2.left_trigger);
 
+
+ */
             braco.control();
 
+            drive.getTelemetry();
 
-            elev.Control(
-                    gamepad2.y,
-                    gamepad2.x,
-                    gamepad1.dpad_up || gamepad2.dpad_up,
-                    gamepad1.dpad_down || gamepad2.dpad_down);
-            
             telemetry.update();
         }
     }

@@ -15,11 +15,11 @@ public class DTMecanum  extends Subsystem {
     private final Servo sOdmE, sOdmD;
     private final DcMotorEx FE, FD, TE, TD, encE, encD;
     private final Gyro gyro;
-    private final ElapsedTime acelT;
+    private final ElapsedTime accTime;
     private final Turret yaw;
 
     private boolean sOdmActv = false, moveIsBusy = false;
-    private double turn, pos, setPoint = 0, direction = 0;
+    private double pos, setPoint = 0, direction = 0, acc = 0, x = 0, y = 0, turn = 0, slow = 0;
 
     public DTMecanum(Turret yaw) {
 
@@ -58,68 +58,21 @@ public class DTMecanum  extends Subsystem {
 
         //resetEnc();
 
-        acelT = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        acelT.startTime();
+        accTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        accTime.startTime();
 
-
-    }
-
-    //Controle movimentação mecanum
-    public void control(double x, double y, double turn, boolean marcha) {
-        double speed;
-
-        if (!sOdmActv) {
-            sOdmE.setPosition(1);
-            sOdmD.setPosition(1);
-            sOdmActv = true;
-        }
-
-        if (marcha) speed = Constants.DTMecanum.SPEED / 2.0;
-        else speed = Constants.DTMecanum.SPEED;
-
-        turn *= speed * Constants.DTMecanum.YAW_SPEED;
-
-        if (yaw.getInverted()) speed *= -1;
-        x *= speed;
-        y *= speed;
-
-        turn = Math.round(turn / Constants.DTMecanum.PRECISION) * Constants.DTMecanum.PRECISION;
-        x = Math.round(x / Constants.DTMecanum.PRECISION) * Constants.DTMecanum.PRECISION;
-        y = Math.round(y / Constants.DTMecanum.PRECISION) * Constants.DTMecanum.PRECISION;
-
-
-        double accl;
-        if (Math.abs(x) < 0.06 && Math.abs(y) < 0.06 && Math.abs(turn) < 0.1) {
-            accl = 0;
-            acelT.reset();
-        } else {
-            accl = acelT.time();
-        }
-
-        //telemetry.addData("moveT", accl);
-
-        accl = Math.min(1, accl / Constants.DTMecanum.ACCELERATION);
-        accl = Math.round(accl * 1000.0) / 1000.0;
-
-        FE.setPower((y + x + turn) * accl);
-        FD.setPower((y - x - turn) * accl);
-        TE.setPower((y - x + turn) * accl);
-        TD.setPower((y + x - turn) * accl);
-
-        //getTelemetry();
 
     }
 
     public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist) {
-
-        double erro, yawErro, acT;
+        double erro, yawErro, acT, turn;
 
         propc *= Constants.DTMecanum.CONVERTION;
         dist *= Constants.DTMecanum.CONVERTION;
 
         if (dist != setPoint) {
             setPoint = dist;
-            this.acelT.reset();
+            this.accTime.reset();
             resetEnc();
             moveIsBusy = true;
         }
@@ -139,7 +92,7 @@ public class DTMecanum  extends Subsystem {
 
             moveIsBusy = true;
 
-            acT = Math.min(1, this.acelT.time() / acelT);
+            acT = Math.min(1, this.accTime.time() / acelT);
 
             pos = erro / propc;
             pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
@@ -149,11 +102,11 @@ public class DTMecanum  extends Subsystem {
             turn = Math.min(maxVel, turn);
             turn *= acT;
 
-            setPower(pos, turn, sideMove);
+            tankDrive(pos, turn, sideMove);
 
         } else {
             moveIsBusy = false;
-            setPower(0);
+            tankDrive(0);
         }
     }
 
@@ -167,14 +120,14 @@ public class DTMecanum  extends Subsystem {
 
         if (dist != setPoint) {
             setPoint = dist;
-            this.acelT.reset();
+            this.accTime.reset();
             resetEnc();
             moveIsBusy = true;
         }
 
         if (direction != direction + ang) {
             direction += ang;
-            this.acelT.reset();
+            this.accTime.reset();
         }
 
         if (sideMove) {
@@ -192,7 +145,7 @@ public class DTMecanum  extends Subsystem {
 
             moveIsBusy = true;
 
-            acT = Math.min(1, this.acelT.time() / acelT);
+            acT = Math.min(1, this.accTime.time() / acelT);
 
             pos = erro / propc;
             pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
@@ -202,11 +155,11 @@ public class DTMecanum  extends Subsystem {
             turn = Math.min(maxVel, turn);
             turn *= acT;
 
-            setPower(pos, turn, sideMove);
+            tankDrive(pos, turn, sideMove);
 
         } else {
             moveIsBusy = false;
-            setPower(0);
+            tankDrive(0);
         }
     }
 
@@ -227,14 +180,14 @@ public class DTMecanum  extends Subsystem {
 
     }
 
-    public void setPower(double p) {
+    public void tankDrive(double p) {
         FE.setPower(p);
         FD.setPower(p);
         TE.setPower(p);
         TD.setPower(p);
     }
 
-    public void setPower(double p, double g, boolean side) {
+    private void tankDrive(double p, double g, boolean side) {
 
         if (side) {
             FE.setPower(p + g);
@@ -260,6 +213,65 @@ public class DTMecanum  extends Subsystem {
         TeleOpM03.tel.addData("TE", TE.getPower());
         TeleOpM03.tel.addData("TD", TD.getPower());
     }
+
+
+
+
+
+
+    public void setMove(double x, double y) {
+        this.x = roundPrecision(x);
+        this.y = roundPrecision(-y);
+
+        periodic();
+
+    }
+
+    public void setTurn(double turn) {
+        this.turn = turn;
+        periodic();
+
+    }
+
+    public void setSlow(double slow) {
+        this.slow = 1 - slow / 1.5;
+        periodic();
+    }
+
+    private void periodic() {
+        retractOdometry();
+        updateAcceleration(Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(turn) < 0.1);
+
+        double vel = slow * acc * Constants.DTMecanum.SPEED;
+        FE.setPower((y + x + turn) * vel);
+        FD.setPower((y - x - turn) * vel);
+        TE.setPower((y - x + turn) * vel);
+        TD.setPower((y + x - turn) * vel);
+    }
+
+    private void retractOdometry() {
+        sOdmE.setPosition(1);
+        sOdmD.setPosition(1);
+
+    }
+
+    private void updateAcceleration(boolean release) {
+
+        if (release) {
+            acc = 0;
+            accTime.reset();
+            return;
+        }
+
+        acc = Math.min(1, accTime.time() / Constants.DTMecanum.ACCELERATION);
+        acc = Math.round(acc * 1000.0) / 1000.0;
+    }
+
+    private double roundPrecision(double val) {
+        return Math.round(val / Constants.DTMecanum.PRECISION) * Constants.DTMecanum.PRECISION;
+    }
+
+
  //*/
 
 }

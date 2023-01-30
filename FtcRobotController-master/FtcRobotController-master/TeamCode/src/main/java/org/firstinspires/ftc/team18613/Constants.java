@@ -15,7 +15,7 @@ public class Constants {
         //Tele
         public static final double  SPEED = .7,
                                     YAW_SPEED = .7,
-                                    ACCELERATION = 1500, //Tempo para atingir setpoint de velocidade
+                                    ACCELERATION = 1000, //Tempo para atingir setpoint de velocidade
                                     PRECISION = 0.25,
                                     TOLERANCE_DISTANCE = 100,
                                     TOLERANCE_ANGLE = 100,
@@ -35,22 +35,23 @@ public class Constants {
                                     NV_1 = 1.5,
                                     NV_2 = 3.2,
                                     NV_3 = 4.62,
-                                    CONVR = 1500,
+
                                     UP_SPEED = .9,
                                     DOWN_SPEED = .7,
                                     AJUSTE = 0.25;
 
-        public static final int TOLERANCE = 100;
+        public static final int TOLERANCE = 100,
+                                CONVR = 1500;
 
     }
 
-    public static class Garra {
+    public static class Claw {
 
         public static final double  CLAW_CLOSE = 0.2,
                                     CLAW_OPEN = 0.45,
-                                    PITCH_DROP = 0.05,
-                                    HORIZONTAL = 0.53,
-                                    PITCH_FALLEN = 0.9,
+                                    PITCH_UP = 0.05,
+                                    PITCH_HORIZONTAL = 0.53,
+                                    PITCH_LOWERED = 0.9,
                                     ELEVADOR_UP = 1,
                                     ROLL_UP = 0.2,
                                     ROLL_DOWN = 0.6,

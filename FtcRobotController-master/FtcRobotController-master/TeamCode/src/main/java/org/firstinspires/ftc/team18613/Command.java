@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.team18613;
 
-import java.util.ArrayList;
 
 public abstract class Command {
-
-
 
     public abstract void run();
 

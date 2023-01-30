@@ -5,10 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.team18613.Subsystems.Braco;
+import org.firstinspires.ftc.team18613.Subsystems.Arm;
 import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
-import org.firstinspires.ftc.team18613.Subsystems.Elevador;
-import org.firstinspires.ftc.team18613.Subsystems.Garra;
+import org.firstinspires.ftc.team18613.Subsystems.Elevator;
+import org.firstinspires.ftc.team18613.Subsystems.Claw;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
 import org.firstinspires.ftc.team18613.Vision.VisionCtrl;
 
@@ -19,10 +19,10 @@ import java.util.Arrays;
 public class AutoM03 extends LinearOpMode {
 
     DTMecanum drive;
-    Elevador elev;
+    Elevator elev;
     Turret yaw;
-    Garra garra;
-    Braco braco;
+    Claw garra;
+    Arm braco;
     ElapsedTime time;
     VisionCtrl vision;
 
@@ -30,9 +30,9 @@ public class AutoM03 extends LinearOpMode {
 
     public void runOpMode() {
 
-        elev  = new Elevador  ();
-        braco = new Braco     (elev);
-        garra = new Garra     (elev, braco);
+        elev  = new Elevator();
+        braco = new Arm(elev);
+        garra = new Claw(elev, braco);
         yaw   = new Turret(elev, garra);
         drive = new DTMecanum (yaw);
 

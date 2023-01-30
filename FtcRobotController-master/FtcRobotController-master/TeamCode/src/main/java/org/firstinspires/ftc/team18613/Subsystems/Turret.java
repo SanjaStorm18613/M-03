@@ -11,16 +11,16 @@ import org.firstinspires.ftc.team18613.TeleOpM03;
 public class Turret extends Subsystem {
 
     private final DcMotor turret;
-    private final Elevador elev;
+    private final Elevator elev;
     private final ElapsedTime time;
-    private final Garra garra;
+    private final Claw garra;
 
     //private double y = 0, x = 0;
     private double var = 0;
 
     boolean elevColt = true;
 
-    public Turret(Elevador elev, Garra garra) {
+    public Turret(Elevator elev, Claw garra) {
 
         turret = TeleOpM03.hm.get(DcMotor.class, "Yaw");
 
@@ -36,34 +36,6 @@ public class Turret extends Subsystem {
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     }
 
-    public void Control(boolean cw, boolean ccw) {
-
-        elevColt = elev.getNiveis() == 0;
-
-
-        double vel;
-        if ((!cw && !ccw) || ((var > 0.15 && var < 0.86) && elev.getCurrentPos() < 1700)) {
-            time.reset();
-            vel = 0;
-        } else {
-            vel = Math.min(time.time() / 1500, 1);
-        }
-        TeleOpM03.tel.addData("yaw", turret.getCurrentPosition());
-
-
-        if (cw && turret.getCurrentPosition() > -1600) turret.setPower(-1);
-        else if (ccw && turret.getCurrentPosition() < 1600) turret.setPower(1);
-        else turret.setPower(0);
-
-
-        if (var > 0.12 && var < 0.89) {
-            garra.setElev(1.6);
-        } else garra.setElev(0);
-
-        TeleOpM03.tel.addData("yaw", turret.getCurrentPosition());
-        TeleOpM03.tel.addData("var", var);
-    }
-
     public boolean getBusy() { return turret.isBusy(); }
 
     public void setPos(double pos, double vel) {
@@ -73,30 +45,37 @@ public class Turret extends Subsystem {
     }
 
     public boolean getInverted() {
-        return var >= 0.86;
-    }
-
-    public double[] getCorrectionCoord () {
-        return new double[] {1, -1};
+        return false;
     }
 
     public void turn (boolean isClockwise) {
 
-        int var = turret.getCurrentPosition() / 1600;
+        double var = turret.getCurrentPosition() / 800.0;
+        var -= Math.round(var);
 
-        if (isClockwise) {
-            if (var >= .  || var >= -) {
+        TeleOpM03.tel.addData("var", var);
+        TeleOpM03.tel.addData("CorrentPos", turret.getCurrentPosition());
 
-            }
-
-        } else {
-            if (var <= .16  || var >= -.16) {
-
-            }
+        if (turret.getCurrentPosition() >= 1760 || turret.getCurrentPosition() <= -1760) {
+            stop();
+            return;
         }
 
+        if (elev.onColletionStage()) {
+            //Implementar: Se chegar no limite levantar elevador para continuar rotação
+            if (isClockwise && var <= .15) {
+                turret.setPower(Constants.Yaw.SPEED);
 
-        turret.setPower(Constants.Yaw.SPEED * (isClockwise ? 1 : -1));
+            } else if (!isClockwise && var >= -.15){
+                turret.setPower(-Constants.Yaw.SPEED);
+
+            } else {
+                stop();
+            }
+        } else {
+            turret.setPower(Constants.Yaw.SPEED * (isClockwise ? 1 : -1));
+        }
+
     }
 
     public void stop () {

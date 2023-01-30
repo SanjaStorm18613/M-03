@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.team18613.commands;
 
 import org.firstinspires.ftc.team18613.Command;
-import org.firstinspires.ftc.team18613.Subsystems.Garra;
+import org.firstinspires.ftc.team18613.Subsystems.Claw;
 
-public class FecharGarra extends Command {
+public class ClawClose extends Command {
 
-    Garra m_garra;
+    Claw m_garra;
 
-    public FecharGarra(Garra garra){
+    public ClawClose(Claw garra){
         m_garra = garra;
     }
 
