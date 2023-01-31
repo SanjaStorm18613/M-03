@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.team18613.commands;
+package org.firstinspires.ftc.team18613.commands.Drive;
 
 import org.firstinspires.ftc.team18613.Command;
 import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
 
-public class DriveMove extends Command {
+public class Move extends Command {
+    private final DTMecanum drive;
+    private final double x, y;
 
-    DTMecanum drive;
-    double x, y;
-    public DriveMove(DTMecanum drive, double x, double y) {
+    public Move(DTMecanum drive, double x, double y) {
         this.drive = drive;
         this.x = x;
         this.y = y;

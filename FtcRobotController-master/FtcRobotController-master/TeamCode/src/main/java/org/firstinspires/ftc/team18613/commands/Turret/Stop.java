@@ -1,13 +1,12 @@
-package org.firstinspires.ftc.team18613.commands;
+package org.firstinspires.ftc.team18613.commands.Turret;
 
 import org.firstinspires.ftc.team18613.Command;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
 
-public class StopTurret extends Command {
-
+public class Stop extends Command {
     private final Turret turret;
 
-    public StopTurret (Turret turret) {
+    public Stop(Turret turret) {
         this.turret = turret;
     }
 

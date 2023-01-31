@@ -12,13 +12,11 @@ public class Turret extends Subsystem {
 
     private final DcMotor turret;
     private final Elevator elev;
-    private final ElapsedTime time;
-    private final Claw garra;
 
     //private double y = 0, x = 0;
-    private double var = 0;
+    private final double var = 0;
 
-    boolean elevColt = true;
+    private boolean enable = false, isClockwise = true;
 
     public Turret(Elevator elev, Claw garra) {
 
@@ -31,9 +29,8 @@ public class Turret extends Subsystem {
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.elev = elev;
-        this.garra = garra;
 
-        time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     }
 
     public boolean getBusy() { return turret.isBusy(); }
@@ -44,8 +41,8 @@ public class Turret extends Subsystem {
         turret.setPower(vel);
     }
 
-    public boolean getInverted() {
-        return false;
+    public boolean getForward() {
+        return !(Math.abs(turret.getCurrentPosition()) > 400 && Math.abs(turret.getCurrentPosition()) < 1200);
     }
 
     public void turn (boolean isClockwise) {
@@ -78,8 +75,33 @@ public class Turret extends Subsystem {
 
     }
 
+    private boolean notLimit (boolean isClockwise) {
+        double var = turret.getCurrentPosition() / 800.0;
+        var -= Math.round(var);
+
+        return turret.getCurrentPosition() < 1760 && turret.getCurrentPosition() > -1760
+                && (!isClockwise || !(var <= .15)) && (isClockwise || !(var >= -.15));
+
+    }
+
+    public void periodic() {
+
+        if (enable) {
+            turret.setPower(Constants.Yaw.SPEED * (isClockwise ? 1 : -1));
+        } else {
+            turret.setPower(0);
+        }
+
+    }
+
+    public void enable(boolean isClockwise) {
+        this.isClockwise = isClockwise;
+        enable = notLimit(isClockwise);
+
+    }
+
     public void stop () {
-        turret.setPower(0);
+        enable = false;
     }
 
 }

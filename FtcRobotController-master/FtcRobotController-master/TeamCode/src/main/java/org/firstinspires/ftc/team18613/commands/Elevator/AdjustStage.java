@@ -1,13 +1,13 @@
-package org.firstinspires.ftc.team18613.commands;
+package org.firstinspires.ftc.team18613.commands.Elevator;
 
 import org.firstinspires.ftc.team18613.Command;
 import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 
-public class ElevatorAdjustStage extends Command {
-    Elevator elevator;
-    boolean up;
+public class AdjustStage extends Command {
+    private final Elevator elevator;
+    private final boolean up;
 
-    public ElevatorAdjustStage(Elevator elevator, boolean up) {
+    public AdjustStage(Elevator elevator, boolean up) {
         this.elevator = elevator;
         this.up = up;
     }

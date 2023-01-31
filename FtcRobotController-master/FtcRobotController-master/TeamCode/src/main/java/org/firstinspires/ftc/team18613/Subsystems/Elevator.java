@@ -10,83 +10,136 @@ import org.firstinspires.ftc.team18613.TeleOpM03;
 
 public class Elevator extends Subsystem {
 
-    DcMotorEx elev;
+    private DcMotorEx elevator;
 
-    int adjust = 0;
+    private int adjust = 0;
 
-    double[] stages =
+    private final double[] stages =
             { Constants.Elevador.NV_0
             , Constants.Elevador.NV_1
             , Constants.Elevador.NV_2
             , Constants.Elevador.NV_3 };
 
-    int stage = 0;
-    double setAjt = 0;
+    private int stage = 0;
+    private double setAjt = 0, priorityPos = 0, controlRequirement = 0;
+
+    private boolean UPCtr = true, UP = true, DOWNCtr = true, DOWN = true, velUp = true;
+    private double ajt = 0;
+    private boolean mxLimt = false, mnLimt = false;
+    private int count = 0, pos = 0;
+
 
     public Elevator() {
-        elev = TeleOpM03.hm.get(DcMotorEx.class, "Elevador");
+        elevator = TeleOpM03.hm.get(DcMotorEx.class, "Elevador");
 
-        elev.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        elev.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        elev.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        elev.setDirection(DcMotorSimple.Direction.REVERSE);
-        elev.setTargetPositionTolerance(Constants.Elevador.TOLERANCE);
+        elevator.setDirection(DcMotorSimple.Direction.REVERSE);
+        elevator.setTargetPositionTolerance(Constants.Elevador.TOLERANCE);
+    }
+
+    public void Control(boolean up, boolean down, boolean upCtr, boolean dowCtr) {
+
+        if (upCtr && UPCtr && !mxLimt) ajt += Constants.Elevador.AJUSTE;
+
+        if (dowCtr && DOWNCtr && !mnLimt) ajt -= Constants.Elevador.AJUSTE;
+
+
+        if (up && UP) {
+            count++;
+            count = Math.min(3, count);
+            ajt = 0;
+            velUp = true;
+        }
+
+        if (down && DOWN) {
+            count--;
+            count = Math.max(0, count);
+            ajt = 0;
+            velUp = false;
+        }
+
+
+        UPCtr = !upCtr;
+        DOWNCtr = !dowCtr;
+        UP = !up;
+        DOWN = !down;
+
+        pos = (int) (Math.max(stages[count] + ajt, setAjt) * Constants.Elevador.CONVR);
+
+
+        pos = Math.min(pos, (int) (stages[3] * Constants.Elevador.CONVR));
+        mxLimt = pos == (stages[3] * Constants.Elevador.CONVR);
+
+        pos = Math.max(pos, (int) (stages[0] * Constants.Elevador.CONVR));
+        mnLimt = pos == (stages[0] * Constants.Elevador.CONVR);
+
+
+        elevator.setTargetPosition(pos);
+        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        if (elevator.isBusy()) elevator.setPower(velUp ? Constants.Elevador.UP_SPEED : Constants.Elevador.DOWN_SPEED);
+        else elevator.setPower(0);
+
+        //telemetry.addData("getTargetPosition", elev.getTargetPosition());
+        TeleOpM03.tel.addData("elev Pos", elevator.getCurrentPosition());
+
     }
 
     public int getStages() {
-        return stage;
+        return count;
     }
     public boolean onColletionStage() {
         return stage == 0;
     }
 
     public double getTargetPosition() {
-        return elev.getTargetPosition();
+        return elevator.getTargetPosition();
     }
 
     public int getCurrentPos() {
-        return elev.getCurrentPosition();
+        return elevator.getCurrentPosition();
     }
 
     public void setPos(double pos, double vel) {
-        elev.setTargetPosition((int) (pos * Constants.Elevador.CONVR));
-        elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        elev.setPower(vel);
+        elevator.setTargetPosition((int) (pos * Constants.Elevador.CONVR));
+        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        elevator.setPower(vel);
     }
 
     public boolean getBusy() {
-        return elev.isBusy();
+        return elevator.isBusy();
     }
 
     public void setAjt(boolean activ, double ajt) {
         if (activ) {
-            //setAjt = ajt;
+            setAjt = ajt;
         } else {
             setAjt = 0;
         }
     }
+//////aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
+    public double addControl(double pos) {
+        controlRequirement = Math.max(pos, controlRequirement);
+        return controlRequirement;
+    }
 
-    public void setMinPos(double pos) {
-        if (pos ==-1){
-            setAjt = 0;
-        } else {
-            setAjt = pos;
-        }
+    public void removeControl(){
+        controlRequirement = 0;
     }
 
     public void raiseStage() {
         adjust = 0;
         stage = Math.min(3, ++stage);
-        stageUpdate();
 
     }
 
     public void lowerStage() {
         adjust = 0;
         stage = Math.max(0, --stage);
-        stageUpdate();
 
     }
 
@@ -99,25 +152,26 @@ public class Elevator extends Subsystem {
         if (!up && currentStage > Constants.Elevador.NV_0) {
             adjust--;
         }
-        stageUpdate();
 
     }
 
-    private void stageUpdate() {
+    public void periodic() {
         double targetPos = stages[stage] + adjust * Constants.Elevador.AJUSTE;
+
+        targetPos = addControl(targetPos);
+
         targetPos = Math.min(Constants.Elevador.NV_3, targetPos);
         targetPos = Math.max(Constants.Elevador.NV_0, targetPos);
         targetPos = targetPos * Constants.Elevador.CONVR;
 
-        elev.setTargetPosition((int) targetPos);
-        elev.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        elevator.setTargetPosition((int) targetPos);
+        elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        int delta = elev.getTargetPosition() - elev.getCurrentPosition();
+        int delta = elevator.getTargetPosition() - elevator.getCurrentPosition();
         if (delta >= 0) {
-            elev.setPower(Constants.Elevador.UP_SPEED);
+            elevator.setPower(Constants.Elevador.UP_SPEED);
         } else {
-            elev.setPower(Constants.Elevador.DOWN_SPEED);
-
+            elevator.setPower(Constants.Elevador.DOWN_SPEED);
         }
 
         TeleOpM03.tel.addData("adjust", adjust);

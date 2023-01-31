@@ -1,18 +1,17 @@
-package org.firstinspires.ftc.team18613.commands;
+package org.firstinspires.ftc.team18613.commands.Claw;
 
 import org.firstinspires.ftc.team18613.Command;
 import org.firstinspires.ftc.team18613.Subsystems.Claw;
 
-public class ClawClose extends Command {
+public class Open extends Command {
+    private final Claw m_garra;
 
-    Claw m_garra;
-
-    public ClawClose(Claw garra){
+    public Open(Claw garra){
         m_garra = garra;
     }
 
     @Override
     public void run() {
-        m_garra.closeClaw();
+        m_garra.openClaw();
     }
 }
