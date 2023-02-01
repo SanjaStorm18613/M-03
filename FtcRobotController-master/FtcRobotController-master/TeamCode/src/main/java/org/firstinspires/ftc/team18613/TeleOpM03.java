@@ -62,7 +62,7 @@ public class TeleOpM03 extends LinearOpMode {
 
  */
             pilot.sticks(Controller.left_stick_x, Controller.left_stick_y, (FloatPair val) -> new Move(drive, val.firstValue(), val.secondValue()));
-            pilot.stick(Controller.right_stick_x, (Supplier<Float> val) -> new org.firstinspires.ftc.team18613.commands.Drive.Turn(drive, val));
+            pilot.stick(Controller.right_stick_x, (Float val) -> new org.firstinspires.ftc.team18613.commands.Drive.Turn(drive, val));
             pilot.trigger(Controller.right_trigger, (Float val) -> new Slow(drive, val));
 /*
             pilot.onPressed(Controller.a, new HorizontalColect(claw));

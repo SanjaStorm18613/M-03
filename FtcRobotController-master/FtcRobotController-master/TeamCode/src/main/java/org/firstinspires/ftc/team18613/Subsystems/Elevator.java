@@ -26,7 +26,7 @@ public class Elevator extends Subsystem {
     private boolean UPCtr = true, UP = true, DOWNCtr = true, DOWN = true, velUp = true;
     private double ajt = 0;
     private boolean mxLimt = false, mnLimt = false;
-    private int count = 0, pos = 0;
+    private int pos = 0;
 
 
     public Elevator() {
@@ -48,15 +48,15 @@ public class Elevator extends Subsystem {
 
 
         if (up && UP) {
-            count++;
-            count = Math.min(3, count);
+            stage++;
+            stage = Math.min(3, stage);
             ajt = 0;
             velUp = true;
         }
 
         if (down && DOWN) {
-            count--;
-            count = Math.max(0, count);
+            stage--;
+            stage = Math.max(0, stage);
             ajt = 0;
             velUp = false;
         }
@@ -67,7 +67,7 @@ public class Elevator extends Subsystem {
         UP = !up;
         DOWN = !down;
 
-        pos = (int) (Math.max(stages[count] + ajt, setAjt) * Constants.Elevador.CONVR);
+        pos = (int) (Math.max(stages[stage] + ajt, setAjt) * Constants.Elevador.CONVR);
 
 
         pos = Math.min(pos, (int) (stages[3] * Constants.Elevador.CONVR));
@@ -89,7 +89,7 @@ public class Elevator extends Subsystem {
     }
 
     public int getStages() {
-        return count;
+        return stage;
     }
     public boolean onColletionStage() {
         return stage == 0;

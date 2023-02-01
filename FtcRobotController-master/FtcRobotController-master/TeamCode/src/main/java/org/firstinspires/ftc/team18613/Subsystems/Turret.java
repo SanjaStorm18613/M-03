@@ -11,7 +11,7 @@ import org.firstinspires.ftc.team18613.TeleOpM03;
 public class Turret extends Subsystem {
 
     private final DcMotor turret;
-    private final Elevator elev;
+    private final Elevator elevator;
 
     //private double y = 0, x = 0;
     private final double var = 0;
@@ -28,7 +28,7 @@ public class Turret extends Subsystem {
         turret.setDirection(DcMotorSimple.Direction.REVERSE);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        this.elev = elev;
+        this.elevator = elev;
 
         ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     }
@@ -58,7 +58,7 @@ public class Turret extends Subsystem {
             return;
         }
 
-        if (elev.onColletionStage()) {
+        if (elevator.onColletionStage()) {
             //Implementar: Se chegar no limite levantar elevador para continuar rotação
             if (isClockwise && var <= .15) {
                 turret.setPower(Constants.Yaw.SPEED);
@@ -76,32 +76,60 @@ public class Turret extends Subsystem {
     }
 
     private boolean notLimit (boolean isClockwise) {
+
+        return !(turret.getCurrentPosition() > 1760
+                || turret.getCurrentPosition() < -1760
+                || (isClockwise && getRelativePos() > .15)
+                || (!isClockwise && getRelativePos () < -.15))
+                || elevator.getTargetPosition() >= Constants.Elevador.NV_1;
+
+    }
+
+    private double getRelativePos () {
         double var = turret.getCurrentPosition() / 800.0;
         var -= Math.round(var);
-
-        return turret.getCurrentPosition() < 1760 && turret.getCurrentPosition() > -1760
-                && (!isClockwise || !(var <= .15)) && (isClockwise || !(var >= -.15));
-
+        return var;
     }
 
     public void periodic() {
 
-        if (enable) {
-            turret.setPower(Constants.Yaw.SPEED * (isClockwise ? 1 : -1));
+        if (notLimit(isClockwise)){
+            if (enable) {
+                turret.setPower(Constants.Yaw.SPEED * (isClockwise ? 1 : -1));
+            } else {
+                turret.setPower(0);
+            }
         } else {
-            turret.setPower(0);
+            turret.setPower(runAllowedPoint());
         }
 
     }
 
     public void enable(boolean isClockwise) {
         this.isClockwise = isClockwise;
-        enable = notLimit(isClockwise);
+        enable = true;
 
     }
 
     public void stop () {
         enable = false;
+        turret.setPower(0);
+
+    }
+
+    private double runAllowedPoint () {
+        double setPoint;
+        double currentPos = turret.getCurrentPosition();
+        double sig = Math.signum(currentPos) == 0 ? 1 : Math.signum(currentPos);
+
+        if (!getForward()) {
+                setPoint = 800 * sig;
+            } else if (Math.abs(currentPos) >= 1200) {
+                setPoint = 1600 * sig;
+            } else {
+                setPoint = 0;
+            }
+        return (setPoint - currentPos) * 0.005;
     }
 
 }

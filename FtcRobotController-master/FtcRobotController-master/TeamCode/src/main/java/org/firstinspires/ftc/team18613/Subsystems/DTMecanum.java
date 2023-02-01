@@ -233,6 +233,8 @@ public class DTMecanum  extends Subsystem {
         updateAcceleration(Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(turn) < 0.1);
 
         double vel = slowFactor * acc * Constants.DTMecanum.SPEED;
+        vel *= turret.getForward() ? 1 : -1;
+
         FL.setPower((y + x + turn) * vel);
         FR.setPower((y - x - turn) * vel);
         BL.setPower((y - x + turn) * vel);
@@ -261,7 +263,5 @@ public class DTMecanum  extends Subsystem {
         return Math.round(val / Constants.DTMecanum.PRECISION) * Constants.DTMecanum.PRECISION;
     }
 
-
- //*/
 
 }

@@ -14,8 +14,8 @@ public class Turn extends Command {
 
     @Override
     public void run() {
-        //turret.turn(isClockwise);
-        turret.enable(isClockwise);
+        turret.turn(isClockwise);
+        //turret.enable(isClockwise);
     }
 
 }

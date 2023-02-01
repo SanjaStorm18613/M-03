@@ -219,7 +219,7 @@ public class Controller {
             Function<Float,Command> fcc = i.firstValue();
             int id = i.secondValue();
 
-            Supplier<Float> current = floatSupplier.get(id);
+            Float current = floatSupplier.get(id).get();
 
             fcc.apply(current).run();
         }
