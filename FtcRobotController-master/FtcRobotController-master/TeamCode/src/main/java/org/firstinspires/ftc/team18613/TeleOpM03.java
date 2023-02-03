@@ -11,8 +11,16 @@ import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
 import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 import org.firstinspires.ftc.team18613.Subsystems.Claw;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
+import org.firstinspires.ftc.team18613.commands.Claw.AngulationDrop;
+import org.firstinspires.ftc.team18613.commands.Claw.Drop;
+import org.firstinspires.ftc.team18613.commands.Claw.HorizontalColect;
+import org.firstinspires.ftc.team18613.commands.Claw.LoweredFrontColect;
+import org.firstinspires.ftc.team18613.commands.Claw.LoweredSideColect;
+import org.firstinspires.ftc.team18613.commands.Claw.Retract;
 import org.firstinspires.ftc.team18613.commands.Drive.Move;
 import org.firstinspires.ftc.team18613.commands.Drive.Slow;
+import org.firstinspires.ftc.team18613.commands.Elevator.AdjustStage;
+import org.firstinspires.ftc.team18613.commands.Elevator.ShiftStage;
 import org.firstinspires.ftc.team18613.commands.Turret.Stop;
 import org.firstinspires.ftc.team18613.commands.Turret.Turn;
 import org.firstinspires.ftc.team18613.utils.FloatPair;
@@ -21,9 +29,9 @@ import org.firstinspires.ftc.team18613.utils.Supplier;
 @TeleOp(name = "TeleOpM03", group = "Linear Opmode")
 
 public class TeleOpM03 extends LinearOpMode {
-    
-    DTMecanum drive;
+
     Elevator elevator;
+    DTMecanum drive;
     Turret turret;
     Claw claw;
     Arm arm;
@@ -45,6 +53,7 @@ public class TeleOpM03 extends LinearOpMode {
         turret = new Turret(elevator, claw);
         drive = new DTMecanum (turret);
 
+
         waitForStart();
         while (opModeIsActive()) {
 
@@ -53,47 +62,44 @@ public class TeleOpM03 extends LinearOpMode {
 
             copilot.whilePressed(Controller.right, new Turn(turret, true));
             copilot.onReleased(Controller.right, new Stop(turret));
-/*
-            copilot.onPressed(Controller.y, new ElevatorShiftStage(elevator, true));
-            copilot.onPressed(Controller.x, new ElevatorShiftStage(elevator, false));
 
-            copilot.onPressed(Controller.up, new ElevatorAdjustStage(elevator, true));
-            copilot.onPressed(Controller.down, new ElevatorAdjustStage(elevator, false));
-
- */
             pilot.sticks(Controller.left_stick_x, Controller.left_stick_y, (FloatPair val) -> new Move(drive, val.firstValue(), val.secondValue()));
             pilot.stick(Controller.right_stick_x, (Float val) -> new org.firstinspires.ftc.team18613.commands.Drive.Turn(drive, val));
             pilot.trigger(Controller.right_trigger, (Float val) -> new Slow(drive, val));
-/*
+
             pilot.onPressed(Controller.a, new HorizontalColect(claw));
             pilot.onPressed(Controller.b, new LoweredFrontColect(claw));
             pilot.onPressed(Controller.x, new LoweredSideColect(claw));
             copilot.trigger(Controller.left_trigger, (Float val) -> new AngulationDrop(claw, val));
             copilot.onPressed(Controller.right_trigger_not_zero, new Drop(claw));
- */
+            copilot.onPressed(Controller.b, new Retract(claw));
+
+            //*/
+            copilot.onPressed(Controller.y, new ShiftStage(elevator, true));
+            copilot.onPressed(Controller.x, new ShiftStage(elevator, false));
+
+            copilot.onPressed(Controller.up, new AdjustStage(elevator, true));
+            copilot.onPressed(Controller.down, new AdjustStage(elevator, false));
 
 
+            elevator.removeControl();
+            arm.removeControl();
             drive.periodic();
-            //claw.periodic();
-            //elevator.periodic();
-            //turret.periodic();
-            //arm.periodic();
+            claw.periodic();
+            turret.periodic();
+            arm.periodic();
+            elevator.periodic();
             //claw.getTelemetry();
+            telemetry.update();
 
+/*
             elevator.Control(
                     gamepad2.y,
                     gamepad2.x,
                     gamepad2.dpad_up,
                     gamepad2.dpad_down
-            );
-
-
-//            drive.control(
-//                    gamepad1.left_stick_x,
-//                    -gamepad1.left_stick_y,
-//                    gamepad1.right_stick_x,
-//                    gamepad1.right_trigger > 0.1);
-
+            );*/
+/*
             claw.Control(
                     gamepad2.a,
                     gamepad1.a,
@@ -104,12 +110,12 @@ public class TeleOpM03 extends LinearOpMode {
                     gamepad2.left_trigger);
 
 
- //*/
-            arm.control();
+ */
+            //arm.control();
 
-            drive.getTelemetry();
+            //drive.getTelemetry();
 
-            telemetry.update();
+
         }
     }
 }

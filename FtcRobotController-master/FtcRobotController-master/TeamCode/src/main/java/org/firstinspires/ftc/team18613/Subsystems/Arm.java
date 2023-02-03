@@ -26,24 +26,6 @@ public class Arm extends Subsystem {
         this.elevator = elevator;
     }
 
-    public void control() {
-        double posRangeBraco = Constants.Braco.MAX_POS - Constants.Braco.MIN_POS;
-        double posPercentElev = (elevator.getCurrentPos() / ((Constants.Elevador.NV_3/0.9) * Constants.Elevador.CONVR));
-        double pos = (posPercentElev * posRangeBraco) + Constants.Braco.MIN_POS;
-
-        pos = Math.min(pos, Constants.Braco.MAX_POS);
-        pos = Math.max(pos, Constants.Braco.MIN_POS);
-
-        automaticPos = addControl(pos);
-
-        //pos = controlRequirement == -1 ? pos : controlRequirement;
-
-        sLeft.setPosition(automaticPos);
-        sRight.setPosition(automaticPos);
-
-        TeleOpM03.tel.addData("braco", sLeft.getPosition());
-    }
-
     public double getPos(){
         return automaticPos - Constants.Braco.MIN_POS;
     }
@@ -55,10 +37,17 @@ public class Arm extends Subsystem {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void periodic(){
+        double var;
         updateAutomaticPos();
-        sLeft.setPosition(automaticPos);
-        sRight.setPosition(automaticPos);
-        TeleOpM03.tel.addData("braco", sLeft.getPosition());
+        if (controlRequirement == -1){
+            var = automaticPos;
+        } else {
+            var = controlRequirement;
+        }
+        sLeft.setPosition(var);
+        sRight.setPosition(var);
+
+        //TeleOpM03.tel.addData("braco", sLeft.getPosition());
 
     }
 
@@ -68,7 +57,7 @@ public class Arm extends Subsystem {
     }
 
     public void removeControl(){
-        controlRequirement = 0;
+        controlRequirement = -1;
     }
 
     private void updateAutomaticPos() {
@@ -79,7 +68,8 @@ public class Arm extends Subsystem {
         pos = Math.min(pos, Constants.Braco.MAX_POS);
         pos = Math.max(pos, Constants.Braco.MIN_POS);
 
-        automaticPos = addControl(pos);
+        automaticPos = pos;
+
     }
 
 }

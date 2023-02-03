@@ -34,7 +34,7 @@ public class Constants {
         public static final double  NV_0 = 0,
                                     NV_1 = 1.5,
                                     NV_2 = 3.2,
-                                    NV_3 = 4.8,
+                                    NV_3 = 4.5,
 
                                     UP_SPEED = .9,
                                     DOWN_SPEED = .7,
@@ -55,7 +55,7 @@ public class Constants {
                                     ROLL_UP = 0.2,
                                     ROLL_DOWN = 0.6,
                                     ROLL_SIDE_CONE = ROLL_UP + Math.abs(ROLL_DOWN-ROLL_UP)/2,
-                                    TRANSITION_TIME = 2000;
+                                    TRANSITION_TIME = 1000;
 
     }
 

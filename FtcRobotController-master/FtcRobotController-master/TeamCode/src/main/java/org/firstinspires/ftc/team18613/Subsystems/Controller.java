@@ -73,12 +73,12 @@ public class Controller {
                         , () -> gamepad.right_bumper
                         , () -> gamepad.left_stick_button
                         , () -> gamepad.right_stick_button
-                        , () -> gamepad.right_trigger != 0
                         , () -> gamepad.left_stick_y != 0
                         , () -> gamepad.left_stick_x != 0
                         , () -> gamepad.right_stick_y != 0
                         , () -> gamepad.right_stick_x != 0
                         , () -> gamepad.left_trigger != 0
+                        , () -> gamepad.right_trigger != 0
                 )
         );
 

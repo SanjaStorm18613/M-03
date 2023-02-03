@@ -84,7 +84,6 @@ public class Elevator extends Subsystem {
         else elevator.setPower(0);
 
         //telemetry.addData("getTargetPosition", elev.getTargetPosition());
-        TeleOpM03.tel.addData("elev Pos", elevator.getCurrentPosition());
 
     }
 
@@ -95,10 +94,13 @@ public class Elevator extends Subsystem {
         return stage == 0;
     }
 
-    public double getTargetPosition() {
+    public double getTargetPos() {
         return elevator.getTargetPosition();
     }
 
+    public boolean targetPosLowStage() {
+        return elevator.getTargetPosition() < stages[1] * Constants.Elevador.CONVR;
+    }
     public int getCurrentPos() {
         return elevator.getCurrentPosition();
     }
@@ -152,17 +154,16 @@ public class Elevator extends Subsystem {
         if (!up && currentStage > Constants.Elevador.NV_0) {
             adjust--;
         }
-
     }
 
     public void periodic() {
         double targetPos = stages[stage] + adjust * Constants.Elevador.AJUSTE;
 
-        targetPos = addControl(targetPos);
+        targetPos = Math.max(targetPos, controlRequirement);
 
         targetPos = Math.min(Constants.Elevador.NV_3, targetPos);
         targetPos = Math.max(Constants.Elevador.NV_0, targetPos);
-        targetPos = targetPos * Constants.Elevador.CONVR;
+        targetPos *= Constants.Elevador.CONVR;
 
         elevator.setTargetPosition((int) targetPos);
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -175,7 +176,8 @@ public class Elevator extends Subsystem {
         }
 
         TeleOpM03.tel.addData("adjust", adjust);
-        TeleOpM03.tel.addData("stage", stage);
+        TeleOpM03.tel.addData("targetPos-final", targetPos);
+        TeleOpM03.tel.addData("controlRequirement", controlRequirement);
 
     }
 
