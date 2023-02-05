@@ -15,7 +15,7 @@ public class Constants {
         //Tele
         public static final double  SPEED = .7,
                                     YAW_SPEED = .7,
-                                    ACCELERATION = 1000, //Tempo para atingir setpoint de velocidade
+                                    ACCELERATION = 1500, //Tempo para atingir setpoint de velocidade
                                     PRECISION = 0.25,
                                     TOLERANCE_DISTANCE = 100,
                                     TOLERANCE_ANGLE = 100,

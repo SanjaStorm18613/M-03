@@ -84,6 +84,7 @@ public class TeleOpM03 extends LinearOpMode {
 
             elevator.removeControl();
             arm.removeControl();
+
             drive.periodic();
             claw.periodic();
             turret.periodic();

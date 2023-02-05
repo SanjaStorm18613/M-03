@@ -68,18 +68,14 @@ public class Turret extends Subsystem {
             limitProxPercent = 1;
         }
 
-        if (Math.abs(getRelativePos()) > .135) {
-            elevator.addControl((Constants.Elevador.NV_1+.1));
-        }
-
-        if (notLimit(isClockwise) || elevator.getCurrentPos() >= Constants.Elevador.NV_1 * Constants.Elevador.CONVR) {
+        if (notLimit(isClockwise)) {
             if (enable) {
                 turret.setPower(Constants.Yaw.SPEED * (isClockwise ? 1 : -1) * limitProxPercent);
             } else {
                 turret.setPower(0);
             }
         } else {
-            turret.setPower(0);
+            runAllowedPoint();
         }
 
         TeleOpM03.tel.addData("getRelativePos", Math.abs(getRelativePos()));
@@ -99,7 +95,7 @@ public class Turret extends Subsystem {
 
     }
 
-    private double runAllowedPoint () {
+    private double runAllowedPoint() {
         double setPoint;
         double currentPos = turret.getCurrentPosition();
         double sig = Math.signum(currentPos) == 0 ? 1 : Math.signum(currentPos);
@@ -112,7 +108,11 @@ public class Turret extends Subsystem {
                 setPoint = 0;
             }
 
-        return setPoint - currentPos * 0.005;
+        double delta = setPoint - currentPos;
+
+        elevator.addControl(Constants.Elevador.NV_1 * delta * 0.002);
+
+        return delta * 0.005;
 
     }
 
