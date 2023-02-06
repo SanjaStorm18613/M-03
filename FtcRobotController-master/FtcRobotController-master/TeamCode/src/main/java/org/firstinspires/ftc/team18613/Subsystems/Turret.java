@@ -13,8 +13,6 @@ public class Turret extends Subsystem {
     private final DcMotor turret;
     private final Elevator elevator;
 
-    private final double var = 0;
-
     private boolean enable = false, isClockwise = true;
 
     public Turret(Elevator elev, Claw garra) {
@@ -35,27 +33,28 @@ public class Turret extends Subsystem {
     public boolean getBusy() { return turret.isBusy(); }
 
     public void setPos(double pos, double vel) {
-        turret.setTargetPosition((int) (pos * Constants.Yaw.CONVR));
+        turret.setTargetPosition((int) (pos * Constants.Turret.CONVR));
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turret.setPower(vel);
     }
 
     public boolean getForward() {
-        return !(Math.abs(turret.getCurrentPosition()) > 400 && Math.abs(turret.getCurrentPosition()) < 1200);
+        return !(Math.abs(turret.getCurrentPosition()) > Constants.Turret.COUNTS_PER_REVOLUTION/ 4.
+                && Math.abs(turret.getCurrentPosition()) < Constants.Turret.COUNTS_PER_REVOLUTION/ 1.5);
     }
 
     private boolean notLimit (boolean isClockwise) {
 
-        return !(turret.getCurrentPosition() > 1760
-                || turret.getCurrentPosition() < -1760
-                || (isClockwise && getRelativePos() > .145)
-                || (!isClockwise && getRelativePos () < -.145))
-                ;
+        return !(turret.getCurrentPosition() > Constants.Turret.LIMIT
+                || turret.getCurrentPosition() < -Constants.Turret.LIMIT
+                || (isClockwise && getRelativePos() > Constants.Turret.CHASSIS_OPENING + .015)
+                || (!isClockwise && getRelativePos() < -(Constants.Turret.CHASSIS_OPENING + .015)))
+                || !elevator.targetPosLowStage();
 
     }
 
     private double getRelativePos () {
-        double var = turret.getCurrentPosition() / 800.0;
+        double var = turret.getCurrentPosition() / (Constants.Turret.COUNTS_PER_REVOLUTION/ 2.);
         var -= Math.round(var);
         return var;
     }
@@ -68,14 +67,15 @@ public class Turret extends Subsystem {
             limitProxPercent = 1;
         }
 
-        if (notLimit(isClockwise)) {
+        if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING - .015 && elevator.targetPosLowStage()) {
+            turret.setPower(runAllowedPoint());
+
+        } else if (notLimit(isClockwise)) {
             if (enable) {
-                turret.setPower(Constants.Yaw.SPEED * (isClockwise ? 1 : -1) * limitProxPercent);
+                turret.setPower(Constants.Turret.SPEED * (isClockwise ? 1 : -1) * limitProxPercent);
             } else {
                 turret.setPower(0);
             }
-        } else {
-            runAllowedPoint();
         }
 
         TeleOpM03.tel.addData("getRelativePos", Math.abs(getRelativePos()));
@@ -89,7 +89,7 @@ public class Turret extends Subsystem {
 
     }
 
-    public void stop () {
+    public void stop() {
         enable = false;
         turret.setPower(0);
 
@@ -101,16 +101,21 @@ public class Turret extends Subsystem {
         double sig = Math.signum(currentPos) == 0 ? 1 : Math.signum(currentPos);
 
         if (!getForward()) {
-                setPoint = 800 * sig;
-            } else if (Math.abs(currentPos) >= 1200) {
-                setPoint = 1600 * sig;
+                setPoint = Constants.Turret.COUNTS_PER_REVOLUTION / 2. * sig;
+            } else if (Math.abs(currentPos) >= Constants.Turret.COUNTS_PER_REVOLUTION / 1.5) {
+                setPoint = Constants.Turret.COUNTS_PER_REVOLUTION * sig;
             } else {
                 setPoint = 0;
             }
 
         double delta = setPoint - currentPos;
 
-        elevator.addControl(Constants.Elevador.NV_1 * delta * 0.002);
+        if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING){
+            elevator.addControl(Constants.Elevador.NV_1 * delta * 0.0028);
+
+        } else {
+            elevator.addControl(0);
+        }
 
         return delta * 0.005;
 

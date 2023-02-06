@@ -2,21 +2,21 @@ package org.firstinspires.ftc.team18613.commands.Drive;
 
 import org.firstinspires.ftc.team18613.Command;
 import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
+import org.firstinspires.ftc.team18613.utils.SupplierPair;
 
 public class Move extends Command {
     private final DTMecanum drive;
-    private final double x, y;
+    private final SupplierPair<Float> stick;
 
-    public Move(DTMecanum drive, double x, double y) {
+    public Move(DTMecanum drive, SupplierPair<Float> stick) {
         this.drive = drive;
-        this.x = x;
-        this.y = y;
+        this.stick = stick;
 
     }
 
     @Override
     public void run(){
-        drive.setMove(x, y);
+        drive.setMove(stick.firstValue().get(), stick.secondValue().get());
     }
 
 }

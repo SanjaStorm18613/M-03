@@ -18,7 +18,7 @@ public class Claw extends Subsystem {
             angle = 0, pitchProgress = 0, pitchPos = Constants.Claw.PITCH_UP, lastPitchPos = Constants.Claw.PITCH_UP,
             rollPos = Constants.Claw.ROLL_UP, elevatorControl = 0;
 
-    private boolean clawOpen = false, pBusy = false, init = true;
+    private boolean clawOpen = false, pBusy = false, init;
 
     private boolean cIsBusy = false, armControl =false;
 
@@ -146,8 +146,6 @@ public class Claw extends Subsystem {
             pitchPos = Constants.Claw.PITCH_UP;
         }
 
-        elevatorControl();
-
         if (loweredCollectMove()) {
             if (clawOpen) {
                 openClaw();
@@ -156,9 +154,10 @@ public class Claw extends Subsystem {
             }
         }
 
+        elevatorControl();
         velPitchUpdate();
 
-        if (pitchProgress < 1) {
+        if (pitchProgress < 1 && needTurning()) {
             sPitch.setPosition(angle + lastPitchPos + (pitchPos - lastPitchPos) * pitchProgress);
         } else {
             sPitch.setPosition(angle + pitchPos);
@@ -173,16 +172,12 @@ public class Claw extends Subsystem {
             arm.addControl(.18);
         }
 
-        TeleOpM03.tel.addData("clawOpen", clawOpen);
-        TeleOpM03.tel.addData("pitchProgress", pitchProgress);
-        TeleOpM03.tel.addData("lastPitchPos", lastPitchPos);
-        TeleOpM03.tel.addData("pitchPos", pitchPos);
     }
 
 
     private void velPitchUpdate() {
 
-        if (init || !pBusy && (pitchPos == Constants.Claw.PITCH_LOWERED || lastPitchPos == Constants.Claw.PITCH_LOWERED) && pitchPos != lastPitchPos){
+        if (init || !pBusy && needTurning()){
             time.reset();
             pitchProgress = 0;
             pBusy =  true;
@@ -192,12 +187,30 @@ public class Claw extends Subsystem {
         }
     }
 
+    private boolean needTurning() {
+        return (pitchPos == Constants.Claw.PITCH_LOWERED || lastPitchPos == Constants.Claw.PITCH_LOWERED) && pitchPos != lastPitchPos;
+    }
+
     private void elevatorControl() {
-        if ((pitchProgress != 1 && pitchProgress != 0) || (clawOpen && pitchPos == Constants.Claw.PITCH_LOWERED)) {
+
+        if (needTurning() && pitchProgress < 1){
             elevatorControl = Constants.Claw.ELEVADOR_UP;
+
+        } else if (pitchPos == Constants.Claw.PITCH_LOWERED) {
+            if (clawOpen){
+                elevatorControl = Constants.Claw.ELEVADOR_UP;
+
+            } else if (sClawD.getPosition() == Constants.Claw.CLAW_OPEN) {
+                elevatorControl = 0;
+
+            } else {
+                elevatorControl = 0.5;
+
+            }
         } else {
             elevatorControl = 0;
         }
+
     }
 
     private boolean loweredCollectMove() {
@@ -207,10 +220,9 @@ public class Claw extends Subsystem {
             return true;
         }
 
-        if (!clawOpen) {
+        if (!clawOpen && sClawD.getPosition() == Constants.Claw.CLAW_OPEN) {
             if (elevator.getCurrentPos() < 80) {
                 armControl = false;
-                elevatorControl = 0.5;
                 return true;
 
             } else if (elevator.getCurrentPos() < 400) {
@@ -230,7 +242,7 @@ public class Claw extends Subsystem {
         TeleOpM03.tel.addData("pitch.getPosition", sPitch.getPosition());
         TeleOpM03.tel.addData("pitchVel", pitchProgress);
         TeleOpM03.tel.addData("pitchVelPow", Math.pow(pitchProgress, 2));
-        TeleOpM03.tel.addData("lastPitchPos", lastPitchPos);
+        //TeleOpM03.tel.addData("lastPitchPos", lastPitchPos);
         TeleOpM03.tel.addData("pitchPos", pitchPos);
 
     }

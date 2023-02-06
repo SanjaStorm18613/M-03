@@ -18,7 +18,7 @@ public class DTMecanum  extends Subsystem {
     private final ElapsedTime accTime;
     private final Turret turret;
 
-    private boolean sOdmActv = false, moveIsBusy = false;
+    private boolean moveIsBusy = false;
     private double pos, setPoint = 0, direction = 0, acc = 0, x = 0, y = 0, turn = 0, slowFactor = 0;
 
     public DTMecanum(Turret turret) {
@@ -230,15 +230,21 @@ public class DTMecanum  extends Subsystem {
 
     public void periodic() {
         retractOdometry();
-        updateAcceleration(Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(turn) < 0.1);
+        //updateAcceleration(Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(turn) < 0.1);
 
-        double vel = slowFactor * acc * Constants.DTMecanum.SPEED;
+        double vel = slowFactor * Constants.DTMecanum.SPEED; //* cc *
         vel *= turret.getForward() ? 1 : -1;
 
-        FL.setPower((y + x + turn) * vel);
-        FR.setPower((y - x - turn) * vel);
-        BL.setPower((y - x + turn) * vel);
-        BR.setPower((y + x - turn) * vel);
+
+        FL.setPower(sensitivReduction((y + x + turn)) * vel);
+        FR.setPower(sensitivReduction((y - x - turn)) * vel);
+        BL.setPower(sensitivReduction((y - x + turn)) * vel);
+        BR.setPower(sensitivReduction((y + x - turn)) * vel);
+    }
+
+    public double sensitivReduction(double a) {
+        return  Math.signum(a) * Math.pow(Math.abs(a), 3);
+
     }
 
     private void retractOdometry() {

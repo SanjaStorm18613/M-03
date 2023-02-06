@@ -2,12 +2,13 @@ package org.firstinspires.ftc.team18613.commands.Drive;
 
 import org.firstinspires.ftc.team18613.Command;
 import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
+import org.firstinspires.ftc.team18613.utils.Supplier;
 
-public class Turn extends Command {
+public class TurnD extends Command {
     private final DTMecanum drive;
-    private final double turn;
+    private final Supplier<Float> turn;
 
-    public Turn(DTMecanum drive, double turn) {
+    public TurnD(DTMecanum drive, Supplier<Float> turn) {
         this.drive = drive;
         this.turn = turn;
 
@@ -15,6 +16,6 @@ public class Turn extends Command {
 
     @Override
     public void run(){
-        drive.setTurn(turn);
+        drive.setTurn(turn.get());
     }
 }

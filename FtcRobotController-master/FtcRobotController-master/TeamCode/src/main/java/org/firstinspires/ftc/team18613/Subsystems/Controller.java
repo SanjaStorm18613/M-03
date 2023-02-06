@@ -8,6 +8,7 @@ import org.firstinspires.ftc.team18613.utils.FloatPair;
 import org.firstinspires.ftc.team18613.utils.Pair;
 import org.firstinspires.ftc.team18613.utils.Supplier;
 import org.firstinspires.ftc.team18613.utils.Function;
+import org.firstinspires.ftc.team18613.utils.SupplierPair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,8 +45,8 @@ public class Controller {
     private final ArrayList<Pair<Command, Integer>> onPressedRegisters = new ArrayList<>();
     private final ArrayList<Pair<Command, Integer>> onReleasedRegisters = new ArrayList<>();
     private final ArrayList<Pair<Command, Integer>> whilePressedRegisters = new ArrayList<>();
-    private final ArrayList<Pair<Function<Float, Command>, Integer>> stickAndTriggerRegisters = new ArrayList<>();
-    private final ArrayList<Pair<Function<FloatPair,Command>, int[]>> sticksRegisters = new ArrayList<>();
+    private final ArrayList<Pair<Function<Supplier<Float>, Command>, Integer>> stickAndTriggerRegisters = new ArrayList<>();
+    private final ArrayList<Pair<Function<SupplierPair<Float>,Command>, int[]>> sticksRegisters = new ArrayList<>();
 
 
     private final boolean[] last_values = new boolean[18];
@@ -94,6 +95,7 @@ public class Controller {
         );
     }
 
+/*
 
     public void onPressed (int id, Command cc) {
         boolean current = boolSuppliers.get(id).get();
@@ -141,6 +143,7 @@ public class Controller {
 
         fcc.apply(current).run();
     }
+*/
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -159,15 +162,15 @@ public class Controller {
         }
     }
 
-    public void registerAction (int[] ids, Function<FloatPair,Command> fcc) {
+    public void registerAction (int[] ids, Function<SupplierPair<Float>,Command> fcc) {
         sticksRegisters.add(new Pair<>(fcc, ids));
     }
 
-    public void registerAction (int ids, Function<Float,Command> fcc) {
+    public void registerAction (Integer ids, Function<Supplier<Float>,Command> fcc) {
         stickAndTriggerRegisters.add(new Pair<>(fcc, ids));
     }
 
-    public void updateOnPressed() {
+    private void updateOnPressed() {
 
         for (Pair<Command, Integer> i : onPressedRegisters) {
             int id = i.secondValue();
@@ -184,9 +187,9 @@ public class Controller {
 
     }
 
-    public void updateOnRelease() {
+    private void updateOnRelease() {
 
-        for (Pair<Command, Integer> i : onPressedRegisters) {
+        for (Pair<Command, Integer> i : onReleasedRegisters) {
             int id = i.secondValue();
             Command cc = i.firstValue();
 
@@ -200,9 +203,9 @@ public class Controller {
         }
     }
 
-    public void updateWhilePressed() {
+    private void updateWhilePressed() {
 
-        for (Pair<Command, Integer> i : onPressedRegisters) {
+        for (Pair<Command, Integer> i : whilePressedRegisters) {
             int id = i.secondValue();
             Command cc = i.firstValue();
 
@@ -214,23 +217,23 @@ public class Controller {
         }
     }
 
-    public void updateStickAndTrigger() {
-        for (Pair<Function<Float,Command>,Integer> i : stickAndTriggerRegisters) {
-            Function<Float,Command> fcc = i.firstValue();
+    private void updateStickAndTrigger() {
+        for (Pair<Function<Supplier<Float>,Command>,Integer> i : stickAndTriggerRegisters) {
+            Function<Supplier<Float>,Command> fcc = i.firstValue();
             int id = i.secondValue();
 
-            Float current = floatSupplier.get(id).get();
+            Supplier<Float> current = floatSupplier.get(id);
 
             fcc.apply(current).run();
         }
     }
 
-    public void updateSticks() {
-        for (Pair<Function<FloatPair,Command>, int[]> i : sticksRegisters) {
-            Function<FloatPair,Command> fcc = i.firstValue();
+    private void updateSticks() {
+        for (Pair<Function<SupplierPair<Float>,Command>, int[]> i : sticksRegisters) {
+            Function<SupplierPair<Float>,Command> fcc = i.firstValue();
             int id0 = i.secondValue()[0], id1 = i.secondValue()[1];
 
-            FloatPair current = new FloatPair(floatSupplier.get(id0).get(), floatSupplier.get(id1).get());
+            SupplierPair<Float> current = new SupplierPair<>(floatSupplier.get(id0), floatSupplier.get(id1));
 
             fcc.apply(current).run();
         }
@@ -240,8 +243,24 @@ public class Controller {
         ON_PRESSED
         , ON_RELEASED
         , WHILE_PRESSED
-        , STICKS
-        , STICK
+    }
+
+    public void updateCommands(){
+        if (onPressedRegisters.size() > 0) {
+            updateOnPressed();
+        }
+        if (onReleasedRegisters.size() > 0) {
+            updateOnRelease();
+        }
+        if (whilePressedRegisters.size() > 0) {
+            updateWhilePressed();
+        }
+        if (stickAndTriggerRegisters.size() > 0) {
+            updateStickAndTrigger();
+        }
+        if (sticksRegisters.size() > 0) {
+            updateSticks();
+        }
     }
 
 }

@@ -5,7 +5,7 @@ import org.firstinspires.ftc.team18613.Subsystems.Claw;
 
 public class Retract extends Command {
 
-    private Claw claw;
+    private final Claw claw;
 
     public Retract(Claw claw) {
         this.claw = claw;

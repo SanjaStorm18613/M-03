@@ -49,8 +49,8 @@ public class Constants {
         public static final double  CLAW_CLOSE = 0.2,
                                     CLAW_OPEN = 0.45,
                                     PITCH_UP = 0.05,
-                                    PITCH_HORIZONTAL = 0.53,
-                                    PITCH_LOWERED = 0.9,
+                                    PITCH_HORIZONTAL = 0.5,
+                                    PITCH_LOWERED = 0.8,
                                     ELEVADOR_UP = 1,
                                     ROLL_UP = 0.2,
                                     ROLL_DOWN = 0.6,
@@ -59,14 +59,12 @@ public class Constants {
 
     }
 
-    public static class Yaw {
+    public static class Turret {
 
-        public static final int     LIMIT = 5000,
+        public static final int     LIMIT = 1760,
                                     CONVR = 400,
-                                    LAP_COUNTS = 1000;
-        public static final double  AJUST = 0.06,
-                                    CONTROL = .3,
-                                    BRACO_UP = Braco.MIN_POS + 0.2,
-                                    SPEED = 1;
+                                    COUNTS_PER_REVOLUTION = 1600;
+        public static final double  SPEED = 1,
+                                    CHASSIS_OPENING = .15;
     }
 }
