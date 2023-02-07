@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.team18613.Subsystems;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.team18613.AutoM03;
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
 import org.firstinspires.ftc.team18613.TeleOpM03;
@@ -17,36 +19,36 @@ public class DTMecanum  extends Subsystem {
     private final Gyro gyro;
     private final ElapsedTime accTime;
     private final Turret turret;
+    private final OpMode opMode;
 
     private boolean moveIsBusy = false;
     private double pos, setPoint = 0, direction = 0, acc = 0, x = 0, y = 0, turn = 0, slowFactor = 0;
 
-    public DTMecanum(Turret turret) {
+    public DTMecanum(OpMode opMode, Turret turret) {
 
-        gyro = new Gyro();
+        gyro = new Gyro(opMode);
         this.turret = turret;
+        this.opMode = opMode;
 
-        sOdmE = TeleOpM03.hm.get(Servo.class, "odmE");
-        sOdmD = TeleOpM03.hm.get(Servo.class, "odmD");
+        sOdmE = opMode.hardwareMap.get(Servo.class, "odmE");
+        sOdmD = opMode.hardwareMap.get(Servo.class, "odmD");
 
-        eLeft = TeleOpM03.hm.get(DcMotorEx.class, "encE");
-        eRight = TeleOpM03.hm.get(DcMotorEx.class, "encD");
+        eLeft = opMode.hardwareMap.get(DcMotorEx.class, "encE");
+        eRight = opMode.hardwareMap.get(DcMotorEx.class, "encD");
 
         eLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         eRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //Cria motores
-        FL = TeleOpM03.hm.get(DcMotorEx.class, "FE");
-        FR = TeleOpM03.hm.get(DcMotorEx.class, "FD");
-        BL = TeleOpM03.hm.get(DcMotorEx.class, "TE");
-        BR = TeleOpM03.hm.get(DcMotorEx.class, "TD");
+        FL = opMode.hardwareMap.get(DcMotorEx.class, "FE");
+        FR = opMode.hardwareMap.get(DcMotorEx.class, "FD");
+        BL = opMode.hardwareMap.get(DcMotorEx.class, "TE");
+        BR = opMode.hardwareMap.get(DcMotorEx.class, "TD");
 
         DcMotor[] motors = {FL, BL, FR, BR};
 
 
         for (int m = 0; m < 4; m++) {
-            motors[m].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motors[m].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             motors[m].setDirection(m > 1 ? DcMotor.Direction.FORWARD :
@@ -56,7 +58,7 @@ public class DTMecanum  extends Subsystem {
         sOdmE.setDirection(Servo.Direction.FORWARD);
         sOdmD.setDirection(Servo.Direction.FORWARD);
 
-        //resetEnc();
+        resetEnc();
 
         accTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         accTime.startTime();
@@ -66,6 +68,9 @@ public class DTMecanum  extends Subsystem {
 
     public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist) {
         double erro, yawErro, acT, turn;
+
+        opMode.telemetry.addData("eLeft", eLeft.getCurrentPosition());
+        opMode.telemetry.addData("eRight", eRight.getCurrentPosition());
 
         propc *= Constants.DTMecanum.CONVERTION;
         dist *= Constants.DTMecanum.CONVERTION;
@@ -80,7 +85,7 @@ public class DTMecanum  extends Subsystem {
         if (sideMove) {
             pos = (BR.getCurrentPosition() - FR.getCurrentPosition());
         } else {
-            pos = (FL.getCurrentPosition() + FR.getCurrentPosition());
+            pos = (eLeft.getCurrentPosition() + eRight.getCurrentPosition());
         }
         pos /= 2.0;
 
@@ -102,7 +107,7 @@ public class DTMecanum  extends Subsystem {
             turn = Math.min(maxVel, turn);
             turn *= acT;
 
-            tankDrive(pos, turn, sideMove);
+            tankDrive(pos, -turn, sideMove);
 
         } else {
             moveIsBusy = false;
@@ -133,8 +138,9 @@ public class DTMecanum  extends Subsystem {
         if (sideMove) {
             pos = (BR.getCurrentPosition() - FR.getCurrentPosition());
         } else {
-            pos = (FL.getCurrentPosition() + FR.getCurrentPosition());
+            pos = (eLeft.getCurrentPosition() + eRight.getCurrentPosition());
         }
+
         pos /= 2.0;
 
         erro = setPoint - pos;
@@ -164,11 +170,9 @@ public class DTMecanum  extends Subsystem {
     }
 
     public void resetEnc() {
-        /*encE.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        encE.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        encD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        encD.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-         */
+        eLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        eRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         //*/
         FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         FL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -208,10 +212,10 @@ public class DTMecanum  extends Subsystem {
     }
 
     public void getTelemetry() {
-        TeleOpM03.tel.addData("FE", FL.getPower());
-        TeleOpM03.tel.addData("FD", FR.getPower());
-        TeleOpM03.tel.addData("TE", BL.getPower());
-        TeleOpM03.tel.addData("TD", BR.getPower());
+        opMode.telemetry.addData("FE", FL.getPower());
+        opMode.telemetry.addData("FD", FR.getPower());
+        opMode.telemetry.addData("TE", BL.getPower());
+        opMode.telemetry.addData("TD", BR.getPower());
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

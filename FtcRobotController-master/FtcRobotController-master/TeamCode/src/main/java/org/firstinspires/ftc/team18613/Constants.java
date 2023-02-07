@@ -19,7 +19,7 @@ public class Constants {
                                     PRECISION = 0.25,
                                     TOLERANCE_DISTANCE = 100,
                                     TOLERANCE_ANGLE = 100,
-                                    CONVERTION = 50;
+                                    CONVERTION = 80;
     }
 
     public static class Braco {

@@ -3,14 +3,17 @@ package org.firstinspires.ftc.team18613;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.team18613.Subsystems.Arm;
 import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
 import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 import org.firstinspires.ftc.team18613.Subsystems.Claw;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
 import org.firstinspires.ftc.team18613.Vision.VisionCtrl;
+import org.firstinspires.ftc.team18613.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,23 +22,25 @@ import java.util.Arrays;
 public class AutoM03 extends LinearOpMode {
 
     DTMecanum drive;
-    Elevator elev;
-    Turret yaw;
-    Claw garra;
-    Arm braco;
+    Elevator elevator;
+    Turret turret;
+    Claw claw;
+    Arm arm;
     ElapsedTime time;
     VisionCtrl vision;
+
+    public static Telemetry tel;
+    public static HardwareMap hm;
 
     double parkArea = 0;
 
     public void runOpMode() {
 
-        elev  = new Elevator();
-        braco = new Arm(elev);
-        garra = new Claw(elev, braco);
-        yaw   = new Turret(elev, garra);
-        drive = new DTMecanum (yaw);
-
+        elevator = new Elevator(this);
+        arm = new Arm(this, elevator);
+        claw = new Claw(this, elevator, arm);
+        turret = new Turret(this, elevator, claw);
+        drive = new DTMecanum (this, turret);
 
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         time.startTime();
@@ -57,68 +62,49 @@ public class AutoM03 extends LinearOpMode {
         }
  //*/
 
-        ArrayList<Double> steps = new ArrayList<>(Arrays.asList(
-                1.,//yw
-                50.,//dr
-                0.,//yw
-                -50.,//dr
-                -1.//yw
+        ArrayList<Pair<Double, Integer>> steps = new ArrayList<>(Arrays.asList(
+                //0-dr, 1-el, 2-cl, 3-yw
+                new Pair<>(50., 0)
+                ,new Pair<>(-50., 0)
         ));
 
         ArrayList<Boolean> forward = new ArrayList<>(Arrays.asList(
                 false,
-                false,
-                false,
-                false,
-                true
+                false
         ));
-
-        ArrayList<Integer> stepCtrl = new ArrayList<>(Arrays.asList(
-                //0-dr, 1-el, 2-cl, 3-yw
-                3,
-                0,
-                3,
-                0,
-                3
-        ));
-
 
         waitForStart();
 
 
-        while (opModeIsActive() && stepCtrl.size() != 0) {
+        while (opModeIsActive() && steps.size() != 0) {
 
-            switch (stepCtrl.get(0)) {
+            switch (steps.get(0).secondValue()) {
 
                 case 0:
-                    drive.move(forward.get(0), 0.5, 1500, 10, steps.get(0));
-                    if (!drive.getBusy() && stepCtrl.size() > 0) {
-                        stepCtrl.remove(0);
+                    drive.move(forward.get(0), 0.5, 1500, 2000, steps.get(0).firstValue());
+                    if (!drive.getBusy() && steps.size() > 0) {
                         steps.remove(0);
                         forward.remove(0);
                     }
                     break;
 
                 case 1:
-                    elev.setPos(steps.get(0), 0.7);
-                    if (!elev.getBusy() && stepCtrl.size() > 0) {
-                        stepCtrl.remove(0);
+                    elevator.setPos(steps.get(0).firstValue(), 0.7);
+                    if (!elevator.getBusy() && steps.size() > 0) {
                         steps.remove(0);
                     }
                     break;
 
                 case 2:
-                    garra.setClaw(steps.get(0), 2000);
-                    if (!garra.getBusy() && stepCtrl.size() > 0) {
-                        stepCtrl.remove(0);
+                    claw.setClaw(steps.get(0).firstValue(), 2000);
+                    if (!claw.getBusy() && steps.size() > 0) {
                         steps.remove(0);
                     }
                     break;
 
                 case 3:
-                    yaw.setPos(steps.get(0), .9);
-                    if (!yaw.getBusy() && stepCtrl.size() > 0) {
-                        stepCtrl.remove(0);
+                    turret.setPos(steps.get(0).firstValue(), .9);
+                    if (!turret.getBusy() && steps.size() > 0) {
                         steps.remove(0);
                     }
                     break;
@@ -129,6 +115,7 @@ public class AutoM03 extends LinearOpMode {
         }
     }
 }
+
 /*
             .3,//el
             .0,//cl

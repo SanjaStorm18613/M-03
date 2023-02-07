@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.team18613.Subsystems;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.team18613.AutoM03;
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
 import org.firstinspires.ftc.team18613.TeleOpM03;
@@ -11,6 +13,7 @@ import org.firstinspires.ftc.team18613.TeleOpM03;
 public class Elevator extends Subsystem {
 
     private final DcMotorEx elevator;
+    private final OpMode opMode;
 
     private final double[] stages =
             { Constants.Elevador.NV_0
@@ -21,8 +24,11 @@ public class Elevator extends Subsystem {
     private int stage = 0, adjust = 0;
     private double controlRequirement = 0;
 
-    public Elevator() {
-        elevator = TeleOpM03.hm.get(DcMotorEx.class, "Elevador");
+    public Elevator(OpMode opMode) {
+
+        this.opMode = opMode;
+
+        elevator = opMode.hardwareMap.get(DcMotorEx.class, "Elevador");
 
         elevator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -110,9 +116,9 @@ public class Elevator extends Subsystem {
             elevator.setPower(Constants.Elevador.DOWN_SPEED);
         }
 
-        TeleOpM03.tel.addData("adjust", adjust);
-        TeleOpM03.tel.addData("targetPos-final", targetPos);
-        TeleOpM03.tel.addData("controlRequirement", controlRequirement);
+        opMode.telemetry.addData("adjust", adjust);
+        opMode.telemetry.addData("targetPos-final", targetPos);
+        opMode.telemetry.addData("controlRequirement", controlRequirement);
 
     }
 

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.team18613.Subsystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -16,11 +17,11 @@ public class Gyro extends Subsystem {
     private int revolucoes;
 
 
-    public Gyro(){
+    public Gyro(OpMode opMode){
 
         BNO055IMU.Parameters GYRO_imu_parameters;
 
-        imu = TeleOpM03.hm.get(BNO055IMU.class, "imu2");
+        imu = opMode.hardwareMap.get(BNO055IMU.class, "imu2");
 
         GYRO_imu_parameters                = new BNO055IMU.Parameters();
         GYRO_imu_parameters.mode           = BNO055IMU.SensorMode.GYRONLY;

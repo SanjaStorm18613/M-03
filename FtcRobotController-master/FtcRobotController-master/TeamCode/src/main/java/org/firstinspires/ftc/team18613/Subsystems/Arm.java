@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team18613.Subsystems;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.team18613.Constants;
@@ -10,15 +11,17 @@ public class Arm extends Subsystem {
 
     private final Servo sLeft, sRight;
     private final Elevator elevator;
+    private  final OpMode opMode;
 
     private double controlRequirement = -1;
     private double automaticPos = 0;
 
-    public Arm(Elevator elevator) {
+    public Arm(OpMode opMode, Elevator elevator) {
 
+        this.opMode = opMode;
         //Servos direito e esquerdo do braço
-        sLeft = TeleOpM03.hm.get(Servo.class, "E");
-        sRight = TeleOpM03.hm.get(Servo.class, "D");
+        sLeft = opMode.hardwareMap.get(Servo.class, "E");
+        sRight = opMode.hardwareMap.get(Servo.class, "D");
 
         sRight.setDirection(Servo.Direction.FORWARD);
         sLeft.setDirection(Servo.Direction.REVERSE);
@@ -47,7 +50,7 @@ public class Arm extends Subsystem {
         sLeft.setPosition(var);
         sRight.setPosition(var);
 
-        //TeleOpM03.tel.addData("braco", sLeft.getPosition());
+        //opMode.telemetry.addData("braco", sLeft.getPosition());
 
     }
 

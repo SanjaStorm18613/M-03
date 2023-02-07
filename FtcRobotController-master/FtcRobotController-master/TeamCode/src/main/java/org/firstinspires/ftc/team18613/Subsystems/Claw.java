@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team18613.Subsystems;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -13,6 +14,7 @@ public class Claw extends Subsystem {
     private final Elevator elevator;
     private final Arm arm;
     private final ElapsedTime time;
+    private final OpMode opMode;
 
     private double cTargetPos = 0,
             angle = 0, pitchProgress = 0, pitchPos = Constants.Claw.PITCH_UP, lastPitchPos = Constants.Claw.PITCH_UP,
@@ -24,12 +26,14 @@ public class Claw extends Subsystem {
 
     private int colectState = 0, lastColectState = 0;
 
-    public Claw(Elevator elev, Arm braco) {
+    public Claw(OpMode opMode, Elevator elev, Arm braco) {
 
-        sRoll = TeleOpM03.hm.get(Servo.class, "Roll");
-        sClawD = TeleOpM03.hm.get(Servo.class, "GarraD");
-        sClawE = TeleOpM03.hm.get(Servo.class, "GarraE");
-        sPitch = TeleOpM03.hm.get(Servo.class, "Pitch");
+        this.opMode = opMode;
+
+        sRoll = opMode.hardwareMap.get(Servo.class, "Roll");
+        sClawD = opMode.hardwareMap.get(Servo.class, "GarraD");
+        sClawE = opMode.hardwareMap.get(Servo.class, "GarraE");
+        sPitch = opMode.hardwareMap.get(Servo.class, "Pitch");
 
         sClawD.setDirection(Servo.Direction.FORWARD);
         sClawE.setDirection(Servo.Direction.REVERSE);
@@ -239,11 +243,11 @@ public class Claw extends Subsystem {
 
 
     public void getTelemetry () {
-        TeleOpM03.tel.addData("pitch.getPosition", sPitch.getPosition());
-        TeleOpM03.tel.addData("pitchVel", pitchProgress);
-        TeleOpM03.tel.addData("pitchVelPow", Math.pow(pitchProgress, 2));
+        opMode.telemetry.addData("pitch.getPosition", sPitch.getPosition());
+        opMode.telemetry.addData("pitchVel", pitchProgress);
+        opMode.telemetry.addData("pitchVelPow", Math.pow(pitchProgress, 2));
         //TeleOpM03.tel.addData("lastPitchPos", lastPitchPos);
-        TeleOpM03.tel.addData("pitchPos", pitchPos);
+        opMode.telemetry.addData("pitchPos", pitchPos);
 
     }
 

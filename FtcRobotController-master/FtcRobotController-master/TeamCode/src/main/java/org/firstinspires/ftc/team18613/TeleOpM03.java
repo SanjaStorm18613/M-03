@@ -48,11 +48,11 @@ public class TeleOpM03 extends LinearOpMode {
         pilot = new Controller(gamepad1);
         copilot = new Controller(gamepad2);
 
-        elevator = new Elevator();
-        arm = new Arm(elevator);
-        claw = new Claw(elevator, arm);
-        turret = new Turret(elevator, claw);
-        drive = new DTMecanum (turret);
+        elevator = new Elevator(this);
+        arm = new Arm(this, elevator);
+        claw = new Claw(this, elevator, arm);
+        turret = new Turret(this, elevator, claw);
+        drive = new DTMecanum (this, turret);
 
         waitForStart();
 

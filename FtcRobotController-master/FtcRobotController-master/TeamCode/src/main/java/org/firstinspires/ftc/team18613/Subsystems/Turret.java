@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team18613.Subsystems;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -12,12 +13,14 @@ public class Turret extends Subsystem {
 
     private final DcMotor turret;
     private final Elevator elevator;
+    private final OpMode opMode;
 
     private boolean enable = false, isClockwise = true;
 
-    public Turret(Elevator elev, Claw garra) {
+    public Turret(OpMode opMode, Elevator elev, Claw garra) {
 
-        turret = TeleOpM03.hm.get(DcMotor.class, "Yaw");
+        this.opMode = opMode;
+        turret = opMode.hardwareMap.get(DcMotor.class, "Yaw");
 
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -78,8 +81,8 @@ public class Turret extends Subsystem {
             }
         }
 
-        TeleOpM03.tel.addData("getRelativePos", Math.abs(getRelativePos()));
-        TeleOpM03.tel.addData("elevator.targetPosLowStage", elevator.targetPosLowStage());
+        opMode.telemetry.addData("getRelativePos", Math.abs(getRelativePos()));
+        opMode.telemetry.addData("elevator.targetPosLowStage", elevator.targetPosLowStage());
 
     }
 
