@@ -52,7 +52,11 @@ public class Claw extends Subsystem {
 
     public void setClaw(double c, int t) {
 
-        claw(c == 1.0);
+        if (c == 1.0){
+            openClaw();
+        } else {
+            closeClaw();
+        }
 
         sRoll.setPosition(Constants.Claw.ROLL_UP);
         sPitch.setPosition(Constants.Claw.PITCH_UP + 0.1);
@@ -69,12 +73,6 @@ public class Claw extends Subsystem {
 
     public boolean getBusy(){
         return cIsBusy;
-    }
-
-    public void claw(boolean p) {
-        sClawD.setPosition(p ? Constants.Claw.CLAW_OPEN : Constants.Claw.CLAW_CLOSE);
-        sClawE.setPosition(p ? Constants.Claw.CLAW_OPEN : Constants.Claw.CLAW_CLOSE);
-
     }
 
 

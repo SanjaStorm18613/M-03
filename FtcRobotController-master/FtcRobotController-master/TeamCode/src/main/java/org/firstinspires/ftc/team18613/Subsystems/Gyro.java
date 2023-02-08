@@ -24,7 +24,7 @@ public class Gyro extends Subsystem {
         imu = opMode.hardwareMap.get(BNO055IMU.class, "imu2");
 
         GYRO_imu_parameters                = new BNO055IMU.Parameters();
-        GYRO_imu_parameters.mode           = BNO055IMU.SensorMode.GYRONLY;
+        GYRO_imu_parameters.mode           = BNO055IMU.SensorMode.IMU;
         GYRO_imu_parameters.angleUnit      = BNO055IMU.AngleUnit.DEGREES;
         GYRO_imu_parameters.loggingEnabled = false;
 
@@ -50,7 +50,7 @@ public class Gyro extends Subsystem {
 
     }
 
-    private double getPeriodicAngle(){
+    public double getPeriodicAngle(){
 
         return -imu.getAngularOrientation(AxesReference
                 .INTRINSIC, AxesOrder

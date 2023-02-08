@@ -17,9 +17,10 @@ public class Constants {
                                     YAW_SPEED = .7,
                                     ACCELERATION = 1500, //Tempo para atingir setpoint de velocidade
                                     PRECISION = 0.25,
-                                    TOLERANCE_DISTANCE = 100,
-                                    TOLERANCE_ANGLE = 100,
-                                    CONVERTION = 80;
+                                    TOLERANCE_DISTANCE = 1000,
+                                    TOLERANCE_ANGLE = 5,
+                                    TOLERANCE_ENCODER_DIFERENCE = 100,
+                                    CONVERTION = 725;
     }
 
     public static class Braco {

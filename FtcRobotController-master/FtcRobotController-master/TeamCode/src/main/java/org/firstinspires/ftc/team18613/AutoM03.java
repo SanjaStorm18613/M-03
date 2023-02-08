@@ -33,6 +33,7 @@ public class AutoM03 extends LinearOpMode {
     public static HardwareMap hm;
 
     double parkArea = 0;
+    public final int dr = 0, el = 1, cl = 2, yw = 3;
 
     public void runOpMode() {
 
@@ -64,13 +65,24 @@ public class AutoM03 extends LinearOpMode {
 
         ArrayList<Pair<Double, Integer>> steps = new ArrayList<>(Arrays.asList(
                 //0-dr, 1-el, 2-cl, 3-yw
-                new Pair<>(50., 0)
-                ,new Pair<>(-50., 0)
+                new Pair<>(1., el)
+                ,new Pair<>(0., cl)
+                ,new Pair<>(40., dr)
+                ,new Pair<>(2., el)
+                ,new Pair<>(.5, yw)
+                ,new Pair<>(1., cl)
+                ,new Pair<>(0., yw)
+                ,new Pair<>(0., el)
+                ,new Pair<>(-20., dr)
+                ,new Pair<>(40., dr)
+
+
         ));
 
         ArrayList<Boolean> forward = new ArrayList<>(Arrays.asList(
-                false,
                 false
+                ,false
+                ,true
         ));
 
         waitForStart();
@@ -81,7 +93,7 @@ public class AutoM03 extends LinearOpMode {
             switch (steps.get(0).secondValue()) {
 
                 case 0:
-                    drive.move(forward.get(0), 0.5, 1500, 2000, steps.get(0).firstValue());
+                    drive.move(forward.get(0), 0.5, 800, 80, steps.get(0).firstValue(), 0);
                     if (!drive.getBusy() && steps.size() > 0) {
                         steps.remove(0);
                         forward.remove(0);
@@ -96,7 +108,7 @@ public class AutoM03 extends LinearOpMode {
                     break;
 
                 case 2:
-                    claw.setClaw(steps.get(0).firstValue(), 2000);
+                    claw.setClaw(steps.get(0).firstValue(), 1500);
                     if (!claw.getBusy() && steps.size() > 0) {
                         steps.remove(0);
                     }

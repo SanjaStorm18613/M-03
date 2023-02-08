@@ -67,13 +67,21 @@ public class DTMecanum  extends Subsystem {
     }
 
     public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist) {
-        double erro, yawErro, acT, turn;
+        double erro, yawErro, acT, turn, tolerance;
 
         opMode.telemetry.addData("eLeft", eLeft.getCurrentPosition());
         opMode.telemetry.addData("eRight", eRight.getCurrentPosition());
 
-        propc *= Constants.DTMecanum.CONVERTION;
-        dist *= Constants.DTMecanum.CONVERTION;
+        if (sideMove) {
+            propc *= Constants.DTMecanum.CONVERTION/35.;
+            dist *= Constants.DTMecanum.CONVERTION/35.;
+            tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE/35.;
+
+        } else {
+            propc *= Constants.DTMecanum.CONVERTION;
+            dist *= Constants.DTMecanum.CONVERTION;
+            tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
+        }
 
         if (dist != setPoint) {
             setPoint = dist;
@@ -82,18 +90,20 @@ public class DTMecanum  extends Subsystem {
             moveIsBusy = true;
         }
 
+        yawErro = eLeft.getCurrentPosition() - eRight.getCurrentPosition();//enc
+
         if (sideMove) {
             pos = (BR.getCurrentPosition() - FR.getCurrentPosition());
+            yawErro /= 35.;
         } else {
             pos = (eLeft.getCurrentPosition() + eRight.getCurrentPosition());
         }
         pos /= 2.0;
 
         erro = setPoint - pos;
-        yawErro = eLeft.getCurrentPosition() - eRight.getCurrentPosition();//enc
 
 
-        if ((Math.abs(erro) > Constants.DTMecanum.TOLERANCE_DISTANCE) || yawErro > Constants.DTMecanum.TOLERANCE_ANGLE) {
+        if ((Math.abs(erro) > tolerance) || yawErro > Constants.DTMecanum.TOLERANCE_ENCODER_DIFERENCE) {
 
             moveIsBusy = true;
 
@@ -118,10 +128,18 @@ public class DTMecanum  extends Subsystem {
 
     public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist, double ang) {
 
-        double erro, yawErro, acT;
+        double erro, yawErro, acT, turn, tolerance;
 
-        propc *= Constants.DTMecanum.CONVERTION;
-        dist *= Constants.DTMecanum.CONVERTION;
+        if (sideMove) {
+            propc *= Constants.DTMecanum.CONVERTION/35.;
+            dist *= Constants.DTMecanum.CONVERTION/35.;
+            tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE/35.;
+
+        } else {
+            propc *= Constants.DTMecanum.CONVERTION;
+            dist *= Constants.DTMecanum.CONVERTION;
+            tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
+        }
 
         if (dist != setPoint) {
             setPoint = dist;
@@ -135,6 +153,7 @@ public class DTMecanum  extends Subsystem {
             this.accTime.reset();
         }
 
+
         if (sideMove) {
             pos = (BR.getCurrentPosition() - FR.getCurrentPosition());
         } else {
@@ -147,7 +166,7 @@ public class DTMecanum  extends Subsystem {
         yawErro = direction - gyro.getContinuousAngle();
 
 
-        if ((Math.abs(erro) > Constants.DTMecanum.TOLERANCE_DISTANCE) || yawErro > Constants.DTMecanum.TOLERANCE_ANGLE) {
+        if ((Math.abs(erro) > tolerance) || yawErro > Constants.DTMecanum.TOLERANCE_ANGLE) {
 
             moveIsBusy = true;
 
@@ -161,12 +180,13 @@ public class DTMecanum  extends Subsystem {
             turn = Math.min(maxVel, turn);
             turn *= acT;
 
-            tankDrive(pos, turn, sideMove);
+            tankDrive(pos, -turn, sideMove);
 
         } else {
             moveIsBusy = false;
             tankDrive(0);
         }
+        opMode.telemetry.addData("yawErro", yawErro);
     }
 
     public void resetEnc() {
