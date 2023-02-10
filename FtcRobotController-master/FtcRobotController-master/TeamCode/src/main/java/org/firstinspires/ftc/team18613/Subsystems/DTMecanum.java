@@ -56,7 +56,7 @@ public class DTMecanum  extends Subsystem {
         }
 
         sOdmE.setDirection(Servo.Direction.FORWARD);
-        sOdmD.setDirection(Servo.Direction.FORWARD);
+        sOdmD.setDirection(Servo.Direction.REVERSE);
 
         resetEnc();
 
@@ -65,9 +65,20 @@ public class DTMecanum  extends Subsystem {
 
 
     }
+    public void encoderServo(boolean activated){
+        if (activated) {
+            sOdmE.setPosition(1);
+            sOdmD.setPosition(1);
+        } else {
+            sOdmE.setPosition(0);
+            sOdmD.setPosition(0);
+        }
+    }
 
     public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist) {
         double erro, yawErro, acT, turn, tolerance;
+
+        encoderServo(false);
 
         opMode.telemetry.addData("eLeft", eLeft.getCurrentPosition());
         opMode.telemetry.addData("eRight", eRight.getCurrentPosition());
@@ -127,8 +138,9 @@ public class DTMecanum  extends Subsystem {
 
 
     public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist, double ang) {
-
         double erro, yawErro, acT, turn, tolerance;
+
+        encoderServo(false);
 
         if (sideMove) {
             propc *= Constants.DTMecanum.CONVERTION/35.;
@@ -253,8 +265,9 @@ public class DTMecanum  extends Subsystem {
     }
 
     public void periodic() {
-        retractOdometry();
         //updateAcceleration(Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(turn) < 0.1);
+
+        encoderServo(true);
 
         double vel = slowFactor * Constants.DTMecanum.SPEED; //* cc *
         vel *= turret.getForward() ? 1 : -1;
@@ -268,12 +281,6 @@ public class DTMecanum  extends Subsystem {
 
     public double sensitivReduction(double a) {
         return  Math.signum(a) * Math.pow(Math.abs(a), 3);
-
-    }
-
-    private void retractOdometry() {
-        sOdmE.setPosition(1);
-        sOdmD.setPosition(1);
 
     }
 
