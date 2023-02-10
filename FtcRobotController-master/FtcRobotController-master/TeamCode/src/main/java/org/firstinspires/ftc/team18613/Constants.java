@@ -35,7 +35,7 @@ public class Constants {
         public static final double  NV_0 = 0,
                                     NV_1 = 1.5,
                                     NV_2 = 3.2,
-                                    NV_3 = 4.5,
+                                    NV_3 = 4.82,
 
                                     UP_SPEED = .9,
                                     DOWN_SPEED = .7,
@@ -47,12 +47,12 @@ public class Constants {
 
     public static class Claw {
 
-        public static final double  CLAW_CLOSE = 0.2,
+        public static final double  CLAW_CLOSE = 0.19,
                                     CLAW_OPEN = 0.45,
                                     PITCH_UP = 0.05,
-                                    PITCH_HORIZONTAL = 0.5,
-                                    PITCH_LOWERED = 0.8,
-                                    ELEVADOR_UP = 1,
+                                    PITCH_HORIZONTAL = 0.45,
+                                    PITCH_LOWERED = 0.88,
+                                    ELEVADOR_UP = .9,
                                     ROLL_UP = 0.2,
                                     ROLL_DOWN = 0.6,
                                     ROLL_SIDE_CONE = ROLL_UP + Math.abs(ROLL_DOWN-ROLL_UP)/2,

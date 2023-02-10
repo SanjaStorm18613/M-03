@@ -5,10 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.team18613.AutoM03;
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
-import org.firstinspires.ftc.team18613.TeleOpM03;
 
 public class Elevator extends Subsystem {
 

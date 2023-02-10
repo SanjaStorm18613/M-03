@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.team18613.AutoM03;
+import org.firstinspires.ftc.team18613.AutoOpM03;
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
 import org.firstinspires.ftc.team18613.TeleOpM03;

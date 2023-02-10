@@ -118,7 +118,7 @@ public class Claw extends Subsystem {
     }
 
     public void retract() {
-        if (elevator.getTargetPos() > 300) {
+        if (elevator.getTargetPos() > 0 && colectState == 1) {
             pitchPos = Constants.Claw.PITCH_UP;
         } else {
             pitchPos = Constants.Claw.PITCH_LOWERED;
@@ -129,7 +129,15 @@ public class Claw extends Subsystem {
     }
 //*/
     public void angulationDrop(double angle){
-        this.angle = arm.getPos() + (elevator.onColletionStage() ? 0 : angle * Constants.Claw.PITCH_HORIZONTAL);
+        this.angle = arm.getPos() * 0.8 + (pitchPos == Constants.Claw.PITCH_UP ? angle * 0.4 : 0);
+    }
+
+    public void invertCone() {
+        if (rollPos != Constants.Claw.ROLL_UP) {
+            rollPos = Constants.Claw.ROLL_UP;
+        } else {
+            rollPos = Constants.Claw.ROLL_DOWN;
+        }
     }
 
     public void updateClaw() {
@@ -146,9 +154,12 @@ public class Claw extends Subsystem {
 
         if (!elevator.onColletionStage()) {
             pitchPos = Constants.Claw.PITCH_UP;
+            if (rollPos == Constants.Claw.ROLL_SIDE_CONE){
+                rollPos = Constants.Claw.ROLL_UP;
+            }
         }
 
-        if (loweredCollectMove()) {
+        if (loweredCollectMove() || (elevator.getTargetPos() > 0 && colectState == 1)) {
             if (clawOpen) {
                 openClaw();
             } else {
@@ -171,7 +182,7 @@ public class Claw extends Subsystem {
 
         elevator.addControl(elevatorControl);
         if (armControl) {
-            arm.addControl(.18);
+            arm.addControl(.17);
         }
 
     }
@@ -223,11 +234,11 @@ public class Claw extends Subsystem {
         }
 
         if (!clawOpen && sClawD.getPosition() == Constants.Claw.CLAW_OPEN) {
-            if (elevator.getCurrentPos() < 80) {
+            if (elevator.getCurrentPos() < 70) {
                 armControl = false;
                 return true;
 
-            } else if (elevator.getCurrentPos() < 400) {
+            } else if (elevator.getCurrentPos() < 800) {
                 armControl = true;
             }
             return false;

@@ -18,8 +18,8 @@ import org.firstinspires.ftc.team18613.utils.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@Autonomous(name = "AutoM03", group = "Linear Opmode")
-public class AutoM03 extends LinearOpMode {
+@Autonomous(name = "AutoOpM03", group = "Linear Opmode")
+public class AutoOpM03 extends LinearOpMode {
 
     DTMecanum drive;
     Elevator elevator;

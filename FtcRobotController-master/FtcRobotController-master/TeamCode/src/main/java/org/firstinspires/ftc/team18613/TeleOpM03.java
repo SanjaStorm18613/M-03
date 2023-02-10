@@ -14,6 +14,7 @@ import org.firstinspires.ftc.team18613.Subsystems.Turret;
 import org.firstinspires.ftc.team18613.commands.Claw.AngulationDrop;
 import org.firstinspires.ftc.team18613.commands.Claw.Drop;
 import org.firstinspires.ftc.team18613.commands.Claw.HorizontalColect;
+import org.firstinspires.ftc.team18613.commands.Claw.InvertCone;
 import org.firstinspires.ftc.team18613.commands.Claw.LoweredFrontColect;
 import org.firstinspires.ftc.team18613.commands.Claw.LoweredSideColect;
 import org.firstinspires.ftc.team18613.commands.Claw.Retract;
@@ -75,6 +76,7 @@ public class TeleOpM03 extends LinearOpMode {
         copilot.registerAction(Controller.b, new Retract(claw), Controller.Actions.ON_PRESSED);
         copilot.registerAction(Controller.right_trigger_not_zero, new Drop(claw), Controller.Actions.ON_PRESSED);
         copilot.registerAction(Controller.left_trigger, (Supplier<Float> val) -> new AngulationDrop(claw, val));
+        copilot.registerAction(Controller.a, new InvertCone(claw), Controller.Actions.ON_PRESSED);
 
         //ELEVATOR
         copilot.registerAction(Controller.y, new ShiftStage(elevator, true), Controller.Actions.ON_PRESSED);
