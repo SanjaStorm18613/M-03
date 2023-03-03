@@ -57,12 +57,12 @@ public class TeleOpM03 extends LinearOpMode {
 
         waitForStart();
 
-        //TURRET
-        copilot.registerAction(Controller.left, new TurnT(turret, false), Controller.Actions.WHILE_PRESSED);
-        copilot.registerAction(Controller.left, new Stop(turret), Controller.Actions.ON_RELEASED);
-
-        copilot.registerAction(Controller.right, new TurnT(turret, true), Controller.Actions.WHILE_PRESSED);
+        //TURRETq
+        copilot.registerAction(Controller.right, new TurnT(turret, false), Controller.Actions.WHILE_PRESSED);
         copilot.registerAction(Controller.right, new Stop(turret), Controller.Actions.ON_RELEASED);
+
+        copilot.registerAction(Controller.left, new TurnT(turret, true), Controller.Actions.WHILE_PRESSED);
+        copilot.registerAction(Controller.left, new Stop(turret), Controller.Actions.ON_RELEASED);
 
         //DRIVE MECANUM
         pilot.registerAction(Controller.right_stick_x, (Supplier<Float> val) -> new TurnD(drive, val));

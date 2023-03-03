@@ -129,7 +129,7 @@ public class Claw extends Subsystem {
     }
 //*/
     public void angulationDrop(double angle){
-        this.angle = arm.getPos() * 0.8 + (pitchPos == Constants.Claw.PITCH_UP ? angle * 0.4 : 0);
+        this.angle = arm.getPos() * 0.65 + (pitchPos == Constants.Claw.PITCH_UP ? angle * 0.4 : 0);
     }
 
     public void invertCone() {
@@ -182,7 +182,7 @@ public class Claw extends Subsystem {
 
         elevator.addControl(elevatorControl);
         if (armControl) {
-            arm.addControl(.17);
+            arm.addControl(.07);
         }
 
     }

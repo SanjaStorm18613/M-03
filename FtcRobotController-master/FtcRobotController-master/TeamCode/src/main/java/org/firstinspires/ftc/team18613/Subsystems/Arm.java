@@ -24,7 +24,7 @@ public class Arm extends Subsystem {
         sRight = opMode.hardwareMap.get(Servo.class, "D");
 
         sRight.setDirection(Servo.Direction.REVERSE);
-        sLeft.setDirection(Servo.Direction.REVERSE);
+        sLeft.setDirection(Servo.Direction.FORWARD);
 
         this.elevator = elevator;
     }
@@ -66,8 +66,7 @@ public class Arm extends Subsystem {
     private void updateAutomaticPos() {
         double posRangeBraco = Constants.Braco.MAX_POS - Constants.Braco.MIN_POS;
         double posPercentElev = (elevator.getCurrentPos() / ((Constants.Elevador.NV_3) * Constants.Elevador.CONVR));
-        double pos = (posPercentElev * posRangeBraco) + Constants.Braco.MIN_POS;
-
+        double pos = (Math.pow(posPercentElev, 3) * posRangeBraco) + Constants.Braco.MIN_POS;
 
         pos = Math.min(pos, Constants.Braco.MAX_POS);
         pos = Math.max(pos, Constants.Braco.MIN_POS);

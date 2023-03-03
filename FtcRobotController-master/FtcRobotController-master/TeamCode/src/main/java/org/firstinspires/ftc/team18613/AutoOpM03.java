@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.team18613;
 
 
+import static org.firstinspires.ftc.team18613.Vision.PipelineColors.DetectionColor.BLACK;
+import static org.firstinspires.ftc.team18613.Vision.PipelineColors.DetectionColor.CIAN;
+import static org.firstinspires.ftc.team18613.Vision.PipelineColors.DetectionColor.GREEN;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -12,6 +16,7 @@ import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
 import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 import org.firstinspires.ftc.team18613.Subsystems.Claw;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
+import org.firstinspires.ftc.team18613.Vision.PipelineColors;
 import org.firstinspires.ftc.team18613.Vision.VisionCtrl;
 import org.firstinspires.ftc.team18613.utils.Pair;
 
@@ -28,6 +33,7 @@ public class AutoOpM03 extends LinearOpMode {
     Arm arm;
     ElapsedTime time;
     VisionCtrl vision;
+    PipelineColors pipeline;
 
     public static Telemetry tel;
     public static HardwareMap hm;
@@ -45,20 +51,24 @@ public class AutoOpM03 extends LinearOpMode {
 
         time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         time.startTime();
-/*
+
         vision = new VisionCtrl(this, hardwareMap, telemetry);
+        pipeline = vision.getPipeline();
 
 
         while (!isStarted() && !isStopRequested()) {
-            switch (vision.getColorDetected()) {
+            switch (pipeline.getColorDetected()) {
                 case GREEN:
                     parkArea = -50;
+                    break;
                 case BLACK:
                     parkArea = 0;
+                    break;
                 case CIAN:
                     parkArea = 50;
+                    break;
             }
-            telemetry.addData("Color Detected", vision.getColorDetected());
+            telemetry.addData("Color Detected", pipeline.getColorDetected());
             telemetry.update();
         }
  //*/
@@ -90,7 +100,21 @@ public class AutoOpM03 extends LinearOpMode {
 
         while (opModeIsActive() && steps.size() != 0) {
 
-            switch (steps.get(0).secondValue()) {
+            switch (pipeline.getColorDetected()) {
+                case GREEN:
+                    parkArea = -50;
+                    break;
+                case BLACK:
+                    parkArea = 0;
+                    break;
+                case CIAN:
+                    parkArea = 50;
+                    break;
+            }
+            telemetry.addData("Color Detected", pipeline.getColorDetected());
+            telemetry.update();
+
+            /*switch (steps.get(0).secondValue()) {
 
                 case 0:
                     drive.move(forward.get(0), 0.5, 800, 80, steps.get(0).firstValue(), 0);
@@ -119,14 +143,14 @@ public class AutoOpM03 extends LinearOpMode {
                     if (!turret.getBusy() && steps.size() > 0) {
                         steps.remove(0);
                     }
-                    break;
+                    break;*/
             }
             //*/
 
             telemetry.update();
         }
     }
-}
+
 
 /*
             .3,//el

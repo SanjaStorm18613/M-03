@@ -4,8 +4,8 @@ public class Constants {
 
     public static class Pipeline {
 
-        public static final int[][] COLOR_LOW = {{40, 64, 100},  {25, 64, 127}},//HLS
-                                    COLOR_UP =  {{90, 192, 255}, {35, 192, 255}};
+        public static final double[][] COLOR_LOW = {{30, 70, 20},  {0, 70, 70}},//HLS
+                                    COLOR_UP =  {{50, 130, 80}, {20, 130, 100}};//teste antes
         public static final int TOLERANCE_AREA = 50;
 
     }
@@ -25,8 +25,8 @@ public class Constants {
 
     public static class Braco {
 
-        public static final double  MIN_POS = .23,
-                                    MAX_POS = .69;
+        public static final double  MIN_POS = .2,
+                                    MAX_POS = .7;
 
     }
 
@@ -34,8 +34,8 @@ public class Constants {
 
         public static final double  NV_0 = 0,
                                     NV_1 = 1.5,
-                                    NV_2 = 3.2,
-                                    NV_3 = 4.82,
+                                    NV_2 = 3.6,
+                                    NV_3 = 4.63,
 
                                     UP_SPEED = .9,
                                     DOWN_SPEED = .7,
@@ -50,11 +50,11 @@ public class Constants {
         public static final double  CLAW_CLOSE = 0.19,
                                     CLAW_OPEN = 0.45,
                                     PITCH_UP = 0.05,
-                                    PITCH_HORIZONTAL = 0.45,
-                                    PITCH_LOWERED = 0.88,
+                                    PITCH_HORIZONTAL = .50,
+                                    PITCH_LOWERED = .85,
                                     ELEVADOR_UP = .9,
                                     ROLL_UP = 0.2,
-                                    ROLL_DOWN = 0.6,
+                                    ROLL_DOWN = 0.55,
                                     ROLL_SIDE_CONE = ROLL_UP + Math.abs(ROLL_DOWN-ROLL_UP)/2,
                                     TRANSITION_TIME = 1000;
 

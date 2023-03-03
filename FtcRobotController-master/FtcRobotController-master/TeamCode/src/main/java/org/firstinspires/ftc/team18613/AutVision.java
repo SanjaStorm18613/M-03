@@ -22,7 +22,7 @@ public class AutVision extends LinearOpMode {
     public void runOpMode() {
 
         vision = new VisionCtrl(this, hardwareMap, telemetry);
-        detector = vision.getPipeline();
+        /*detector = vision.getPipeline();
 
         while (!isStarted()) {
             telemetry.addData("Color Detected", detector.getColorDetected());
@@ -38,8 +38,8 @@ public class AutVision extends LinearOpMode {
             telemetry.addData("Up", Constants.Pipeline.COLOR_UP[1]);
             telemetry.addData("Low", Constants.Pipeline.COLOR_LOW[1]);
 
-        }
-        //waitForStart();
+        }*/
+        waitForStart();
 
         while (opModeIsActive()) {
 

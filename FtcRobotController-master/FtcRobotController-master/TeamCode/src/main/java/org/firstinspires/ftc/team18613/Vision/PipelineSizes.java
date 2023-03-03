@@ -13,9 +13,9 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
-public class PipelineSizes extends OpenCvPipeline {
-
-    int[][] cUp = Constants.Pipeline.COLOR_UP,
+public class PipelineSizes {//extends OpenCvPipeline {
+/*
+    double[][] cUp = Constants.Pipeline.COLOR_UP,
             cLw = Constants.Pipeline.COLOR_LOW;
 
     int tolerance = Constants.Pipeline.TOLERANCE_AREA;
@@ -99,6 +99,8 @@ public class PipelineSizes extends OpenCvPipeline {
         MIDDLE,
         BIG
     }
+
+ */
 }
 
 

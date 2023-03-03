@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
-import org.firstinspires.ftc.team18613.TeleOpM03;
 
 public class Turret extends Subsystem {
 
@@ -114,7 +113,7 @@ public class Turret extends Subsystem {
         double delta = setPoint - currentPos;
 
         if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING){
-            elevator.addControl(Constants.Elevador.NV_1 * delta * 0.0028);
+            elevator.addControl(Constants.Elevador.NV_1 * delta * 0.0029);
 
         } else {
             elevator.addControl(0);

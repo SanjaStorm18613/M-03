@@ -7,10 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.team18613.AutoOpM03;
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
-import org.firstinspires.ftc.team18613.TeleOpM03;
 
 public class DTMecanum  extends Subsystem {
 
@@ -33,11 +31,14 @@ public class DTMecanum  extends Subsystem {
         sOdmE = opMode.hardwareMap.get(Servo.class, "odmE");
         sOdmD = opMode.hardwareMap.get(Servo.class, "odmD");
 
+        sOdmE.setDirection(Servo.Direction.FORWARD);
+        sOdmD.setDirection(Servo.Direction.FORWARD);
+
         eLeft = opMode.hardwareMap.get(DcMotorEx.class, "encE");
         eRight = opMode.hardwareMap.get(DcMotorEx.class, "encD");
 
-        eLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        eRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        eLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        eRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //Cria motores
         FL = opMode.hardwareMap.get(DcMotorEx.class, "FE");
@@ -45,20 +46,22 @@ public class DTMecanum  extends Subsystem {
         BL = opMode.hardwareMap.get(DcMotorEx.class, "TE");
         BR = opMode.hardwareMap.get(DcMotorEx.class, "TD");
 
+        FL.setDirection(DcMotor.Direction.REVERSE);
+        BL.setDirection(DcMotor.Direction.REVERSE);
+        FR.setDirection(DcMotor.Direction.FORWARD);
+        BR.setDirection(DcMotor.Direction.FORWARD);
+
         DcMotor[] motors = {FL, BL, FR, BR};
 
 
         for (int m = 0; m < 4; m++) {
 
             motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            motors[m].setDirection(m > 1 ? DcMotor.Direction.FORWARD :
-                                            DcMotor.Direction.REVERSE);
         }
 
-        sOdmE.setDirection(Servo.Direction.FORWARD);
-        sOdmD.setDirection(Servo.Direction.REVERSE);
 
-        resetEnc();
+
+        //resetEnc();
 
         accTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         accTime.startTime();
@@ -67,11 +70,11 @@ public class DTMecanum  extends Subsystem {
     }
     public void encoderServo(boolean activated){
         if (activated) {
-            sOdmE.setPosition(1);
-            sOdmD.setPosition(1);
-        } else {
             sOdmE.setPosition(0);
             sOdmD.setPosition(0);
+        } else {
+            sOdmE.setPosition(1);
+            sOdmD.setPosition(1);
         }
     }
 
@@ -265,22 +268,28 @@ public class DTMecanum  extends Subsystem {
     }
 
     public void periodic() {
-        //updateAcceleration(Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(turn) < 0.1);
+        updateAcceleration(Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(turn) < 0.1);
 
         encoderServo(true);
 
-        double vel = slowFactor * Constants.DTMecanum.SPEED; //* cc *
+        double vel = slowFactor * Constants.DTMecanum.SPEED * acc;
         vel *= turret.getForward() ? 1 : -1;
 
+        /*FL.setPower(sensitivReduction((y + x - turn)) * vel);
+        FR.setPower(sensitivReduction((y - x + turn)) * vel);
+        BL.setPower(sensitivReduction((y - x - turn)) * vel);
+        BR.setPower(sensitivReduction((y + x + turn)) * vel);*/
 
-        FL.setPower(sensitivReduction((y + x + turn)) * vel);
-        FR.setPower(sensitivReduction((y - x - turn)) * vel);
-        BL.setPower(sensitivReduction((y - x + turn)) * vel);
-        BR.setPower(sensitivReduction((y + x - turn)) * vel);
+        FL.setPower((y + x + turn) * vel);
+        FR.setPower((y - x - turn) * vel);
+        BL.setPower((y - x + turn) * vel);
+        BR.setPower((y + x - turn) * vel);
+
+        opMode.telemetry.addData("getForward", turret.getForward());
     }
 
     public double sensitivReduction(double a) {
-        return  Math.signum(a) * Math.pow(Math.abs(a), 3);
+        return  Math.signum(a) * Math.pow(Math.abs(a), 2);
 
     }
 
@@ -293,7 +302,7 @@ public class DTMecanum  extends Subsystem {
         }
 
         acc = Math.min(1, accTime.time() / Constants.DTMecanum.ACCELERATION);
-        acc = Math.round(acc * 1000.0) / 1000.0;
+        acc = Math.round(acc * 1500.0) / 1500.0;
     }
 
     private double roundPrecision(double val) {

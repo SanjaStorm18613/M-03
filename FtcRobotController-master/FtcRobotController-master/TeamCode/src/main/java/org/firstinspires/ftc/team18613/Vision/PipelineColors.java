@@ -15,12 +15,12 @@ import java.util.ArrayList;
 
 public class PipelineColors extends OpenCvPipeline {
 
-    int[][] cUp = Constants.Pipeline.COLOR_UP,
+    double[][] cUp = Constants.Pipeline.COLOR_UP,
             cLw = Constants.Pipeline.COLOR_LOW;
 
     int tolerance = Constants.Pipeline.TOLERANCE_AREA;
 
-    Scalar low0, up0, low1, up1, up2, green;
+    Scalar low0, up0, low1, up1, green;
     Mat input, mat, mat2;
     Size s;
     MatOfPoint objtDetc;
@@ -45,7 +45,7 @@ public class PipelineColors extends OpenCvPipeline {
         up0 = new Scalar(cUp[0][0], cUp[0][1], cUp[0][2]);//green
 
         low1 = new Scalar(cLw[1][0], cLw[1][1], cLw[1][2]);
-        up2 = new Scalar(cUp[1][0], cUp[1][1], cUp[1][2]);//cian
+        up1 = new Scalar(cUp[1][0], cUp[1][1], cUp[1][2]);//cian
     }
 
 
@@ -83,8 +83,10 @@ public class PipelineColors extends OpenCvPipeline {
             Point supDir = new Point(rectRange.x, rectRange.y);
             Point botEsc = new Point(rectRange.x + rectRange.width,
                     rectRange.y + rectRange.height);
+            Point org = new Point(0,0);
 
             Imgproc.rectangle(input, supDir, botEsc, green, 5);
+            Imgproc.putText(input, getColorDetected().toString(), org, Imgproc.FONT_HERSHEY_PLAIN, 1, green, 2);
         }
 
 
