@@ -8,7 +8,8 @@ import java.util.Arrays;
 public class ContantsAuto {
 
     private final int PT_TIME =-1, DR = 0, EL = 1, CL = 2, PT = 3, YW = 4, DR_EL = 5,
-            DR_EL_CL_YW_DR = 6, EL_YW = 7;
+            EL_YW = 7, DR_EL_CL_YW_DR = 6;
+
 
     private Double sideAjust = 0.0;
 
