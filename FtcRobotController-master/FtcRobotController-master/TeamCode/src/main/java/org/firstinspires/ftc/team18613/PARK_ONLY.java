@@ -18,14 +18,14 @@ import java.util.ArrayList;
 @Autonomous(name = "PARK_ONLY", group = "LinearOpMode")
 public class PARK_ONLY extends LinearOpMode {
 
+    ElapsedTime time;
+    VisionCtrl webcam;
+    PipelineColors pipeline;
     DTMecanum drive;
     Elevator elevator;
     Turret turret;
     Claw claw;
     Arm arm;
-    ElapsedTime time;
-    VisionCtrl webcam;
-    PipelineColors pipeline;
 
     boolean init = false;
     Double parkArea = 0.0;
