@@ -4,7 +4,6 @@ package org.firstinspires.ftc.team18613.Subsystems;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.team18613.Command;
-import org.firstinspires.ftc.team18613.utils.FloatPair;
 import org.firstinspires.ftc.team18613.utils.Pair;
 import org.firstinspires.ftc.team18613.utils.Supplier;
 import org.firstinspires.ftc.team18613.utils.Function;
@@ -260,6 +259,7 @@ public class Controller {
         }
         if (sticksRegisters.size() > 0) {
             updateSticks();
+
         }
     }
 

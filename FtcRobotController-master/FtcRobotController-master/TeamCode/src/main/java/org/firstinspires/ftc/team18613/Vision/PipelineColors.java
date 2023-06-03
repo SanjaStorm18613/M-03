@@ -5,6 +5,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
+import org.opencv.core.Range;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -18,14 +19,12 @@ public class PipelineColors extends OpenCvPipeline {
     double[][] cUp = Constants.Pipeline.COLOR_UP,
             cLw = Constants.Pipeline.COLOR_LOW;
 
-    int tolerance = Constants.Pipeline.TOLERANCE_AREA;
-
-    Scalar low0, up0, low1, up1, green;
-    Mat input, mat, mat2;
+    Scalar low0, up0, low1, up1, green, red, black;
+    Mat input, mat, mat2, cropOrg;
     Size s;
     MatOfPoint objtDetc;
     ArrayList<ArrayList<MatOfPoint>> elemsArr;
-    ArrayList<MatOfPoint> contourArr;
+    ArrayList<MatOfPoint> contourArr, contourObjectDetect;
     int ObjtDetcColor = -1;
 
 
@@ -34,8 +33,11 @@ public class PipelineColors extends OpenCvPipeline {
         mat = new Mat();
         mat2 = new Mat();
         input = new Mat();
+        cropOrg = new Mat();
 
         green = new Scalar(0, 255, 0);
+        red = new Scalar(255, 0, 0);
+        black = new Scalar(0,0,0);
 
         s = new Size(3, 3);
         elemsArr = new ArrayList<>();
@@ -51,42 +53,51 @@ public class PipelineColors extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat orgmInpt) {
-        Imgproc.cvtColor(orgmInpt, input, Imgproc.COLOR_BGR2HLS);
+        Point center = new Point(100,160);
+
+        cropOrg = new Mat(orgmInpt, new Rect(140,200,360,280));
+        Imgproc.cvtColor(cropOrg, input, Imgproc.COLOR_BGR2HLS);
 
         elemsArr.clear();
 
         elemsArr.add(colorFilter(low0, up0));
         elemsArr.add(colorFilter(low1, up1));
 
-        orgmInpt.copyTo(input);
+        cropOrg.copyTo(input);
 
         ObjtDetcColor = -1;
         objtDetc = null;
+        contourObjectDetect = null;
 
         int i = 0;
         for (ArrayList<MatOfPoint> elms : elemsArr) {
 
             for (MatOfPoint item : elms) {
 
-                if (objtDetc == null ||(Imgproc.contourArea(item) > Imgproc.contourArea(objtDetc))) {
+                if (objtDetc == null || (Imgproc.contourArea(item) > Imgproc.contourArea(objtDetc))) {
                     ObjtDetcColor = i;
                     objtDetc = item;
+                    contourObjectDetect = elms;
                 }
             }
             i++;
         }
 
-
-        if (objtDetc != null && Imgproc.contourArea(objtDetc) > tolerance) {
+        if (objtDetc != null && Imgproc.contourArea(objtDetc) > Constants.Pipeline.TOLERANCE_AREA) {
 
             Rect rectRange = Imgproc.boundingRect(objtDetc);
             Point supDir = new Point(rectRange.x, rectRange.y);
             Point botEsc = new Point(rectRange.x + rectRange.width,
                     rectRange.y + rectRange.height);
-            Point org = new Point(0,0);
 
-            Imgproc.rectangle(input, supDir, botEsc, green, 5);
-            Imgproc.putText(input, getColorDetected().toString(), org, Imgproc.FONT_HERSHEY_PLAIN, 1, green, 2);
+
+            Imgproc.rectangle(input, supDir, botEsc, green, 1);
+            if (contourObjectDetect != null) {
+                Imgproc.drawContours(input, contourObjectDetect, contourObjectDetect.indexOf(objtDetc), red, 2);
+            }
+            Imgproc.putText(input, getColorDetected().toString(), supDir, Imgproc.FONT_HERSHEY_PLAIN, 1, green, 2);
+        } else {
+            Imgproc.putText(input, "NOT FOUND/BLACK", center, Imgproc.FONT_HERSHEY_PLAIN, 1, green, 2);
         }
 
 
@@ -120,19 +131,23 @@ public class PipelineColors extends OpenCvPipeline {
 
     public DetectionColor getColorDetected() {
 
-        switch (ObjtDetcColor) {
-            case 0:
-                return DetectionColor.GREEN;
-            case 1:
-                return DetectionColor.CIAN;
-            default:
-                return DetectionColor.BLACK;
+        if (objtDetc != null && Imgproc.contourArea(objtDetc) > Constants.Pipeline.TOLERANCE_AREA) {
+            switch (ObjtDetcColor) {
+                case 0:
+                    return DetectionColor.GREEN;
+                case 1:
+                    return DetectionColor.YELLOW;
+                default:
+                    return DetectionColor.BLACK;
+            }
+        } else {
+            return DetectionColor.BLACK;
         }
     }
 
     public enum DetectionColor {
         GREEN,
-        CIAN,
+        YELLOW,
         BLACK
     }
 }

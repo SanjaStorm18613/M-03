@@ -30,7 +30,7 @@ public class ElevadorCtrl extends LinearOpMode {
             else if (gamepad1.dpad_down || gamepad2.dpad_down) e.setPower(-0.4);
             else e.setPower(0.0);
 
-            telemetry.addData("pos", e.getCurrentPosition() / (double) Constants.Elevador.CONVR);
+            telemetry.addData("pos", e.getCurrentPosition() / (double) Constants.Elevator.CONVR);
             telemetry.update();
 
         }

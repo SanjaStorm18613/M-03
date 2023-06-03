@@ -19,7 +19,7 @@ public class DTMecanum  extends Subsystem {
     private final Turret turret;
     private final OpMode opMode;
 
-    private boolean moveIsBusy = false;
+    private boolean moveIsBusy = false, actEnc = false;
     private double pos, setPoint = 0, direction = 0, acc = 0, x = 0, y = 0, turn = 0, slowFactor = 0;
 
     public DTMecanum(OpMode opMode, Turret turret) {
@@ -34,11 +34,16 @@ public class DTMecanum  extends Subsystem {
         sOdmE.setDirection(Servo.Direction.FORWARD);
         sOdmD.setDirection(Servo.Direction.FORWARD);
 
+        activatedEncoderServo(false);
+
         eLeft = opMode.hardwareMap.get(DcMotorEx.class, "encE");
         eRight = opMode.hardwareMap.get(DcMotorEx.class, "encD");
 
-        eLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        eRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        eLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        eRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        eLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        eRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //Cria motores
         FL = opMode.hardwareMap.get(DcMotorEx.class, "FE");
@@ -59,91 +64,23 @@ public class DTMecanum  extends Subsystem {
             motors[m].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
 
-
-
-        //resetEnc();
+        resetEnc();
 
         accTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         accTime.startTime();
 
 
     }
-    public void encoderServo(boolean activated){
-        if (activated) {
-            sOdmE.setPosition(0);
-            sOdmD.setPosition(0);
-        } else {
-            sOdmE.setPosition(1);
-            sOdmD.setPosition(1);
-        }
+
+    public void activatedEncoderServo(boolean act){
+        sOdmE.setPosition(act ? 0 : 1);
+        sOdmD.setPosition(act ? 0 : 1);
     }
 
-    public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist) {
+    public void move(boolean externalEnc, boolean sideMove, double maxVel, double acelT, double propc, double dist, double ang) {
         double erro, yawErro, acT, turn, tolerance;
 
-        encoderServo(false);
-
-        opMode.telemetry.addData("eLeft", eLeft.getCurrentPosition());
-        opMode.telemetry.addData("eRight", eRight.getCurrentPosition());
-
-        if (sideMove) {
-            propc *= Constants.DTMecanum.CONVERTION/35.;
-            dist *= Constants.DTMecanum.CONVERTION/35.;
-            tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE/35.;
-
-        } else {
-            propc *= Constants.DTMecanum.CONVERTION;
-            dist *= Constants.DTMecanum.CONVERTION;
-            tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
-        }
-
-        if (dist != setPoint) {
-            setPoint = dist;
-            this.accTime.reset();
-            resetEnc();
-            moveIsBusy = true;
-        }
-
-        yawErro = eLeft.getCurrentPosition() - eRight.getCurrentPosition();//enc
-
-        if (sideMove) {
-            pos = (BR.getCurrentPosition() - FR.getCurrentPosition());
-            yawErro /= 35.;
-        } else {
-            pos = (eLeft.getCurrentPosition() + eRight.getCurrentPosition());
-        }
-        pos /= 2.0;
-
-        erro = setPoint - pos;
-
-
-        if ((Math.abs(erro) > tolerance) || yawErro > Constants.DTMecanum.TOLERANCE_ENCODER_DIFERENCE) {
-
-            moveIsBusy = true;
-
-            acT = Math.min(1, this.accTime.time() / acelT);
-
-            pos = erro / propc;
-            pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
-            pos *= acT;
-
-            turn = yawErro / propc;
-            turn = Math.min(maxVel, turn);
-            turn *= acT;
-
-            tankDrive(pos, -turn, sideMove);
-
-        } else {
-            moveIsBusy = false;
-            tankDrive(0);
-        }
-    }
-
-
-    public void move(boolean sideMove, double maxVel, double acelT, double propc, double dist, double ang) {
-        double erro, yawErro, acT, turn, tolerance;
-
-        encoderServo(false);
+        activatedEncoderServo(false);
 
         if (sideMove) {
             propc *= Constants.DTMecanum.CONVERTION/35.;
@@ -170,12 +107,12 @@ public class DTMecanum  extends Subsystem {
 
 
         if (sideMove) {
-            pos = (BR.getCurrentPosition() - FR.getCurrentPosition());
+            pos = (BR.getCurrentPosition() - FR.getCurrentPosition()) / 2.0;
+        } else if (externalEnc) {
+            pos = (FL.getCurrentPosition() + FR.getCurrentPosition()) / 2.0;
         } else {
-            pos = (eLeft.getCurrentPosition() + eRight.getCurrentPosition());
+            pos = eRight.getCurrentPosition();
         }
-
-        pos /= 2.0;
 
         erro = setPoint - pos;
         yawErro = direction - gyro.getContinuousAngle();
@@ -201,7 +138,10 @@ public class DTMecanum  extends Subsystem {
             moveIsBusy = false;
             tankDrive(0);
         }
-        opMode.telemetry.addData("yawErro", yawErro);
+        opMode.telemetry.addData("eLeft", eLeft.getCurrentPosition());
+        opMode.telemetry.addData("eRight", eRight.getCurrentPosition());
+        opMode.telemetry.addData("erro", erro);
+
     }
 
     public void resetEnc() {
@@ -270,7 +210,7 @@ public class DTMecanum  extends Subsystem {
     public void periodic() {
         updateAcceleration(Math.abs(x) < 0.1 && Math.abs(y) < 0.1 && Math.abs(turn) < 0.1);
 
-        encoderServo(true);
+        activatedEncoderServo(true);
 
         double vel = slowFactor * Constants.DTMecanum.SPEED * acc;
         vel *= turret.getForward() ? 1 : -1;
@@ -302,7 +242,7 @@ public class DTMecanum  extends Subsystem {
         }
 
         acc = Math.min(1, accTime.time() / Constants.DTMecanum.ACCELERATION);
-        acc = Math.round(acc * 1500.0) / 1500.0;
+        acc = Math.round(acc * 1300.0) / 1300.0;
     }
 
     private double roundPrecision(double val) {

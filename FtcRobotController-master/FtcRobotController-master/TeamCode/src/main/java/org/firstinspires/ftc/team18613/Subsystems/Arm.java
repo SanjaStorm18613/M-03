@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
-import org.firstinspires.ftc.team18613.TeleOpM03;
 
 public class Arm extends Subsystem {
 
@@ -47,10 +46,15 @@ public class Arm extends Subsystem {
         } else {
             var = controlRequirement;
         }
+
+        var = Math.round(var * 1000) / 1000.0;
+
         sLeft.setPosition(var);
         sRight.setPosition(var);
 
-        //opMode.telemetry.addData("braco", sLeft.getPosition());
+        opMode.telemetry.addData("bracoL", sLeft.getPosition());
+        opMode.telemetry.addData("bracoR", sRight.getPosition());
+
 
     }
 
@@ -65,7 +69,7 @@ public class Arm extends Subsystem {
 
     private void updateAutomaticPos() {
         double posRangeBraco = Constants.Braco.MAX_POS - Constants.Braco.MIN_POS;
-        double posPercentElev = (elevator.getCurrentPos() / ((Constants.Elevador.NV_3) * Constants.Elevador.CONVR));
+        double posPercentElev = (elevator.getCurrentPos() / ((Constants.Elevator.NV_3) * Constants.Elevator.CONVR));
         double pos = (Math.pow(posPercentElev, 3) * posRangeBraco) + Constants.Braco.MIN_POS;
 
         pos = Math.min(pos, Constants.Braco.MAX_POS);

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.team18613;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -32,22 +33,22 @@ import org.firstinspires.ftc.team18613.utils.SupplierPair;
 
 public class GyroTest extends LinearOpMode {
 
-    Gyro gyro;
-
-    public static Telemetry tel;
-    public static HardwareMap hm;
+    public static DcMotor e, d;
 
     public void runOpMode() {
-        tel = telemetry;
-        hm = hardwareMap;
-        gyro = new Gyro(this);
+
+        e = hardwareMap.get(DcMotor.class, "encE");
+        d = hardwareMap.get(DcMotor.class, "encD");
+
+        e.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        d.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
 
         while (opModeIsActive()) {
 
-            telemetry.addData("getPeriodicAngle", gyro.getPeriodicAngle());
-            telemetry.addData("getContinuousAngle", gyro.getContinuousAngle());
+            telemetry.addData("es", e.getCurrentPosition());
+            telemetry.addData("dir", d.getCurrentPosition());
 
             telemetry.update();
 

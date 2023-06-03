@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
-import org.firstinspires.ftc.team18613.TeleOpM03;
 
 public class Claw extends Subsystem {
 
@@ -16,9 +15,9 @@ public class Claw extends Subsystem {
     private final ElapsedTime time;
     private final OpMode opMode;
 
-    private double cTargetPos = 0,
+    private double pAutoPos = 0,
             angle = 0, pitchProgress = 0, pitchPos = Constants.Claw.PITCH_UP, lastPitchPos = Constants.Claw.PITCH_UP,
-            rollPos = Constants.Claw.ROLL_UP, elevatorControl = 0;
+            rollPos = Constants.Claw.ROLL_UP, elevatorControl = 0, autoPitchPos = 0.0, aoutTime = 0.0;
 
     private boolean clawOpen = false, pBusy = false, init;
 
@@ -50,25 +49,35 @@ public class Claw extends Subsystem {
 
     }
 
-    public void setClaw(double c, int t) {
+    public void setPitch (double pos, double t) {
 
-        if (c == 1.0){
+        if (pAutoPos != pos) {
+            time.reset();
+            cIsBusy = true;
+        }
+        pAutoPos = pos;
+
+        if (time.time() > t * 0.8) {
+            autoPitchPos = pos;
+
+        }
+
+        cIsBusy = t > time.time();
+    }
+
+    public void autoPeriodic(){
+
+        sPitch.setPosition(arm.getPos() * 0.6 + autoPitchPos);
+        sRoll.setPosition(Constants.Claw.ROLL_UP);
+
+    }
+
+    public void setClaw(double pos) {
+        if (pos == 1.0){
             openClaw();
         } else {
             closeClaw();
         }
-
-        sRoll.setPosition(Constants.Claw.ROLL_UP);
-        sPitch.setPosition(Constants.Claw.PITCH_UP + 0.1);
-
-        if (cTargetPos != sClawD.getPosition() && !cIsBusy) {
-            time.reset();
-            cIsBusy = true;
-        }
-        cTargetPos = sClawD.getPosition();
-
-        cIsBusy = time.time() < t;
-
     }
 
     public boolean getBusy(){
@@ -129,7 +138,7 @@ public class Claw extends Subsystem {
     }
 //*/
     public void angulationDrop(double angle){
-        this.angle = arm.getPos() * 0.65 + (pitchPos == Constants.Claw.PITCH_UP ? angle * 0.4 : 0);
+        this.angle = arm.getPos() * 0.6 + (pitchPos == Constants.Claw.PITCH_UP ? angle * 0.4 : 0);
     }
 
     public void invertCone() {
@@ -217,7 +226,7 @@ public class Claw extends Subsystem {
                 elevatorControl = 0;
 
             } else {
-                elevatorControl = 0.5;
+                elevatorControl = Constants.Claw.ELEVATOR_UP_RETRAIN;
 
             }
         } else {

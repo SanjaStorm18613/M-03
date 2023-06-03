@@ -23,6 +23,7 @@ public class Turret extends Subsystem {
 
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turret.setTargetPosition(5);
 
         turret.setDirection(DcMotorSimple.Direction.REVERSE);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -113,7 +114,7 @@ public class Turret extends Subsystem {
         double delta = setPoint - currentPos;
 
         if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING){
-            elevator.addControl(Constants.Elevador.NV_1 * delta * 0.0029);
+            elevator.addControl(Constants.Elevator.NV_1 * delta * 0.0029);
 
         } else {
             elevator.addControl(0);

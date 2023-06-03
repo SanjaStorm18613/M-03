@@ -14,10 +14,10 @@ public class Elevator extends Subsystem {
     private final OpMode opMode;
 
     private final double[] stages =
-            { Constants.Elevador.NV_0
-            , Constants.Elevador.NV_1
-            , Constants.Elevador.NV_2
-            , Constants.Elevador.NV_3 };
+            { Constants.Elevator.NV_0
+            , Constants.Elevator.NV_1
+            , Constants.Elevator.NV_2
+            , Constants.Elevator.NV_3 };
 
     private int stage = 0, adjust = 0;
     private double controlRequirement = 0;
@@ -33,7 +33,7 @@ public class Elevator extends Subsystem {
         elevator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         elevator.setDirection(DcMotorSimple.Direction.REVERSE);
-        elevator.setTargetPositionTolerance(Constants.Elevador.TOLERANCE);
+        elevator.setTargetPositionTolerance(Constants.Elevator.TOLERANCE);
     }
 
     public boolean onColletionStage() {
@@ -45,7 +45,7 @@ public class Elevator extends Subsystem {
     }
 
     public boolean targetPosLowStage() {
-        return elevator.getTargetPosition() < stages[1] * Constants.Elevador.CONVR * (onColletionStage() ? 1.17 :1);
+        return elevator.getTargetPosition() < stages[1] * Constants.Elevator.CONVR * (onColletionStage() ? 1.17 :1);
 
     }
     public int getCurrentPos() {
@@ -53,7 +53,7 @@ public class Elevator extends Subsystem {
     }
 
     public void setPos(double pos, double vel) {
-        elevator.setTargetPosition((int) (pos * Constants.Elevador.CONVR));
+        elevator.setTargetPosition((int) (pos * Constants.Elevator.CONVR));
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         elevator.setPower(vel);
     }
@@ -85,38 +85,37 @@ public class Elevator extends Subsystem {
     }
 
     public void adjustHeight(boolean up) {
-        double currentStage = stages[stage] + adjust * Constants.Elevador.AJUSTE;
+        double currentStage = stages[stage] + adjust * Constants.Elevator.AJUSTE;
 
-        if (up && currentStage < Constants.Elevador.NV_3) {
+        if (up && currentStage < Constants.Elevator.NV_3) {
             adjust++;
         }
-        if (!up && currentStage > Constants.Elevador.NV_0) {
+        if (!up && currentStage > Constants.Elevator.NV_0) {
             adjust--;
         }
     }
 
     public void periodic() {
-        double targetPos = stages[stage] + adjust * Constants.Elevador.AJUSTE;
+        double targetPos = stages[stage] + adjust * Constants.Elevator.AJUSTE;
 
         targetPos = Math.max(targetPos, controlRequirement);
 
-        targetPos = Math.min(Constants.Elevador.NV_3, targetPos);
-        targetPos = Math.max(Constants.Elevador.NV_0, targetPos);
-        targetPos *= Constants.Elevador.CONVR;
+        targetPos = Math.min(Constants.Elevator.NV_3, targetPos);
+        targetPos = Math.max(Constants.Elevator.NV_0, targetPos);
+        targetPos *= Constants.Elevator.CONVR;
 
         elevator.setTargetPosition((int) targetPos);
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         int delta = elevator.getTargetPosition() - elevator.getCurrentPosition();
         if (delta >= 0) {
-            elevator.setPower(Constants.Elevador.UP_SPEED);
+            elevator.setPower(Constants.Elevator.UP_SPEED);
         } else {
-            elevator.setPower(Constants.Elevador.DOWN_SPEED);
+            elevator.setPower(Constants.Elevator.DOWN_SPEED);
         }
 
-        opMode.telemetry.addData("adjust", adjust);
         opMode.telemetry.addData("targetPos-final", targetPos);
-        opMode.telemetry.addData("controlRequirement", controlRequirement);
+        opMode.telemetry.addData("getCurrentPos", getCurrentPos());
 
     }
 
