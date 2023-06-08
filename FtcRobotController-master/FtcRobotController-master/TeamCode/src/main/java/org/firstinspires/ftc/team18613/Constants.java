@@ -31,7 +31,7 @@ public class Constants {
     public static class Braco {
 
         public static final double  MIN_POS = .2,
-                                    MAX_POS = .76;
+                                    MAX_POS = .72;
 
     }
 
@@ -40,13 +40,13 @@ public class Constants {
         public static final double  NV_0 = 0,
                                     NV_1 = 1.5,
                                     NV_2 = 3.4,
-                                    NV_3 = 4.5,
+                                    NV_3 = 4,
 
                                     UP_SPEED = 1,
                                     DOWN_SPEED = .9,
                                     AJUSTE = 0.25;
         public static final int TOLERANCE = 80,
-                                CONVR = 1500;
+                                CONVR = 1830;
 
     }
 

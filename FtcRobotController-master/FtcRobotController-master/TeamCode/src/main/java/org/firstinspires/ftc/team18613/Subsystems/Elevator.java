@@ -115,7 +115,7 @@ public class Elevator extends Subsystem {
         }
 
         opMode.telemetry.addData("targetPos-final", targetPos);
-        opMode.telemetry.addData("getCurrentPos", getCurrentPos());
+        opMode.telemetry.addData("getCurrentPos", getCurrentPos() / ((double) Constants.Elevator.CONVR));
 
     }
 
