@@ -129,7 +129,7 @@ public class DTMecanum  extends Subsystem {
             pos *= acT;
 
             turn = yawErro / propc;
-            turn = Math.min(maxVel, turn);
+            turn = Math.signum(turn) * Math.min(maxVel, Math.abs(turn));
             turn *= acT;
 
             tankDrive(pos, -turn, sideMove);
