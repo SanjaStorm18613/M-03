@@ -18,7 +18,7 @@ public class Arm extends Subsystem {
     public Arm(OpMode opMode, Elevator elevator) {
 
         this.opMode = opMode;
-        //Servos direito e esquerdo do braço
+
         sLeft = opMode.hardwareMap.get(Servo.class, "E");
         sRight = opMode.hardwareMap.get(Servo.class, "D");
 
@@ -27,16 +27,6 @@ public class Arm extends Subsystem {
 
         this.elevator = elevator;
     }
-
-    public double getPos(){
-        return sLeft.getPosition() - Constants.Braco.MIN_POS;
-    }
-
-    public void setControlRequirement(double p) {
-        controlRequirement = p;
-    }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void periodic(){
         double var;
@@ -52,15 +42,10 @@ public class Arm extends Subsystem {
         sLeft.setPosition(var);
         sRight.setPosition(var);
 
-        opMode.telemetry.addData("bracoL", sLeft.getPosition());
-        opMode.telemetry.addData("bracoR", sRight.getPosition());
-
-
     }
 
-    public double addControl(double pos) {
+    public void addControl(double pos) {
         controlRequirement = Math.max(pos, controlRequirement);
-        return controlRequirement;
     }
 
     public void removeControl(){
@@ -77,6 +62,10 @@ public class Arm extends Subsystem {
 
         automaticPos = pos;
 
+    }
+
+    public double getPos(){
+        return sLeft.getPosition() - Constants.Braco.MIN_POS;
     }
 
 }

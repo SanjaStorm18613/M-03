@@ -2,17 +2,12 @@ package org.firstinspires.ftc.team18613;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team18613.Subsystems.Arm;
 import org.firstinspires.ftc.team18613.Subsystems.Claw;
 import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
 import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
-import org.firstinspires.ftc.team18613.Vision.PipelineColors;
-import org.firstinspires.ftc.team18613.Vision.VisionCtrl;
-import org.firstinspires.ftc.team18613.utils.Pair;
 
 import java.util.ArrayList;
 
@@ -32,79 +27,43 @@ public class AUTO_DEMONSTRACAO extends LinearOpMode {
         elevator = new Elevator(this);
         arm = new Arm(this, elevator);
         claw = new Claw(this, elevator, arm);
-        turret = new Turret(this, elevator, claw);
+        turret = new Turret(this, elevator);
         drive = new DTMecanum(this, turret);
 
-        ContantsAuto cAuto = new ContantsAuto();
-
-        ArrayList<Pair<Double, Integer>> steps = cAuto.getApresentationSteps();
-        ArrayList<Boolean> drSide = cAuto.getApresentationSide();
+        ContantsAuto_Multitasking cAuto = new ContantsAuto_Multitasking();
+        ArrayList<ArrayList<Double[]>> steps = cAuto.getAutoDemostracao();
 
         waitForStart();
 
         while (opModeIsActive() && steps.size() != 0) {
 
-            switch (steps.get(0).secondValue()) {
+            for (Double[] action : steps.get(0)) {
 
-                case 0:
-                    drive.move(false, drSide.get(0), 0.5, 800, 50, steps.get(0).firstValue(), 0);
-                    if (!drive.getBusy() && steps.size() > 0) {
-                        steps.remove(0);
-                        drSide.remove(0);
-                    }
-                    break;
+                if (action[1].equals(cAuto.DR)) {
+                    drive.move(true, action[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.0005, action[0], 0);
 
-                case 1:
-                    elevator.setPos(steps.get(0).firstValue(), Constants.Elevator.UP_SPEED);
-                    if (!elevator.getBusy() && steps.size() > 0) {
-                        steps.remove(0);
-                    }
-                    break;
+                } else if (action[1].equals(cAuto.DR_TURN)) {
+                    drive.move(true, false, 0.5, 800, 0.005, 0, action[0]);
 
-                case 2:
-                    claw.setClaw(steps.get(0).firstValue());
-                    if (!claw.getBusy() && steps.size() > 0) {
-                        steps.remove(0);
-                    }
-                    break;
+                } else if (action[1].equals(cAuto.EL)) {
+                    elevator.setPos(action[0], Constants.Elevator.UP_SPEED);
 
-                case 3:
+                } else if (action[1].equals(cAuto.CL)) {
+                    claw.setClaw(action[0]);
+
+                } else if (action[1].equals(cAuto.PT)) {
                     init = true;
-                    claw.setPitch(steps.get(0).firstValue(), steps.get(1).firstValue());
+                    claw.setPitch(action[0], action[2]);
 
-                    if (!claw.getBusy() && steps.size() > 0) {
-                        steps.remove(1);
-                        steps.remove(0);
-                    }
-                    break;
+                } else if (action[1].equals(cAuto.YW)) {
+                    turret.setPos(action[0], .9);
 
-                case 4:
-                    turret.setPos(steps.get(0).firstValue(), .9);
-                    if (!turret.getBusy() && steps.size() > 0) {
-                        steps.remove(0);
-                    }
-                    break;
+                }
+            }
 
-                case 5:
-                    elevator.setPos(steps.get(1).firstValue(), 0.7);
-                    drive.move(false, drSide.get(0), 0.5, 800, 50, steps.get(0).firstValue(), 0);
-
-                    if (!elevator.getBusy() && !drive.getBusy() && steps.size() > 0) {
-                        steps.remove(1);
-                        steps.remove(0);
-                        drSide.remove(0);
-                    }
-                    break;
-
-                case 7:
-                    elevator.setPos(steps.get(0).firstValue(), 0.7);
-                    turret.setPos(steps.get(1).firstValue(), .9);
-
-                    if (!elevator.getBusy() && !turret.getBusy() && steps.size() > 0) {
-                        steps.remove(1);
-                        steps.remove(0);
-                    }
-                    break;
+            if (steps.size() > 0 && !turret.getBusy() && !claw.getBusy()
+                    && !elevator.getBusy() && !drive.getBusy()) {
+                steps.remove(0);
             }
 
             if (init) {

@@ -9,7 +9,6 @@ public class Retract extends Command {
 
     public Retract(Claw claw) {
         this.claw = claw;
-
     }
 
     @Override

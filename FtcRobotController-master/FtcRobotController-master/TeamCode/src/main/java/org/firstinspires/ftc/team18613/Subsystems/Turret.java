@@ -3,7 +3,6 @@ package org.firstinspires.ftc.team18613.Subsystems;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
@@ -16,7 +15,7 @@ public class Turret extends Subsystem {
 
     private boolean enable = false, isClockwise = true;
 
-    public Turret(OpMode opMode, Elevator elev, Claw garra) {
+    public Turret(OpMode opMode, Elevator elev) {
 
         this.opMode = opMode;
         turret = opMode.hardwareMap.get(DcMotor.class, "Yaw");
@@ -30,50 +29,20 @@ public class Turret extends Subsystem {
 
         this.elevator = elev;
 
-        ElapsedTime time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-    }
-
-    public boolean getBusy() { return turret.isBusy(); }
-
-    public void setPos(double pos, double vel) {
-        turret.setTargetPosition((int) (pos * Constants.Turret.CONVR));
-        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turret.setPower(vel);
-    }
-
-    public boolean getForward() {
-        return !(Math.abs(turret.getCurrentPosition()) > Constants.Turret.COUNTS_PER_REVOLUTION/ 4.
-                && Math.abs(turret.getCurrentPosition()) < Constants.Turret.COUNTS_PER_REVOLUTION/ 1.5);
-    }
-
-    private boolean notLimit (boolean isClockwise) {
-
-        return !(turret.getCurrentPosition() > Constants.Turret.LIMIT
-                || turret.getCurrentPosition() < -Constants.Turret.LIMIT
-                || (isClockwise && getRelativePos() > Constants.Turret.CHASSIS_OPENING + .015)
-                || (!isClockwise && getRelativePos() < -(Constants.Turret.CHASSIS_OPENING + .015)))
-                || !elevator.targetPosLowStage();
-
-    }
-
-    private double getRelativePos () {
-        double var = turret.getCurrentPosition() / (Constants.Turret.COUNTS_PER_REVOLUTION/ 2.);
-        var -= Math.round(var);
-        return var;
     }
 
     public void periodic() {
         double limitProxPercent;
-        if (elevator.targetPosLowStage()) {
+        if (elevator.getTargetPosLowStage()) {
             limitProxPercent = (0.15 - Math.abs(getRelativePos())) * 18;
         } else {
             limitProxPercent = 1;
         }
 
-        if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING - .015 && elevator.targetPosLowStage()) {
+        if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING - .015 && elevator.getTargetPosLowStage()) {
             turret.setPower(runAllowedPoint());
 
-        } else if (notLimit(isClockwise)) {
+        } else if (getNotLimit(isClockwise)) {
             if (enable) {
                 turret.setPower(Constants.Turret.SPEED * (isClockwise ? 1 : -1) * limitProxPercent);
             } else {
@@ -82,7 +51,7 @@ public class Turret extends Subsystem {
         }
 
         opMode.telemetry.addData("getRelativePos", Math.abs(getRelativePos()));
-        opMode.telemetry.addData("elevator.targetPosLowStage", elevator.targetPosLowStage());
+        opMode.telemetry.addData("elevator.targetPosLowStage", elevator.getTargetPosLowStage());
 
     }
 
@@ -122,6 +91,35 @@ public class Turret extends Subsystem {
 
         return delta * 0.005;
 
+    }
+
+    public void setPos(double pos, double vel) {
+        turret.setTargetPosition((int) (pos * Constants.Turret.CONVR));
+        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turret.setPower(vel);
+    }
+
+    private boolean getNotLimit(boolean isClockwise) {
+
+        return !(turret.getCurrentPosition() > Constants.Turret.LIMIT
+                || turret.getCurrentPosition() < -Constants.Turret.LIMIT
+                || (isClockwise && getRelativePos() > Constants.Turret.CHASSIS_OPENING + .015)
+                || (!isClockwise && getRelativePos() < -(Constants.Turret.CHASSIS_OPENING + .015)))
+                || !elevator.getTargetPosLowStage();
+
+    }
+
+    public boolean getBusy() { return turret.isBusy(); }
+
+    public boolean getForward() {
+        return !(Math.abs(turret.getCurrentPosition()) > Constants.Turret.COUNTS_PER_REVOLUTION/ 4.
+                && Math.abs(turret.getCurrentPosition()) < Constants.Turret.COUNTS_PER_REVOLUTION/ 1.5);
+    }
+
+    private double getRelativePos () {
+        double var = turret.getCurrentPosition() / (Constants.Turret.COUNTS_PER_REVOLUTION/ 2.);
+        var -= Math.round(var);
+        return var;
     }
 
 }

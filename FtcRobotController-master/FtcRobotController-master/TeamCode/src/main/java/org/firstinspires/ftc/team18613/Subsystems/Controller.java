@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.team18613.Subsystems;
 
-
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.team18613.Command;
@@ -11,7 +10,6 @@ import org.firstinspires.ftc.team18613.utils.SupplierPair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
 
 public class Controller {
 
@@ -93,58 +91,6 @@ public class Controller {
                 )
         );
     }
-
-/*
-
-    public void onPressed (int id, Command cc) {
-        boolean current = boolSuppliers.get(id).get();
-
-        if(current && !last_values[id]){
-            cc.run();
-        }
-
-        last_values[id] = current;
-    }
-
-    public void onReleased (int id, Command cc) {
-        boolean current = boolSuppliers.get(id).get();
-
-        if(!current && last_values[id]){
-            cc.run();
-        }
-
-        last_values[id] = current;
-    }
-
-    public void whilePressed (int id, Command cc) {
-        boolean current = boolSuppliers.get(id).get();
-
-        if (current) {
-            cc.run();
-        }
-
-    }
-
-    public void trigger(int id, Function<Float,Command> fcc) {
-        float current = floatSupplier.get(id).get();
-        fcc.apply(current).run();
-
-    }
-
-    public void sticks(int id0, int id1, Function<FloatPair,Command> fcc) {
-        FloatPair current = new FloatPair(floatSupplier.get(id0).get(), floatSupplier.get(id1).get());
-
-        fcc.apply(current).run();
-    }
-
-    public void stick(int id, Function<Float,Command> fcc) {
-        float current = floatSupplier.get(id).get();
-
-        fcc.apply(current).run();
-    }
-*/
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     public void registerAction (int id, Command cc, Actions actions) {
 

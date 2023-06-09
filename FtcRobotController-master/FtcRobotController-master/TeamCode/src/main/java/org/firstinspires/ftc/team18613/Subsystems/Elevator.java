@@ -36,33 +36,29 @@ public class Elevator extends Subsystem {
         elevator.setTargetPositionTolerance(Constants.Elevator.TOLERANCE);
     }
 
-    public boolean onColletionStage() {
-        return stage == 0;
-    }
+    public void periodic() {
+        double targetPos = stages[stage] + adjust * Constants.Elevator.AJUSTE;
 
-    public double getTargetPos() {
-        return elevator.getTargetPosition();
-    }
+        targetPos = Math.max(targetPos, controlRequirement);
 
-    public boolean targetPosLowStage() {
-        return elevator.getTargetPosition() < stages[1] * Constants.Elevator.CONVR * (onColletionStage() ? 1.17 :1);
+        targetPos = Math.min(Constants.Elevator.NV_3, targetPos);
+        targetPos = Math.max(Constants.Elevator.NV_0, targetPos);
+        targetPos *= Constants.Elevator.CONVR;
 
-    }
-    public int getCurrentPos() {
-        return elevator.getCurrentPosition();
-    }
-
-    public void setPos(double pos, double vel) {
-        elevator.setTargetPosition((int) (pos * Constants.Elevator.CONVR));
+        elevator.setTargetPosition((int) targetPos);
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        elevator.setPower(vel);
-    }
 
-    public boolean getBusy() {
-        return elevator.isBusy();
-    }
+        int delta = elevator.getTargetPosition() - elevator.getCurrentPosition();
+        if (delta >= 0) {
+            elevator.setPower(Constants.Elevator.UP_SPEED);
+        } else {
+            elevator.setPower(Constants.Elevator.DOWN_SPEED);
+        }
 
-//////aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        opMode.telemetry.addData("targetPos-final", targetPos);
+        opMode.telemetry.addData("getCurrentPos", getCurrentPos() / ((double) Constants.Elevator.CONVR));
+
+    }
 
     public void addControl(double pos) {
         controlRequirement = Math.max(pos, controlRequirement);
@@ -95,28 +91,30 @@ public class Elevator extends Subsystem {
         }
     }
 
-    public void periodic() {
-        double targetPos = stages[stage] + adjust * Constants.Elevator.AJUSTE;
-
-        targetPos = Math.max(targetPos, controlRequirement);
-
-        targetPos = Math.min(Constants.Elevator.NV_3, targetPos);
-        targetPos = Math.max(Constants.Elevator.NV_0, targetPos);
-        targetPos *= Constants.Elevator.CONVR;
-
-        elevator.setTargetPosition((int) targetPos);
+    public void setPos(double pos, double vel) {
+        elevator.setTargetPosition((int) (pos * Constants.Elevator.CONVR));
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        elevator.setPower(vel);
+    }
 
-        int delta = elevator.getTargetPosition() - elevator.getCurrentPosition();
-        if (delta >= 0) {
-            elevator.setPower(Constants.Elevator.UP_SPEED);
-        } else {
-            elevator.setPower(Constants.Elevator.DOWN_SPEED);
-        }
+    public boolean getOnColletionStage() {
+        return stage == 0;
+    }
 
-        opMode.telemetry.addData("targetPos-final", targetPos);
-        opMode.telemetry.addData("getCurrentPos", getCurrentPos() / ((double) Constants.Elevator.CONVR));
+    public double getTargetPos() {
+        return elevator.getTargetPosition();
+    }
 
+    public boolean getTargetPosLowStage() {
+        return elevator.getTargetPosition() < stages[1] * Constants.Elevator.CONVR * (getOnColletionStage() ? 1.17 :1);
+
+    }
+    public int getCurrentPos() {
+        return elevator.getCurrentPosition();
+    }
+
+    public boolean getBusy() {
+        return elevator.isBusy();
     }
 
 }

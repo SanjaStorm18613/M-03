@@ -16,11 +16,9 @@ public class ElevadorCtrl extends LinearOpMode {
     public void runOpMode() {
 
         e = hardwareMap.get(DcMotor.class, "Elevador");
-        //d = hardwareMap.get(DcMotor.class, "FD");
 
         e.setDirection(DcMotorSimple.Direction.REVERSE);
         e.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //d.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
 

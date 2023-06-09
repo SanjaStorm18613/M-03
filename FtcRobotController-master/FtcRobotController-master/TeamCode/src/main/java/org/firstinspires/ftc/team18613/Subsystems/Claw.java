@@ -17,7 +17,7 @@ public class Claw extends Subsystem {
 
     private double pAutoPos = 0,
             angle = 0, pitchProgress = 0, pitchPos = Constants.Claw.PITCH_UP, lastPitchPos = Constants.Claw.PITCH_UP,
-            rollPos = Constants.Claw.ROLL_UP, elevatorControl = 0, autoPitchPos = 0.0, aoutTime = 0.0;
+            rollPos = Constants.Claw.ROLL_UP, elevatorControl = 0, autoPitchPos = 0.0;
 
     private boolean clawOpen = false, pBusy = false, init;
 
@@ -49,119 +49,9 @@ public class Claw extends Subsystem {
 
     }
 
-    public void setPitch (double pos, double t) {
-
-        if (pAutoPos != pos) {
-            time.reset();
-            cIsBusy = true;
-        }
-        pAutoPos = pos;
-
-        if (time.time() > t * 0.8) {
-            autoPitchPos = pos;
-
-        }
-
-        cIsBusy = t > time.time();
-    }
-
-    public void autoPeriodic(){
-
-        sPitch.setPosition(arm.getPos() * 0.6 + autoPitchPos);
-        sRoll.setPosition(Constants.Claw.ROLL_UP);
-
-    }
-
-    public void setClaw(double pos) {
-        if (pos == 1.0){
-            openClaw();
-        } else {
-            closeClaw();
-        }
-    }
-
-    public boolean getBusy(){
-        return cIsBusy;
-    }
-
-
-//////////////////////////////////////////////////////////////////////////////////////
-
-    public void openClaw(){
-        sClawD.setPosition(Constants.Claw.CLAW_OPEN);
-        sClawE.setPosition(Constants.Claw.CLAW_OPEN);
-    }
-
-    public void closeClaw(){
-        sClawD.setPosition(Constants.Claw.CLAW_CLOSE);
-        sClawE.setPosition(Constants.Claw.CLAW_CLOSE);
-    }
-
-    public void horizontalCollect() {
-        pitchPos = Constants.Claw.PITCH_HORIZONTAL;
-
-        if (rollPos == Constants.Claw.ROLL_SIDE_CONE){
-            rollPos = Constants.Claw.ROLL_UP;
-        }
-        colectState = 1;
-        updateClaw();
-
-    }
-
-    public void loweredFrontCollect() {
-        pitchPos = Constants.Claw.PITCH_LOWERED;
-        if (rollPos == Constants.Claw.ROLL_SIDE_CONE){
-            rollPos = Constants.Claw.ROLL_UP;
-        }
-        colectState = 2;
-        updateClaw();
-
-    }
-
-    public void loweredSideCollect() {
-        pitchPos = Constants.Claw.PITCH_LOWERED;
-        rollPos = Constants.Claw.ROLL_SIDE_CONE;
-        colectState = 3;
-        updateClaw();
-
-    }
-
-    public void retract() {
-        if (elevator.getTargetPos() > 0 && colectState == 1) {
-            pitchPos = Constants.Claw.PITCH_UP;
-        } else {
-            pitchPos = Constants.Claw.PITCH_LOWERED;
-        }
-        colectState = 4;
-        clawOpen = false;
-        init = false;
-    }
-//*/
-    public void angulationDrop(double angle){
-        this.angle = arm.getPos() * 0.6 + (pitchPos == Constants.Claw.PITCH_UP ? angle * 0.4 : 0);
-    }
-
-    public void invertCone() {
-        if (rollPos != Constants.Claw.ROLL_UP) {
-            rollPos = Constants.Claw.ROLL_UP;
-        } else {
-            rollPos = Constants.Claw.ROLL_DOWN;
-        }
-    }
-
-    public void updateClaw() {
-        if (colectState != lastColectState){
-            clawOpen = true;
-        } else {
-            clawOpen = !clawOpen;
-        }
-        lastColectState = colectState;
-        init = false;
-    }
-
     public void periodic() {
 
-        if (!elevator.onColletionStage()) {
+        if (!elevator.getOnColletionStage()) {
             pitchPos = Constants.Claw.PITCH_UP;
             if (rollPos == Constants.Claw.ROLL_SIDE_CONE){
                 rollPos = Constants.Claw.ROLL_UP;
@@ -196,6 +86,85 @@ public class Claw extends Subsystem {
 
     }
 
+    public void autoPeriodic(){
+
+        sPitch.setPosition(arm.getPos() * 0.6 + autoPitchPos);
+        sRoll.setPosition(Constants.Claw.ROLL_UP);
+
+    }
+
+    public void openClaw(){
+        sClawD.setPosition(Constants.Claw.CLAW_OPEN);
+        sClawE.setPosition(Constants.Claw.CLAW_OPEN);
+    }
+
+    public void closeClaw(){
+        sClawD.setPosition(Constants.Claw.CLAW_CLOSE);
+        sClawE.setPosition(Constants.Claw.CLAW_CLOSE);
+    }
+
+    public void horizontalCollect() {
+        pitchPos = Constants.Claw.PITCH_HORIZONTAL;
+
+        if (rollPos == Constants.Claw.ROLL_SIDE_CONE){
+            rollPos = Constants.Claw.ROLL_UP;
+        }
+
+        colectState = 1;
+        updateClaw();
+
+    }
+
+    public void loweredFrontCollect() {
+        pitchPos = Constants.Claw.PITCH_LOWERED;
+        if (rollPos == Constants.Claw.ROLL_SIDE_CONE){
+            rollPos = Constants.Claw.ROLL_UP;
+        }
+        colectState = 2;
+        updateClaw();
+
+    }
+
+    public void loweredSideCollect() {
+        pitchPos = Constants.Claw.PITCH_LOWERED;
+        rollPos = Constants.Claw.ROLL_SIDE_CONE;
+        colectState = 3;
+        updateClaw();
+
+    }
+
+    public void retract() {
+        if (elevator.getTargetPos() > 0 && colectState == 1) {
+            pitchPos = Constants.Claw.PITCH_UP;
+        } else {
+            pitchPos = Constants.Claw.PITCH_LOWERED;
+        }
+        colectState = 4;
+        clawOpen = false;
+        init = false;
+    }
+
+    public void angulationDrop(double angle){
+        this.angle = arm.getPos() * 0.6 + (pitchPos == Constants.Claw.PITCH_UP ? angle * 0.4 : 0);
+    }
+
+    public void invertCone() {
+        if (rollPos != Constants.Claw.ROLL_UP) {
+            rollPos = Constants.Claw.ROLL_UP;
+        } else {
+            rollPos = Constants.Claw.ROLL_DOWN;
+        }
+    }
+
+    public void updateClaw() {
+        if (colectState != lastColectState){
+            clawOpen = true;
+        } else {
+            clawOpen = !clawOpen;
+        }
+        lastColectState = colectState;
+        init = false;
+    }
 
     private void velPitchUpdate() {
 
@@ -237,7 +206,7 @@ public class Claw extends Subsystem {
 
     private boolean loweredCollectMove() {
 
-        if (!elevator.onColletionStage() || colectState < 2 || pitchProgress < 1) {
+        if (!elevator.getOnColletionStage() || colectState < 2 || pitchProgress < 1) {
             armControl = false;
             return true;
         }
@@ -259,6 +228,33 @@ public class Claw extends Subsystem {
 
     }
 
+    public void setPitch (double pos, double t) {
+
+        if (pAutoPos != pos) {
+            time.reset();
+            cIsBusy = true;
+        }
+        pAutoPos = pos;
+
+        if (time.time() > t * 0.8) {
+            autoPitchPos = pos;
+
+        }
+
+        cIsBusy = t > time.time();
+    }
+
+    public void setClaw(double pos) {
+        if (pos == 1.0){
+            openClaw();
+        } else {
+            closeClaw();
+        }
+    }
+
+    public boolean getBusy(){
+        return cIsBusy;
+    }
 
     public void getTelemetry () {
         opMode.telemetry.addData("pitch.getPosition", sPitch.getPosition());

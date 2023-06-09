@@ -23,9 +23,10 @@ public class Constants {
                                     ACCELERATION = 1500, //Tempo para atingir setpoint de velocidade
                                     PRECISION = 0.25,
                                     TOLERANCE_DISTANCE = 500,
-                                    TOLERANCE_ANGLE = 5,
+                                    TOLERANCE_ANGLE = 3,
                                     TOLERANCE_ENCODER_DIFERENCE = 100,
-                                    CONVERTION = 725;
+                                    CONVERTION_2_EXTERNAL = 725,
+                                    CONVERTION_2_INTERNAL = 30;
     }
 
     public static class Braco {

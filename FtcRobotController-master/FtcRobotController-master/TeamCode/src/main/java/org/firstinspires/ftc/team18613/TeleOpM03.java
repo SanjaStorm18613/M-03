@@ -52,7 +52,7 @@ public class TeleOpM03 extends LinearOpMode {
         elevator = new Elevator(this);
         arm = new Arm(this, elevator);
         claw = new Claw(this, elevator, arm);
-        turret = new Turret(this, elevator, claw);
+        turret = new Turret(this, elevator);
         drive = new DTMecanum (this, turret);
 
         waitForStart();
