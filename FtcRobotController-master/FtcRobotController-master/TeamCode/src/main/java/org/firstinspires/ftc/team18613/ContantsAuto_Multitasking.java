@@ -16,8 +16,13 @@ public class ContantsAuto_Multitasking {
 
         return new ArrayList<>(Arrays.asList(
 
+                new ArrayList<>(Collections.singletonList(new Double[] {20.0, DR, DR_FRONT}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {-20.0, DR, DR_FRONT}))
+
+/*
+                ,new ArrayList<>(Collections.singletonList(new Double[] {40.0, DR, DR_FRONT}))
                 new ArrayList<>(Collections.singletonList(new Double[] {0.0, CL}))
-                ,new ArrayList<>(Collections.singletonList(new Double[]{Constants.Claw.PITCH_UP, PT, 500.0}))
+
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {40.0, DR, DR_FRONT}))
                 ,new ArrayList<>(Collections.singletonList(new Double[] {40.0, DR, DR_SIDE}))
@@ -36,7 +41,7 @@ public class ContantsAuto_Multitasking {
                 ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP, PT,500.0}))
                 ,new ArrayList<>(Collections.singletonList(new Double[] {0.0, CL}))
 
-                ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Elevator.NV_0, EL}, new Double[] {-40.0, DR, DR_FRONT}))
+                ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Elevator.NV_0, EL}, new Double[] {-40.0, DR, DR_FRONT}))*/
         ));
     }
 

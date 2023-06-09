@@ -19,8 +19,10 @@ public class DTMecanum  extends Subsystem {
     private final Turret turret;
     private final OpMode opMode;
 
-    private boolean moveIsBusy = false, actEnc = false;
-    private double setPoint = 0, direction = 0, acc = 0, x = 0, y = 0, turn = 0, slowFactor = 0, valCalibration = 0;
+    private boolean moveIsBusy = false, sideMove = false, intenalEncoder = false;
+    private double setPoint = 0, direction = 0, acc = 0, x = 0, y = 0, turn = 0, slowFactor = 0,
+            valCalibration = 0, tolerance = 0, distance = 0, adjust = 0, angle = 0, dist = 0,
+            proportional = 0, maxVel = 0, timeAccelt = 0;
 
     public DTMecanum(OpMode opMode, Turret turret) {
 
@@ -86,24 +88,35 @@ public class DTMecanum  extends Subsystem {
     }
 
     public void move(boolean intenalEncoder, boolean sideMove, double maxVel, double timeAccelt, double propc, double dist, double ang) {
-        double erro, yawErro, acT, turn, tolerance, distance, adjust;
 
-        setDownEncoderServo(false);
+        angle = ang;
+        proportional = propc;
+        this.dist = dist;
+        this.sideMove = sideMove;
+        this.intenalEncoder = intenalEncoder;
+        this.maxVel = maxVel;
+        this.timeAccelt = timeAccelt;
 
         tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
-        distance = dist * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
+        distance = this.dist * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
         adjust = valCalibration * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
 
         if (sideMove) {
-            propc *= 1.6;
+            proportional *= 1.6;
             distance /= 35.;
             adjust /= 35;
             tolerance /= 35.;
 
         } else if (intenalEncoder) {
-            distance = dist * Constants.DTMecanum.CONVERTION_2_INTERNAL;
+            distance = this.dist * Constants.DTMecanum.CONVERTION_2_INTERNAL;
             adjust = valCalibration * Constants.DTMecanum.CONVERTION_2_INTERNAL;
         }
+    }
+
+    public void autoPeriodic() {
+        double erro, yawErro, acT, turn, pos;
+
+        setDownEncoderServo(false);
 
         if (distance != setPoint) {
             setPoint = distance;
@@ -112,12 +125,11 @@ public class DTMecanum  extends Subsystem {
             moveIsBusy = true;
         }
 
-        if ((direction != ang) && dist == 0) {
-            direction = ang;
+        if ((direction != angle) && dist == 0) {
+            direction = angle;
             this.accTime.reset();
         }
 
-        double pos;
         if (sideMove) {
             pos = (BR.getCurrentPosition() - FR.getCurrentPosition()) / 2.0;
         } else if (intenalEncoder) {
@@ -129,33 +141,24 @@ public class DTMecanum  extends Subsystem {
         erro = setPoint + adjust - pos;
         yawErro = direction - gyro.getContinuousAngle();
 
+        acT = Math.min(1, this.accTime.time() / timeAccelt);
 
-        if ((Math.abs(erro) > tolerance) || yawErro > Constants.DTMecanum.TOLERANCE_ANGLE) {
+        pos = erro * proportional;
+        pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
+        pos *= acT;
 
-            moveIsBusy = true;
-
-            acT = Math.min(1, this.accTime.time() / timeAccelt);
-
-            pos = erro * propc;
-            pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
-            pos *= acT;
-
-            turn = yawErro * propc;
-            turn = Math.signum(turn) * Math.min(maxVel, Math.abs(turn));
-            turn *= acT;
+        turn = yawErro * proportional;
+        turn = Math.signum(turn) * Math.min(maxVel, Math.abs(turn));
+        turn *= acT;
 
 
-            if (dist == 0.0){
-                tankDrive(0, turn, false);
-            } else {
-                tankDrive(pos, turn, sideMove);
-            }
-
+        if (dist == 0.0){
+            tankDrive(0, turn, false);
         } else {
-            moveIsBusy = false;
-            tankDrive(0);
-
+            tankDrive(pos, turn, sideMove);
         }
+
+        moveIsBusy = (Math.abs(erro) > tolerance) || (yawErro > Constants.DTMecanum.TOLERANCE_ANGLE);
 
     }
 

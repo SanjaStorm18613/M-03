@@ -99,7 +99,9 @@ public class CALIBRATION_AUTO extends LinearOpMode {
 
             arm.periodic();
             claw.autoPeriodic();
+            drive.autoPeriodic();
             telemetry.update();
         }
+        drive.tankDrive(0);
     }
 }
