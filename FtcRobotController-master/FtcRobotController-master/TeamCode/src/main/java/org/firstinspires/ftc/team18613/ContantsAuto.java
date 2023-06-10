@@ -1,21 +1,46 @@
 package org.firstinspires.ftc.team18613;
 
-import org.firstinspires.ftc.team18613.utils.Pair;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class ContantsAuto {
 
-    private final int PT_TIME =-1, DR = 0, EL = 1, CL = 2, PT = 3, YW = 4, DR_EL = 5,
-            EL_YW = 7, DR_EL_CL_YW_DR = 6;
+    public final Double DR = 0.0, DR_TURN = 1.0, EL = 2.0, CL = 3.0, PT = 4.0, YW = 5.0,
+                        DR_FRONT = 0.0, DR_SIDE = 0.1;
 
-
-    private Double sideAjust = 0.0;
 
     public ContantsAuto(){}
 
-    public ArrayList<Pair<Double, Integer>> getHeightSteps(Double parkArea, Double side){
+    public ArrayList<ArrayList<Double[]>> getAutoDemostracao(){
+
+        return new ArrayList<>(Arrays.asList(
+
+                new ArrayList<>(Collections.singletonList(new Double[] {0.0, CL}))
+
+                ,new ArrayList<>(Collections.singletonList(new Double[] {40.0, DR, DR_FRONT}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {40.0, DR, DR_SIDE}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {-80.0, DR, DR_SIDE}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {40.0, DR, DR_SIDE}))
+
+                ,new ArrayList<>(Arrays.asList(new Double[] {360.0, DR_TURN}, new Double[]{Constants.Elevator.NV_2, EL}))
+
+                ,new ArrayList<>(Collections.singletonList(new Double[] {0.5, YW}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {-0.5, YW}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {0.0, YW}))
+
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_HORIZONTAL, PT, 2000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {1.0, CL}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP, PT,500.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {0.0, CL}))
+
+                ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Elevator.NV_0, EL}, new Double[] {-40.0, DR, DR_FRONT}))
+        ));
+    }
+
+}
+
+/*  public ArrayList<Pair<Double, Integer>> getHeightSteps(Double parkArea, Double side){
 
         if (side < 0) {
             sideAjust = 0.45;
@@ -111,70 +136,5 @@ public class ContantsAuto {
                 ,new Pair<>(0., EL)
 
         ));
-    }
+    }*/
 
-    public ArrayList<Pair<Double, Integer>> getApresentationSteps(){
-        return new ArrayList<>(Arrays.asList(
-                //0-dr, 1-el, 2-cl, 3-yw, 4-drEl, 5-pt, 6-ElPtDr
-
-                new Pair<>(0., CL)
-                ,new Pair<>(Constants.Claw.PITCH_UP, PT)
-                ,new Pair<>(500.0, PT_TIME)
-
-                ,new Pair<>(40., DR)
-                ,new Pair<>(40., DR)
-                ,new Pair<>(-80., DR)
-                ,new Pair<>(40., DR)
-
-                ,new Pair<>(Constants.Elevator.NV_2, EL)
-
-                ,new Pair<>(0.5, YW)
-                ,new Pair<>(-0.5, YW)
-                ,new Pair<>(0.0, YW)
-
-                ,new Pair<>(Constants.Claw.PITCH_HORIZONTAL, PT)
-                ,new Pair<>(2000.0, PT_TIME)
-                ,new Pair<>(1., CL)
-                ,new Pair<>(Constants.Claw.PITCH_UP, PT)
-                ,new Pair<>(500.0, PT_TIME)
-                ,new Pair<>(0., CL)
-
-                ,new Pair<>(-40., DR_EL)
-                ,new Pair<>(0., EL)
-
-        ));
-    }
-
-    public ArrayList<Boolean> getParkOnlySide() {
-        return new ArrayList<>(Arrays.asList(
-                false
-                ,true
-        ));
-    }
-
-    public ArrayList<Boolean> getHightDRSide() {
-        return new ArrayList<>(Arrays.asList(
-                false
-                ,false
-                ,true
-        ));
-    }
-
-    public ArrayList<Boolean> getMidDRSide() {
-        return new ArrayList<>(Arrays.asList(
-                false
-                ,true
-        ));
-    }
-
-    public ArrayList<Boolean> getApresentationSide() {
-        return new ArrayList<>(Arrays.asList(
-                false
-                ,true
-                ,true
-                ,true
-                ,false
-
-        ));
-    }
-}

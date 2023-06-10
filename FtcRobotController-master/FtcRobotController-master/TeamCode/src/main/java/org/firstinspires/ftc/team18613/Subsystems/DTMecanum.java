@@ -87,32 +87,6 @@ public class DTMecanum  extends Subsystem {
         opMode.telemetry.addData("getForward", turret.getForward());
     }
 
-    public void move(boolean intenalEncoder, boolean sideMove, double maxVel, double timeAccelt, double propc, double dist, double ang) {
-
-        angle = ang;
-        proportional = propc;
-        this.dist = dist;
-        this.sideMove = sideMove;
-        this.intenalEncoder = intenalEncoder;
-        this.maxVel = maxVel;
-        this.timeAccelt = timeAccelt;
-
-        tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
-        distance = this.dist * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
-        adjust = valCalibration * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
-
-        if (sideMove) {
-            proportional *= 1.6;
-            distance /= 35.;
-            adjust /= 35;
-            tolerance /= 35.;
-
-        } else if (intenalEncoder) {
-            distance = this.dist * Constants.DTMecanum.CONVERTION_2_INTERNAL;
-            adjust = valCalibration * Constants.DTMecanum.CONVERTION_2_INTERNAL;
-        }
-    }
-
     public void autoPeriodic() {
         double erro, yawErro, acT, turn, pos;
 
@@ -162,8 +136,27 @@ public class DTMecanum  extends Subsystem {
 
     }
 
-    public void setValueCalibration(double val) {
-        valCalibration = val;
+    public void setMove(boolean intenalEncoder, boolean sideMove, double maxVel, double timeAccelt, double propc, double dist, double ang) {
+
+        angle = ang;
+        proportional = propc;
+        this.dist = dist;
+        this.sideMove = sideMove;
+        this.intenalEncoder = intenalEncoder;
+        this.maxVel = maxVel;
+        this.timeAccelt = timeAccelt;
+
+        tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
+        distance = this.dist * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
+
+        if (sideMove) {
+            proportional *= 1.6;
+            distance /= 35.;
+            tolerance /= 35.;
+
+        } else if (intenalEncoder) {
+            distance = this.dist * Constants.DTMecanum.CONVERTION_2_INTERNAL;
+        }
     }
 
     public void resetEnc() {
@@ -217,6 +210,18 @@ public class DTMecanum  extends Subsystem {
 
         acc = Math.min(1, accTime.time() / Constants.DTMecanum.ACCELERATION);
         acc = Math.round(acc * 1300.0) / 1300.0;
+    }
+
+    public void setValCalibration(double val){
+
+        adjust = val * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
+
+        if (sideMove) {
+            adjust /= 35.;
+        } else if (intenalEncoder) {
+            adjust = val * Constants.DTMecanum.CONVERTION_2_INTERNAL;
+        }
+
     }
 
     public void setDownEncoderServo(boolean act){

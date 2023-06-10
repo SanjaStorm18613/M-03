@@ -2,25 +2,18 @@ package org.firstinspires.ftc.team18613;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.team18613.Subsystems.Arm;
 import org.firstinspires.ftc.team18613.Subsystems.Claw;
 import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
 import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
-import org.firstinspires.ftc.team18613.Vision.PipelineColors;
-import org.firstinspires.ftc.team18613.Vision.VisionCtrl;
-import org.firstinspires.ftc.team18613.utils.Pair;
 
 import java.util.ArrayList;
 
 @Autonomous(name = "PARK_ONLY", group = "LinearOpMode")
 public class PARK_ONLY extends LinearOpMode {
 
-    ElapsedTime time;
-    VisionCtrl webcam;
-    PipelineColors pipeline;
     DTMecanum drive;
     Elevator elevator;
     Turret turret;
@@ -28,7 +21,6 @@ public class PARK_ONLY extends LinearOpMode {
     Arm arm;
 
     boolean init = false;
-    Double parkArea = 0.0;
 
     public void runOpMode() {
 
@@ -38,108 +30,40 @@ public class PARK_ONLY extends LinearOpMode {
         turret = new Turret(this, elevator);
         drive = new DTMecanum(this, turret);
 
-        time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        time.startTime();
-
-        webcam = new VisionCtrl(this, hardwareMap, telemetry);
-        pipeline = webcam.getPipeline();
-
         ContantsAuto cAuto = new ContantsAuto();
+        ArrayList<ArrayList<Double[]>> steps = cAuto.getAutoDemostracao();
 
-        while (!isStarted() && !isStopRequested()) {
-            switch (pipeline.getColorDetected()) {
-                case GREEN:
-                    parkArea = 0.0;
-                    break;
-                case BLACK:
-                    parkArea = -60.0;
-                    break;
-                case YELLOW:
-                    parkArea = 60.0;
-                    break;
-            }
-            telemetry.addData("Color Detected", pipeline.getColorDetected());
-            telemetry.update();
-        }
-
-        webcam.stopDetection();
-
-        ArrayList<Pair<Double, Integer>> steps = cAuto.getParkOnlySteps(parkArea);
-        ArrayList<Boolean> drSide = cAuto.getParkOnlySide();
+        waitForStart();
 
         while (opModeIsActive() && steps.size() != 0) {
 
-            switch (steps.get(0).secondValue()) {
+            for (Double[] action : steps.get(0)) {
 
-                case 0:
-                    drive.move(true, drSide.get(0), 0.5, 800, 50, steps.get(0).firstValue(), 0);
-                    if (!drive.getBusy() && steps.size() > 0) {
-                        steps.remove(0);
-                        drSide.remove(0);
-                    }
-                    break;
+                if (action[1].equals(cAuto.DR)) {
+                    drive.setMove(true, action[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.0005, action[0], 0);
 
-                case 1:
-                    elevator.setPos(steps.get(0).firstValue(), Constants.Elevator.UP_SPEED);
-                    if (!elevator.getBusy() && steps.size() > 0) {
-                        steps.remove(0);
-                    }
-                    break;
+                } else if (action[1].equals(cAuto.DR_TURN)) {
+                    drive.setMove(true, false, 0.5, 800, 0.005, 0, action[0]);
 
-                case 2:
-                    claw.setClaw(steps.get(0).firstValue());
-                    if (!claw.getBusy() && steps.size() > 0) {
-                        steps.remove(0);
-                    }
-                    break;
+                } else if (action[1].equals(cAuto.EL)) {
+                    elevator.setPos(action[0], Constants.Elevator.UP_SPEED);
 
-                case 3:
+                } else if (action[1].equals(cAuto.CL)) {
+                    claw.setClaw(action[0]);
+
+                } else if (action[1].equals(cAuto.PT)) {
                     init = true;
-                    claw.setPitch(steps.get(0).firstValue(), steps.get(1).firstValue());
+                    claw.setPitch(action[0], action[2]);
 
-                    if (!claw.getBusy() && steps.size() > 0) {
-                        steps.remove(1);
-                        steps.remove(0);
-                    }
-                    break;
+                } else if (action[1].equals(cAuto.YW)) {
+                    turret.setPos(action[0], .9);
 
-                case 4:
-                    turret.setPos(steps.get(0).firstValue(), .9);
-                    if (!turret.getBusy() && steps.size() > 0) {
-                        steps.remove(0);
-                    }
-                    break;
+                }
+            }
 
-                case 5:
-                    elevator.setPos(steps.get(1).firstValue(), 0.7);
-                    drive.move(true, drSide.get(0), 0.5, 800, 50, steps.get(0).firstValue(), 0);
-
-                    if (!elevator.getBusy() && !drive.getBusy() && steps.size() > 0) {
-                        steps.remove(1);
-                        steps.remove(0);
-                        drSide.remove(0);
-                    }
-                    break;
-
-                case 6:
-                    elevator.setPos(steps.get(1).firstValue(), 0.7);
-                    claw.setPitch(steps.get(2).firstValue(), steps.get(3).firstValue());
-                    turret.setPos(steps.get(4).firstValue(), .9);
-                    drive.move(true, drSide.get(0), 0.5, 800, 50, steps.get(0).firstValue(), 0);
-
-                    if (!turret.getBusy() && !claw.getBusy() && !elevator.getBusy() && !drive.getBusy() && steps.size() > 0) {
-                        steps.remove(4);
-                        steps.remove(3);
-                        steps.remove(2);
-                        steps.remove(1);
-                        steps.remove(0);
-                        drSide.remove(0);
-                    } else if (!drive.getBusy()) {
-                        steps.set(0, steps.get(5));
-                        steps.remove(5);
-                        drSide.remove(0);
-                    }
-                    break;
+            if (steps.size() > 0 && !turret.getBusy() && !claw.getBusy()
+                    && !elevator.getBusy() && !drive.getBusy()) {
+                steps.remove(0);
             }
 
             if (init) {

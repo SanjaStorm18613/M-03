@@ -30,7 +30,7 @@ public class AUTO_DEMONSTRACAO extends LinearOpMode {
         turret = new Turret(this, elevator);
         drive = new DTMecanum(this, turret);
 
-        ContantsAuto_Multitasking cAuto = new ContantsAuto_Multitasking();
+        ContantsAuto cAuto = new ContantsAuto();
         ArrayList<ArrayList<Double[]>> steps = cAuto.getAutoDemostracao();
 
         waitForStart();
@@ -40,10 +40,10 @@ public class AUTO_DEMONSTRACAO extends LinearOpMode {
             for (Double[] action : steps.get(0)) {
 
                 if (action[1].equals(cAuto.DR)) {
-                    drive.move(true, action[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.0005, action[0], 0);
+                    drive.setMove(true, action[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.0005, action[0], 0);
 
                 } else if (action[1].equals(cAuto.DR_TURN)) {
-                    drive.move(true, false, 0.5, 800, 0.005, 0, action[0]);
+                    drive.setMove(true, false, 0.5, 800, 0.005, 0, action[0]);
 
                 } else if (action[1].equals(cAuto.EL)) {
                     elevator.setPos(action[0], Constants.Elevator.UP_SPEED);

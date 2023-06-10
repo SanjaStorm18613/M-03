@@ -10,6 +10,7 @@ import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @TeleOp(name = "CALIBRATION_AUTO", group = "LinearOpMode")
 public class CALIBRATION_AUTO extends LinearOpMode {
@@ -20,6 +21,8 @@ public class CALIBRATION_AUTO extends LinearOpMode {
     Claw claw;
     Arm arm;
 
+    ArrayList<String[][]> valuesCalibration = new ArrayList<>();
+
     public void runOpMode() {
 
         elevator = new Elevator(this);
@@ -28,28 +31,33 @@ public class CALIBRATION_AUTO extends LinearOpMode {
         turret = new Turret(this, elevator);
         drive = new DTMecanum(this, turret);
 
-        ContantsAuto_Multitasking cAuto = new ContantsAuto_Multitasking();
+        ContantsAuto cAuto = new ContantsAuto();
         ArrayList<ArrayList<Double[]>> steps = cAuto.getAutoDemostracao();
 
         int idxActionSteps = 0;
         boolean A = true, X = true, Y = true;
-        double drAdjust = 0.0, drTurnAdjust = 0.0, elAdjust = 0.0, ywAdjust = 0.0;
+        double drAdjust = 0.0, drTurnAdjust = 0.0, elAdjust = 0.0, ywAdjust = 0.0, sizeStep = steps.size();
 
         waitForStart();
 
         while (opModeIsActive() && steps.size() != 0) {
 
+            regiter();
+
             for (int action = 0; action <= idxActionSteps; action++) {
 
                 if (steps.get(0).get(action)[1].equals(cAuto.DR)) {
-                    drive.move(true, steps.get(0).get(action)[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.0005, steps.get(0).get(action)[0], 0);
-                    drive.setValueCalibration(drAdjust);
+                    drive.setMove(true, steps.get(0).get(action)[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.0005, steps.get(0).get(action)[0], 0);
+                    drive.setValCalibration(drAdjust);
+                    telemetry.addData("drAdjust", drAdjust);
 
                 } else if (steps.get(0).get(action)[1].equals(cAuto.DR_TURN)) {
-                    drive.move(true, false, 0.5, 800, 0.005, 0, steps.get(0).get(action)[0] + drTurnAdjust);
+                    drive.setMove(true, false, 0.5, 800, 0.005, 0, steps.get(0).get(action)[0] + drTurnAdjust);
+                    telemetry.addData("drTurnAdjust", drTurnAdjust);
 
                 } else if (steps.get(0).get(action)[1].equals(cAuto.EL)) {
                     elevator.setPos(steps.get(0).get(action)[0] + elAdjust, Constants.Elevator.UP_SPEED);
+                    telemetry.addData("elAdjust", elAdjust);
 
                 } else if (steps.get(0).get(action)[1].equals(cAuto.CL)) {
                     claw.setClaw(steps.get(0).get(action)[0]);
@@ -59,16 +67,32 @@ public class CALIBRATION_AUTO extends LinearOpMode {
 
                 } else if (steps.get(0).get(action)[1].equals(cAuto.YW)) {
                     turret.setPos(steps.get(0).get(action)[0] + ywAdjust, .9);
+                    telemetry.addData("ywAdjust", ywAdjust);
+
                 }
             }
 
             if (gamepad1.x && X){
+
+                if (steps.size() >= 1 && (valuesCalibration.size() < sizeStep)) {
+                    valuesCalibration.add(new String[][] {{"DRIVE", ""+drAdjust},
+                            {"DRIVE TURN", ""+drTurnAdjust},
+                            {"ELEVATOR", ""+elAdjust},
+                            {"YAW", ""+ywAdjust}});
+                }
+
                 if (idxActionSteps < steps.get(0).size()-1) {
                     idxActionSteps++;
                 } else if (steps.size() > 1 && !turret.getBusy() && !claw.getBusy()
                         && !elevator.getBusy() && !drive.getBusy()) {
                     steps.remove(0);
                     idxActionSteps = 0;
+
+                    drAdjust = 0;
+                    drTurnAdjust = 0;
+                    elAdjust = 0;
+                    ywAdjust = 0;
+
                 }
             }
 
@@ -92,10 +116,7 @@ public class CALIBRATION_AUTO extends LinearOpMode {
             A = !gamepad1.a;
             Y = !gamepad1.y;
 
-            telemetry.addData("drAdjust", drAdjust);
-            telemetry.addData("drTurnAdjust", drTurnAdjust);
-            telemetry.addData("elAdjust", elAdjust);
-            telemetry.addData("ywAdjust", ywAdjust);
+
 
             arm.periodic();
             claw.autoPeriodic();
@@ -103,5 +124,22 @@ public class CALIBRATION_AUTO extends LinearOpMode {
             telemetry.update();
         }
         drive.tankDrive(0);
+    }
+
+    public void regiter() {
+        telemetry.addLine("REGISTRO DE CALIBRAÇÂO:");
+
+        for (String[][] v : valuesCalibration) {
+            telemetry.addLine("ETAPA: " + valuesCalibration.indexOf(v));
+
+            for (String[] i : v) {
+                telemetry.addData(valuesCalibration.indexOf(v) +"-"+ i[0], i[1]);
+            }
+            telemetry.addLine();
+
+        }
+        telemetry.addLine("--------------------------------------------");
+
+
     }
 }
