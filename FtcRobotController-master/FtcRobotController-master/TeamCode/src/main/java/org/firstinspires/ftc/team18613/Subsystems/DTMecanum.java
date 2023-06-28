@@ -76,13 +76,13 @@ public class DTMecanum  extends Subsystem {
 
         setDownEncoderServo(true);
 
-        double vel = slowFactor * Constants.DTMecanum.SPEED * acc;
-        vel *= turret.getForward() ? 1 : -1;
+        double vel = slowFactor * Constants.DTMecanum.SPEED * acc,
+                turretF = turret.getForward() ? 1 : -1;
 
-        FL.setPower((y + x + turn) * vel);
-        FR.setPower((y - x - turn) * vel);
-        BL.setPower((y - x + turn) * vel);
-        BR.setPower((y + x - turn) * vel);
+        FL.setPower(((y + x) * turretF + turn) * vel);
+        FR.setPower(((y - x) * turretF - turn) * vel);
+        BL.setPower(((y - x) * turretF + turn) * vel);
+        BR.setPower(((y + x) * turretF - turn) * vel);
 
         opMode.telemetry.addData("getForward", turret.getForward());
     }

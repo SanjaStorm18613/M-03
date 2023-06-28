@@ -40,8 +40,8 @@ public class Constants {
 
         public static final double  NV_0 = 0,
                                     NV_1 = 1.5,
-                                    NV_2 = 3.4,
-                                    NV_3 = 4,
+                                    NV_2 = 2.5,
+                                    NV_3 = 3.45,
 
                                     UP_SPEED = 1,
                                     DOWN_SPEED = .9,
