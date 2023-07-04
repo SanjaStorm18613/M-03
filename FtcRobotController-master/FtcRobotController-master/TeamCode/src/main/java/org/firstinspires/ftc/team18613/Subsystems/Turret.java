@@ -32,11 +32,12 @@ public class Turret extends Subsystem {
     }
 
     public void periodic() {
-        double limitProxPercent;
+        double limitProximityPercentage;
+
         if (elevator.getTargetPosLowStage()) {
-            limitProxPercent = (0.15 - Math.abs(getRelativePos())) * 18;
+            limitProximityPercentage = (0.15 - Math.abs(getRelativePos())) * 18;
         } else {
-            limitProxPercent = 1;
+            limitProximityPercentage = 1;
         }
 
         if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING - .015 && elevator.getTargetPosLowStage()) {
@@ -44,14 +45,11 @@ public class Turret extends Subsystem {
 
         } else if (getNotLimit(isClockwise)) {
             if (enable) {
-                turret.setPower(Constants.Turret.SPEED * (isClockwise ? 1 : -1) * limitProxPercent);
+                turret.setPower(Constants.Turret.SPEED * (isClockwise ? 1 : -1) * limitProximityPercentage);
             } else {
                 turret.setPower(0);
             }
         }
-
-        opMode.telemetry.addData("getRelativePos", Math.abs(getRelativePos()));
-        opMode.telemetry.addData("elevator.targetPosLowStage", elevator.getTargetPosLowStage());
 
     }
 

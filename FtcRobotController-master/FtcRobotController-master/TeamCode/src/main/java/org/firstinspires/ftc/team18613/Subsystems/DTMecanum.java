@@ -19,10 +19,10 @@ public class DTMecanum  extends Subsystem {
     private final Turret turret;
     private final OpMode opMode;
 
-    private boolean moveIsBusy = false, sideMove = false, intenalEncoder = false;
+    private boolean moveIsBusy = false, sideMove = false, internalEncoder = false;
     private double setPoint = 0, direction = 0, acc = 0, x = 0, y = 0, turn = 0, slowFactor = 0,
-            valCalibration = 0, tolerance = 0, distance = 0, adjust = 0, angle = 0, dist = 0,
-            proportional = 0, maxVel = 0, timeAccelt = 0;
+            tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE, distance = 0, adjust = 0, angle = 0, dist = 0,
+            proportional = 0, maxVel = 0, timeAccel = 0;
 
     public DTMecanum(OpMode opMode, Turret turret) {
 
@@ -84,11 +84,10 @@ public class DTMecanum  extends Subsystem {
         BL.setPower(((y - x) * turretF + turn) * vel);
         BR.setPower(((y + x) * turretF - turn) * vel);
 
-        opMode.telemetry.addData("getForward", turret.getForward());
     }
 
     public void autoPeriodic() {
-        double erro, yawErro, acT, turn, pos;
+        double error, yawError, acT, turn, pos;
 
         setDownEncoderServo(false);
 
@@ -106,22 +105,22 @@ public class DTMecanum  extends Subsystem {
 
         if (sideMove) {
             pos = (BR.getCurrentPosition() - FR.getCurrentPosition()) / 2.0;
-        } else if (intenalEncoder) {
+        } else if (internalEncoder) {
             pos = (FL.getCurrentPosition() + FR.getCurrentPosition()) / 2.0;
         } else {
             pos = eRight.getCurrentPosition();
         }
 
-        erro = setPoint + adjust - pos;
-        yawErro = direction - gyro.getContinuousAngle();
+        error = setPoint + adjust - pos;
+        yawError = direction - gyro.getContinuousAngle();
 
-        acT = Math.min(1, this.accTime.time() / timeAccelt);
+        acT = Math.min(1, this.accTime.time() / timeAccel);
 
-        pos = erro * proportional;
+        pos = error * proportional;
         pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
         pos *= acT;
 
-        turn = yawErro * proportional;
+        turn = yawError * proportional;
         turn = Math.signum(turn) * Math.min(maxVel, Math.abs(turn));
         turn *= acT;
 
@@ -132,30 +131,31 @@ public class DTMecanum  extends Subsystem {
             tankDrive(pos, turn, sideMove);
         }
 
-        moveIsBusy = (Math.abs(erro) > tolerance) || (yawErro > Constants.DTMecanum.TOLERANCE_ANGLE);
+        moveIsBusy = (Math.abs(error) > tolerance) || (Math.abs(yawError) > Constants.DTMecanum.TOLERANCE_ANGLE);
 
     }
 
-    public void setMove(boolean intenalEncoder, boolean sideMove, double maxVel, double timeAccelt, double propc, double dist, double ang) {
+    public void setMove(boolean internalEncoder, boolean sideMove, double maxVel, double timeAccel, double prop, double dist, double ang) {
 
         angle = ang;
-        proportional = propc;
+        proportional = prop;
         this.dist = dist;
         this.sideMove = sideMove;
-        this.intenalEncoder = intenalEncoder;
+        this.internalEncoder = internalEncoder;
         this.maxVel = maxVel;
-        this.timeAccelt = timeAccelt;
+        this.timeAccel = timeAccel;
 
         tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
         distance = this.dist * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
 
         if (sideMove) {
-            proportional *= 1.6;
+            proportional *= 12.;
             distance /= 35.;
             tolerance /= 35.;
 
-        } else if (intenalEncoder) {
+        } else if (internalEncoder) {
             distance = this.dist * Constants.DTMecanum.CONVERTION_2_INTERNAL;
+            proportional *= 10.;
         }
     }
 
@@ -218,7 +218,7 @@ public class DTMecanum  extends Subsystem {
 
         if (sideMove) {
             adjust /= 35.;
-        } else if (intenalEncoder) {
+        } else if (internalEncoder) {
             adjust = val * Constants.DTMecanum.CONVERTION_2_INTERNAL;
         }
 
@@ -244,13 +244,6 @@ public class DTMecanum  extends Subsystem {
 
     public boolean getBusy() {
         return moveIsBusy;
-    }
-
-    public void getTelemetry() {
-        opMode.telemetry.addData("FE", FL.getPower());
-        opMode.telemetry.addData("FD", FR.getPower());
-        opMode.telemetry.addData("TE", BL.getPower());
-        opMode.telemetry.addData("TD", BR.getPower());
     }
 
 }

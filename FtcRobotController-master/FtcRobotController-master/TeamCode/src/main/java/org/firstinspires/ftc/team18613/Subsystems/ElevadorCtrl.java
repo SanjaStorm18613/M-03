@@ -11,7 +11,7 @@ import org.firstinspires.ftc.team18613.Constants;
 
 public class ElevadorCtrl extends LinearOpMode {
 
-    DcMotor e, d;
+    DcMotor e;
 
     public void runOpMode() {
 

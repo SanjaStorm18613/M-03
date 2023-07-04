@@ -97,7 +97,7 @@ public class Elevator extends Subsystem {
         elevator.setPower(vel);
     }
 
-    public boolean getOnColletionStage() {
+    public boolean getOnCollectionStage() {
         return stage == 0;
     }
 
@@ -106,7 +106,7 @@ public class Elevator extends Subsystem {
     }
 
     public boolean getTargetPosLowStage() {
-        return elevator.getTargetPosition() < stages[1] * Constants.Elevator.CONVR * (getOnColletionStage() ? 1.17 :1);
+        return elevator.getTargetPosition() < stages[1] * Constants.Elevator.CONVR * (getOnCollectionStage() ? 1.17 :1);
 
     }
     public int getCurrentPos() {

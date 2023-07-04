@@ -7,14 +7,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.team18613.Subsystem;
-import org.firstinspires.ftc.team18613.TeleOpM03;
 
 public class Gyro extends Subsystem {
 
     private final BNO055IMU imu;
 
-    private double anguloAnterior;
-    private int revolucoes;
+    private double lastAngle;
+    private int revolutions;
 
 
     public Gyro(OpMode opMode){
@@ -30,23 +29,23 @@ public class Gyro extends Subsystem {
 
         imu.initialize(GYRO_imu_parameters);
 
-        anguloAnterior = 0;
-        revolucoes = 0;
+        lastAngle = 0;
+        revolutions = 0;
     }
 
     public double getContinuousAngle() {
 
-        double anguloAtual = getPeriodicAngle();
+        double currentAngle = getPeriodicAngle();
 
-        if (180 < Math.abs(anguloAnterior - anguloAtual)) {
+        if (180 < Math.abs(lastAngle - currentAngle)) {
 
-            if (anguloAnterior > anguloAtual) revolucoes++;
-            else revolucoes--;
+            if (lastAngle > currentAngle) revolutions++;
+            else revolutions--;
 
         }
-        anguloAnterior = anguloAtual;
+        lastAngle = currentAngle;
 
-        return revolucoes * 360 + anguloAtual;
+        return revolutions * 360 + currentAngle;
 
     }
 

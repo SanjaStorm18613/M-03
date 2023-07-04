@@ -3,10 +3,10 @@ package org.firstinspires.ftc.team18613.Subsystems;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.team18613.Command;
-import org.firstinspires.ftc.team18613.utils.Pair;
-import org.firstinspires.ftc.team18613.utils.Supplier;
-import org.firstinspires.ftc.team18613.utils.Function;
-import org.firstinspires.ftc.team18613.utils.SupplierPair;
+import org.firstinspires.ftc.team18613.Utils.Pair;
+import org.firstinspires.ftc.team18613.Utils.Supplier;
+import org.firstinspires.ftc.team18613.Utils.Function;
+import org.firstinspires.ftc.team18613.Utils.SupplierPair;
 
 import java.util.ArrayList;
 import java.util.Arrays;

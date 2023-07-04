@@ -11,23 +11,22 @@ import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
 import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 import org.firstinspires.ftc.team18613.Subsystems.Claw;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
-import org.firstinspires.ftc.team18613.commands.Claw.AngulationDrop;
-import org.firstinspires.ftc.team18613.commands.Claw.Drop;
-import org.firstinspires.ftc.team18613.commands.Claw.HorizontalColect;
-import org.firstinspires.ftc.team18613.commands.Claw.InvertCone;
-import org.firstinspires.ftc.team18613.commands.Claw.LoweredFrontColect;
-import org.firstinspires.ftc.team18613.commands.Claw.LoweredSideColect;
-import org.firstinspires.ftc.team18613.commands.Claw.Retract;
-import org.firstinspires.ftc.team18613.commands.Drive.Move;
-import org.firstinspires.ftc.team18613.commands.Drive.Slow;
-import org.firstinspires.ftc.team18613.commands.Drive.TurnD;
-import org.firstinspires.ftc.team18613.commands.Elevator.AdjustStage;
-import org.firstinspires.ftc.team18613.commands.Elevator.ShiftStage;
-import org.firstinspires.ftc.team18613.commands.Turret.Stop;
-import org.firstinspires.ftc.team18613.commands.Turret.TurnT;
-import org.firstinspires.ftc.team18613.utils.FloatPair;
-import org.firstinspires.ftc.team18613.utils.Supplier;
-import org.firstinspires.ftc.team18613.utils.SupplierPair;
+import org.firstinspires.ftc.team18613.Commands.Claw.AngulationDrop;
+import org.firstinspires.ftc.team18613.Commands.Claw.Drop;
+import org.firstinspires.ftc.team18613.Commands.Claw.HorizontalColect;
+import org.firstinspires.ftc.team18613.Commands.Claw.InvertCone;
+import org.firstinspires.ftc.team18613.Commands.Claw.LoweredFrontColect;
+import org.firstinspires.ftc.team18613.Commands.Claw.LoweredSideColect;
+import org.firstinspires.ftc.team18613.Commands.Claw.Retract;
+import org.firstinspires.ftc.team18613.Commands.Drive.Move;
+import org.firstinspires.ftc.team18613.Commands.Drive.Slow;
+import org.firstinspires.ftc.team18613.Commands.Drive.TurnD;
+import org.firstinspires.ftc.team18613.Commands.Elevator.AdjustStage;
+import org.firstinspires.ftc.team18613.Commands.Elevator.ShiftStage;
+import org.firstinspires.ftc.team18613.Commands.Turret.Stop;
+import org.firstinspires.ftc.team18613.Commands.Turret.TurnT;
+import org.firstinspires.ftc.team18613.Utils.Supplier;
+import org.firstinspires.ftc.team18613.Utils.SupplierPair;
 
 @TeleOp(name = "TeleOpM03", group = "Linear Opmode")
 
@@ -57,7 +56,7 @@ public class TeleOpM03 extends LinearOpMode {
 
         waitForStart();
 
-        //TURRETq
+        //TURRET
         copilot.registerAction(Controller.right, new TurnT(turret, false), Controller.Actions.WHILE_PRESSED);
         copilot.registerAction(Controller.right, new Stop(turret), Controller.Actions.ON_RELEASED);
 

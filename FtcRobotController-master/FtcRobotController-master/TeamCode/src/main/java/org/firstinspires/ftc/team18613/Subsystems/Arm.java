@@ -48,7 +48,7 @@ public class Arm extends Subsystem {
         controlRequirement = Math.max(pos, controlRequirement);
     }
 
-    public void removeControl(){
+    public void removeControl() {
         controlRequirement = -1;
     }
 
@@ -56,6 +56,8 @@ public class Arm extends Subsystem {
         double posRangeBraco = Constants.Braco.MAX_POS - Constants.Braco.MIN_POS;
         double posPercentElev = (elevator.getCurrentPos() / ((Constants.Elevator.NV_3) * Constants.Elevator.CONVR));
         double pos = (Math.pow(posPercentElev, 3) * posRangeBraco) + Constants.Braco.MIN_POS;
+
+        pos = Math.max(controlRequirement, pos);
 
         pos = Math.min(pos, Constants.Braco.MAX_POS);
         pos = Math.max(pos, Constants.Braco.MIN_POS);

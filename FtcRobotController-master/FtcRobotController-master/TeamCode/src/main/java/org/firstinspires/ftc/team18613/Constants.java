@@ -1,10 +1,5 @@
 package org.firstinspires.ftc.team18613;
 
-import org.firstinspires.ftc.team18613.utils.Pair;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class Constants {
 
     public static class Pipeline {
@@ -40,7 +35,7 @@ public class Constants {
 
         public static final double  NV_0 = 0,
                                     NV_1 = 1.5,
-                                    NV_2 = 2.5,
+                                    NV_2 = 2.8,
                                     NV_3 = 3.45,
 
                                     UP_SPEED = 1,
@@ -61,7 +56,7 @@ public class Constants {
                                     ELEVADOR_UP = 1.2,
                                     ELEVATOR_UP_RETRAIN = .7,
                                     ROLL_UP = 0.12,
-                                    ROLL_DOWN = 0.65,
+                                    ROLL_DOWN = 0.68,
                                     ROLL_SIDE_CONE = ROLL_UP + Math.abs(ROLL_DOWN-ROLL_UP)/2,
                                     TRANSITION_TIME = 1000;
 
