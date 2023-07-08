@@ -10,13 +10,13 @@ public class AUTO_RIGHT_HEIGHT extends LinearOpMode {
 
     public void runOpMode() {
 
-        ContantsAuto cAuto = new ContantsAuto();
+        ConstantsAuto cAuto = new ConstantsAuto();
 
         autonomous = new AutonomousBase(this, cAuto);
         autonomous.initiation();
-        autonomous.setSteps(cAuto.getAutoHeigth(false, autonomous.getColorParkArea()));
+        autonomous.setSteps(cAuto.getAutoHeight(false, autonomous.getColorParkArea()));
 
-        while (opModeIsActive() && autonomous.isFinished()) {
+        while (opModeIsActive() && !autonomous.isFinished()) {
 
             autonomous.execution();
 

@@ -148,15 +148,16 @@ public class DTMecanum  extends Subsystem {
         tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
         distance = this.dist * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
 
-        if (sideMove) {
-            proportional *= 12.;
-            distance /= 35.;
-            tolerance /= 35.;
-
-        } else if (internalEncoder) {
+        if (internalEncoder) {
             distance = this.dist * Constants.DTMecanum.CONVERTION_2_INTERNAL;
             proportional *= 10.;
+
+        } else if (sideMove) {
+            proportional *= 12.;
+            distance /= 35.;
+            this.maxVel += 0.1;
         }
+
     }
 
     public void resetEnc() {
@@ -171,13 +172,6 @@ public class DTMecanum  extends Subsystem {
         BL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         BL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-    }
-
-    public void tankDrive(double p) {
-        FL.setPower(p);
-        FR.setPower(p);
-        BL.setPower(p);
-        BR.setPower(p);
     }
 
     private void tankDrive(double p, double g, boolean side) {

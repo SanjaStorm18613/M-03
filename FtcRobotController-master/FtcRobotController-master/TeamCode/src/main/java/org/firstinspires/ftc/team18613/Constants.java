@@ -34,9 +34,9 @@ public class Constants {
     public static class Elevator {
 
         public static final double  NV_0 = 0,
-                                    NV_1 = 1.5,
-                                    NV_2 = 2.8,
-                                    NV_3 = 3.45,
+                                    NV_1 = 1.8,
+                                    NV_2 = 3.1,
+                                    NV_3 = 3.9,
 
                                     UP_SPEED = 1,
                                     DOWN_SPEED = .9,

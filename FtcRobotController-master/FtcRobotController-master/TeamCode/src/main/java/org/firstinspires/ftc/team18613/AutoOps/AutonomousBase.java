@@ -20,14 +20,14 @@ public class AutonomousBase {
     Turret turret;
     Claw claw;
     Arm arm;
-    ContantsAuto cAuto;
+    ConstantsAuto cAuto;
     LinearOpMode opMode;
 
     ArrayList<ArrayList<Double[]>> steps;
     PipelineColors.DetectionColor colorParkArea = PipelineColors.DetectionColor.YELLOW;
     boolean init = false;
 
-    public AutonomousBase(LinearOpMode opMode, ContantsAuto cAuto) {
+    public AutonomousBase(LinearOpMode opMode, ConstantsAuto cAuto) {
 
         elevator = new Elevator(opMode);
         arm = new Arm(opMode, elevator);
@@ -58,31 +58,34 @@ public class AutonomousBase {
 
     public void execution() {
 
-        for (Double[] action : steps.get(0)) {
+        if (steps.size() != 0) {
 
-            if (action[1].equals(cAuto.DR)) {
-                drive.setMove(false, action[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.0005, action[0], 0);
+            for (Double[] action : steps.get(0)) {
 
-            } else if (action[1].equals(cAuto.DR_TURN)) {
-                drive.setMove(true, false, 0.5, 800, 0.0005, 0, action[0]);
+                if (action[1].equals(cAuto.DR)) {
+                    drive.setMove(false, action[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.00005, action[0], 0);
 
-            } else if (action[1].equals(cAuto.EL)) {
-                elevator.setPos(action[0], Constants.Elevator.UP_SPEED);
+                } else if (action[1].equals(cAuto.DR_TURN)) {
+                    drive.setMove(true, false, 0.5, 800, 0.00005, 0, action[0]);
 
-            } else if (action[1].equals(cAuto.CL)) {
-                claw.setClaw(action[0]);
+                } else if (action[1].equals(cAuto.EL)) {
+                    elevator.setPos(action[0], Constants.Elevator.UP_SPEED);
 
-            } else if (action[1].equals(cAuto.PT)) {
-                init = true;
-                claw.setPitch(action[0], action[2]);
+                } else if (action[1].equals(cAuto.CL)) {
+                    claw.setClaw(action[0]);
 
-            } else if (action[1].equals(cAuto.YW)) {
-                turret.setPos(action[0], .9);
+                } else if (action[1].equals(cAuto.PT)) {
+                    claw.setPitch(action[0], action[2]);
+                    init = true;
 
+                } else if (action[1].equals(cAuto.YW)) {
+                    turret.setPos(action[0], .9);
+
+                }
             }
         }
 
-        if (steps.size() > 0 && !turret.getBusy() && !claw.getBusy()
+        if (steps.size() != 0 && !turret.getBusy() && !claw.getBusy()
                 && !elevator.getBusy() && !drive.getBusy()) {
             steps.remove(0);
         }
@@ -92,6 +95,7 @@ public class AutonomousBase {
             claw.autoPeriodic();
             drive.autoPeriodic();
         }
+
         opMode.telemetry.update();
     }
 

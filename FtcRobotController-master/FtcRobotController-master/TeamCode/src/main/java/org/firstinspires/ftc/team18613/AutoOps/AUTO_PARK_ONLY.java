@@ -10,13 +10,13 @@ public class AUTO_PARK_ONLY extends LinearOpMode {
 
     public void runOpMode() {
 
-        ContantsAuto cAuto = new ContantsAuto();
+        ConstantsAuto cAuto = new ConstantsAuto();
 
         autonomous = new AutonomousBase(this, cAuto);
         autonomous.initiation();
         autonomous.setSteps(cAuto.getAutoParkOnly(autonomous.getColorParkArea()));
 
-        while (opModeIsActive() && autonomous.isFinished()) {
+        while (opModeIsActive() && !autonomous.isFinished()) {
 
             autonomous.execution();
 

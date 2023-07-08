@@ -10,13 +10,13 @@ public class AUTO_RIGHT_MID extends LinearOpMode {
 
     public void runOpMode() {
 
-        ContantsAuto cAuto = new ContantsAuto();
+        ConstantsAuto cAuto = new ConstantsAuto();
 
         autonomous = new AutonomousBase(this, cAuto);
         autonomous.initiation();
         autonomous.setSteps(cAuto.getAutoMid(false, autonomous.getColorParkArea()));
 
-        while (opModeIsActive() && autonomous.isFinished()) {
+        while (opModeIsActive() && !autonomous.isFinished()) {
 
             autonomous.execution();
 

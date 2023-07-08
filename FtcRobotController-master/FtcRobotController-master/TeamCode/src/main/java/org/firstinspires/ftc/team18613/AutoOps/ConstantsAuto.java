@@ -7,22 +7,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class ContantsAuto {
+public class ConstantsAuto {
 
     public final Double DR = 0.0, DR_TURN = 1.0, EL = 2.0, CL = 3.0, PT = 4.0, YW = 5.0,
                         DR_FRONT = 0.0, DR_SIDE = 0.1;
 
 
-    public ContantsAuto(){}
+    public ConstantsAuto(){}
 
-    public ArrayList<ArrayList<Double[]>> getAutoHeigth(boolean leftInitialPos, PipelineColors.DetectionColor colorParkArea){
+    //------------------------HEIGHT
+    public ArrayList<ArrayList<Double[]>> getAutoHeight(boolean leftInitialPos, PipelineColors.DetectionColor colorParkArea){
 
-        double parkArea = 55.0, yawTurn = 0.43;
+        double parkArea = 65.0, yawTurn = 0.41, drStep1 = 133.0;
 
-        if (leftInitialPos) yawTurn = -0.45;
+        if (leftInitialPos) {
+            yawTurn = -0.42;
+            drStep1 = 132.0;
 
-        if (colorParkArea == PipelineColors.DetectionColor.YELLOW) parkArea = 0;
-        else if (colorParkArea == PipelineColors.DetectionColor.GREEN) parkArea *= -1;
+        }
+
+        if (colorParkArea == PipelineColors.DetectionColor.GREEN) parkArea = 0;
+        else if (colorParkArea == PipelineColors.DetectionColor.BLACK) parkArea *= -1;
 
         return new ArrayList<>(Arrays.asList(
 
@@ -32,12 +37,12 @@ public class ContantsAuto {
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Claw.PITCH_UP, PT, 500.0}
                                                 ,new Double[] {Constants.Elevator.NV_3, EL}
-                                                ,new Double[] {130.0, DR, DR_FRONT}
+                                                ,new Double[] {drStep1, DR, DR_FRONT}
                                                 ))
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {yawTurn, YW}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP + 0.12, PT, 2000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP + 0.3, PT, 2000.0}))
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {1.0, CL}
                                                 ,new Double[] {Constants.Claw.PITCH_UP, PT, 1000.0}
@@ -46,7 +51,7 @@ public class ContantsAuto {
                 ,new ArrayList<>(Arrays.asList(new Double[] {0.0, YW}
                                                 ,new Double[] {Constants.Claw.PITCH_LOWERED, PT, 1000.0}
                                                 ,new Double[] {Constants.Claw.ELEVATOR_UP_RETRAIN, EL}
-                                                ,new Double[] {-65., DR, DR_FRONT}
+                                                ,new Double[] {65. - drStep1, DR, DR_FRONT}
                                                 ))
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {parkArea, DR, DR_SIDE}))
@@ -58,14 +63,19 @@ public class ContantsAuto {
         ));
     }
 
+    //------------------------MID
     public ArrayList<ArrayList<Double[]>> getAutoMid(boolean leftInitialPos, PipelineColors.DetectionColor colorParkArea){
 
-        double parkArea = 55.0, yawTurn = 0.43;
+        double parkArea = 65.0, yawTurn = 0.40, drStep1 = 67.0;
 
-        if (leftInitialPos) yawTurn = -0.45;
+        if (leftInitialPos) {
+            yawTurn = -0.40;
+            drStep1 = 64.0;
 
-        if (colorParkArea == PipelineColors.DetectionColor.YELLOW) parkArea = 0;
-        else if (colorParkArea == PipelineColors.DetectionColor.GREEN) parkArea *= -1;
+        }
+
+        if (colorParkArea == PipelineColors.DetectionColor.GREEN) parkArea = 0;
+        else if (colorParkArea == PipelineColors.DetectionColor.BLACK) parkArea *= -1;
 
         return new ArrayList<>(Arrays.asList(
 
@@ -74,12 +84,12 @@ public class ContantsAuto {
                                                 ))
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Claw.PITCH_UP, PT, 500.0}
-                                                ,new Double[] {75.0, DR, DR_FRONT}
+                                                ,new Double[] {drStep1, DR, DR_FRONT}
                                                 ))
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {yawTurn, YW}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP + 0.12, PT, 2000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP + 0.3, PT, 2000.0}))
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {1.0, CL}
                                                 ,new Double[] {Constants.Claw.PITCH_UP, PT, 1000.0}
@@ -88,12 +98,12 @@ public class ContantsAuto {
                 ,new ArrayList<>(Arrays.asList(new Double[] {0.0, YW}
                                                 ,new Double[] {Constants.Claw.PITCH_LOWERED, PT, 1000.0}
                                                 ,new Double[] {Constants.Claw.ELEVATOR_UP_RETRAIN, EL}
-                                                ,new Double[] {-10., DR, DR_FRONT}
+                                                //,new Double[] {5.0, DR, DR_FRONT}
                                                 ))
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {parkArea, DR, DR_SIDE}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_HORIZONTAL, PT, 1000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_HORIZONTAL, PT, 3000.0}))
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Elevator.NV_0, EL}))
 
@@ -102,10 +112,10 @@ public class ContantsAuto {
 
     public ArrayList<ArrayList<Double[]>> getAutoParkOnly(PipelineColors.DetectionColor colorParkArea){
 
-        double parkArea = 55.0;
+        double parkArea = 60.0;
 
-        if (colorParkArea == PipelineColors.DetectionColor.YELLOW) parkArea = 0;
-        else if (colorParkArea == PipelineColors.DetectionColor.GREEN) parkArea *= -1;
+        if (colorParkArea == PipelineColors.DetectionColor.GREEN) parkArea = 0;
+        else if (colorParkArea == PipelineColors.DetectionColor.BLACK) parkArea *= -1;
 
         return new ArrayList<>(Arrays.asList(
 
@@ -131,7 +141,7 @@ public class ContantsAuto {
         ));
     }
 
-    public ArrayList<ArrayList<Double[]>> getAutoDemostracao(){
+    public ArrayList<ArrayList<Double[]>> getAutoDemonstrator(){
 
         return new ArrayList<>(Arrays.asList(
 

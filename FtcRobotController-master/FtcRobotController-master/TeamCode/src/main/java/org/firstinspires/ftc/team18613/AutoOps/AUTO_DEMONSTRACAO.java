@@ -10,13 +10,13 @@ public class AUTO_DEMONSTRACAO extends LinearOpMode {
 
     public void runOpMode() {
 
-        ContantsAuto cAuto = new ContantsAuto();
+        ConstantsAuto cAuto = new ConstantsAuto();
 
         autonomous = new AutonomousBase(this, cAuto);
         autonomous.initiation();
-        autonomous.setSteps(cAuto.getAutoDemostracao());
+        autonomous.setSteps(cAuto.getAutoDemonstrator());
 
-        while (opModeIsActive() && autonomous.isFinished()) {
+        while (opModeIsActive() && !autonomous.isFinished()) {
 
             autonomous.execution();
 
