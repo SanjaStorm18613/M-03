@@ -8,25 +8,29 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 
 public class VisionCtrl {
 
     HardwareMap hardwareMap;
-    OpenCvWebcam webcam;
-    //OpenCvCamera webcam;
-    PipelineColors detector;
+    //OpenCvWebcam webcam;
+    OpenCvCamera webcam;
+    PipelineColors detectorAuto;
+    TrackingJunction detectorTele;
     LinearOpMode opMode;
     Telemetry telemetry;
+    boolean pipelineAuto;
 
 
-    public VisionCtrl(LinearOpMode opM, HardwareMap hw, Telemetry t){
+    public VisionCtrl(LinearOpMode opM, HardwareMap hw, Telemetry t, boolean pipelineAuto){
 
         opMode = opM;
         telemetry = t;
         hardwareMap = hw;
 
+        this.pipelineAuto = pipelineAuto;
 
         int cameraMonitorViewId = opMode.hardwareMap
                                 .appContext .getResources()
@@ -34,20 +38,29 @@ public class VisionCtrl {
                                                 , "id"
                                                 , hardwareMap.appContext.getPackageName());
 
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(
+        /*webcam = OpenCvCameraFactory.getInstance().createWebcam(
                                         hardwareMap.get
                                         (WebcamName.class, "Webcam 1")
-                                        , cameraMonitorViewId);
+                                        , cameraMonitorViewId);*/
  //*/
-        //webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
-        detector = new PipelineColors();
+        if (pipelineAuto) {
+            detectorAuto = new PipelineColors();
+
+        } else {
+            detectorTele = new TrackingJunction();
+
+        }
+        //detectorTele = new TrackingJunction();
+        //detectorAuto = new PipelineColors();
+
         initDetectionElement();
     }
 
     private void initDetectionElement() {
 
-        webcam.setMillisecondsPermissionTimeout(2500);
+        //webcam.setMillisecondsPermissionTimeout(2500);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 
@@ -68,7 +81,16 @@ public class VisionCtrl {
             }
         });
 
-        webcam.setPipeline(detector);
+        if (pipelineAuto) {
+            webcam.setPipeline(detectorAuto);
+
+        } else {
+            webcam.setPipeline(detectorTele);
+
+        }
+
+        //webcam.setPipeline(detectorTele);
+        //webcam.setPipeline(detectorAuto);
 
     }
 
@@ -77,8 +99,11 @@ public class VisionCtrl {
 
     }
 
-    public PipelineColors getPipeline() {
-        return detector;
+    public PipelineColors getPipelineAuto() {
+        return detectorAuto;
     }
 
+    public TrackingJunction getPipelineTele() {
+        return detectorTele;
+    }
 }

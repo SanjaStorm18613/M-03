@@ -70,6 +70,7 @@ public class TeleOpM03 extends LinearOpMode {
 
         //CLAW
         pilot.registerAction(Controller.a, new HorizontalColect(claw), Controller.Actions.ON_PRESSED);
+        pilot.registerAction(Controller.left_bumper, new HorizontalColect(claw), Controller.Actions.ON_PRESSED);
         pilot.registerAction(Controller.b, new LoweredFrontColect(claw), Controller.Actions.ON_PRESSED);
         pilot.registerAction(Controller.x, new LoweredSideColect(claw), Controller.Actions.ON_PRESSED);
         copilot.registerAction(Controller.b, new Retract(claw), Controller.Actions.ON_PRESSED);

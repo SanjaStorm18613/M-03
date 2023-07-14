@@ -55,6 +55,7 @@ public class PipelineColors extends OpenCvPipeline {
         Point center = new Point(100,160);
 
         cropOrg = new Mat(orgmInpt, new Rect(140,200,360,280));
+
         Imgproc.cvtColor(cropOrg, input, Imgproc.COLOR_BGR2HLS);
 
         elemsArr.clear();
@@ -99,6 +100,7 @@ public class PipelineColors extends OpenCvPipeline {
             Imgproc.putText(input, "NOT FOUND/BLACK", center, Imgproc.FONT_HERSHEY_PLAIN, 1, green, 2);
         }
 
+        Imgproc.resize(input, input, orgmInpt.size());
 
         return input;
     }

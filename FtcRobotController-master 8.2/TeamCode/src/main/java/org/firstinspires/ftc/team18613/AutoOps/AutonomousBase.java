@@ -41,8 +41,8 @@ public class AutonomousBase {
 
     public void initiation() {
 
-        VisionCtrl webcam = new VisionCtrl(opMode, opMode.hardwareMap, opMode.telemetry);
-        PipelineColors detector = webcam.getPipeline();
+        VisionCtrl webcam = new VisionCtrl(opMode, opMode.hardwareMap, opMode.telemetry, true);
+        PipelineColors detector = webcam.getPipelineAuto();
 
         while (!opMode.isStarted() && !opMode.isStopRequested()){
             colorParkArea = detector.getColorDetected();

@@ -8,6 +8,9 @@ public class Constants {
                                     COLOR_UP =  {{80, 180, 360}, {100, 180, 360}};//teste antes
         public static final int TOLERANCE_AREA = 1000;
 
+        public static final double[] TRACKING_JUNCTION_COLOR_LOW = {50, 50, 30};
+        public static final double[] TRACKING_JUNCTION_COLOR_UP = {100, 180, 360};
+
     }
 
     public static class DTMecanum {
@@ -56,7 +59,7 @@ public class Constants {
                                     ELEVADOR_UP = 1.2,
                                     ELEVATOR_UP_RETRAIN = .7,
                                     ROLL_UP = 0.12,
-                                    ROLL_DOWN = 0.68,
+                                    ROLL_DOWN = 0.67,
                                     ROLL_SIDE_CONE = ROLL_UP + Math.abs(ROLL_DOWN-ROLL_UP)/2,
                                     TRANSITION_TIME = 1000;
 
