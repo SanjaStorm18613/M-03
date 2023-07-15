@@ -21,17 +21,17 @@ public class TrackingJunction extends OpenCvPipeline {
     MatOfPoint element;
     Point[] box;
     Point midPoint;
-    double lastWidth, width = 0;
+    double lastWidth, width = 0, centerTopJunction = 0;
 
     public TrackingJunction() {
 
         processFrame = new Mat();
-        lowFilter = new Scalar(40, 40, 50);
-        highFilter = new Scalar(90, 180, 360);
+        lowFilter = new Scalar(90, 100, 130);
+        highFilter = new Scalar(120, 250, 360);
 
         matTrash = new Mat();
         box = new Point[4];
-        midPoint = new Point();
+        midPoint = new Point(0,0);
         contours = new ArrayList<>();
         boxCont = new ArrayList<>();
         rect = new RotatedRect();
@@ -53,6 +53,7 @@ public class TrackingJunction extends OpenCvPipeline {
 
         originalFrame.copyTo(processFrame);
 
+        midPoint = new Point(0,0);
         element = null;
         lastWidth = 0;
         if (contours.size() > 0) {
@@ -60,7 +61,7 @@ public class TrackingJunction extends OpenCvPipeline {
                 rect = Imgproc.minAreaRect(new MatOfPoint2f(cont.toArray()));
                 width = Math.min(rect.size.width, rect.size.height);
 
-                if (width > 50 && width > lastWidth) {
+                if (width > 10 && width > lastWidth) {
                     lastWidth = width;
                     element = cont;
                 }
@@ -84,7 +85,13 @@ public class TrackingJunction extends OpenCvPipeline {
 
             }
         }
+        centerTopJunction = (double) midPoint.x;
+
         return processFrame;
+    }
+
+    public double getCenterTopJunction() {
+        return centerTopJunction;
     }
 
 }

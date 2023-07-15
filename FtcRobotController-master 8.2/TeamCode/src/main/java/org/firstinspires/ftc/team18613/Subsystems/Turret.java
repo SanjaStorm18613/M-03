@@ -6,14 +6,34 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.team18613.Constants;
 import org.firstinspires.ftc.team18613.Subsystem;
+import org.firstinspires.ftc.team18613.Vision.TrackingJunction;
 
 public class Turret extends Subsystem {
 
     private final DcMotor turret;
     private final Elevator elevator;
     private final OpMode opMode;
+    TrackingJunction detector;
 
-    private boolean enable = false, isClockwise = true;
+    private boolean enable = false, isClockwise = true, enableTracking = false;
+
+    public Turret(OpMode opMode, Elevator elev, TrackingJunction detector) {
+
+        this.opMode = opMode;
+        turret = opMode.hardwareMap.get(DcMotor.class, "Yaw");
+
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turret.setTargetPosition(5);
+
+        turret.setDirection(DcMotorSimple.Direction.REVERSE);
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        this.elevator = elev;
+
+        this.detector = detector;
+
+    }
 
     public Turret(OpMode opMode, Elevator elev) {
 
@@ -40,16 +60,24 @@ public class Turret extends Subsystem {
             limitProximityPercentage = 1;
         }
 
-        if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING - .015 && elevator.getTargetPosLowStage()) {
-            turret.setPower(runAllowedPoint());
+        if (enableTracking) {
+            turret.setPower(320 - detector.getCenterTopJunction() * 0.0025);
 
-        } else if (getNotLimit(isClockwise)) {
-            if (enable) {
-                turret.setPower(Constants.Turret.SPEED * (isClockwise ? 1 : -1) * limitProximityPercentage);
-            } else {
-                turret.setPower(0);
+        } else {
+
+            if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING - .015 && elevator.getTargetPosLowStage()) {
+                turret.setPower(runAllowedPoint());
+
+            } else if (getNotLimit(isClockwise)) {
+                if (enable) {
+                    turret.setPower(Constants.Turret.SPEED * (isClockwise ? 1 : -1) * limitProximityPercentage);
+                } else {
+                    turret.setPower(0);
+                }
             }
         }
+
+
 
     }
 
@@ -63,6 +91,14 @@ public class Turret extends Subsystem {
         enable = false;
         turret.setPower(0);
 
+    }
+
+    public void enableTracking() {
+        enableTracking = true;
+    }
+
+    public void disableTracking() {
+        enableTracking = false;
     }
 
     private double runAllowedPoint() {

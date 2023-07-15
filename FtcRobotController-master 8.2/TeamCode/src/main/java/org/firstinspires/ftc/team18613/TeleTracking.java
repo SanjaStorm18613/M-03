@@ -44,7 +44,7 @@ public class TeleTracking extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            //webcam.stopDetection();
+            webcam.stopDetection();
 
         }
     }

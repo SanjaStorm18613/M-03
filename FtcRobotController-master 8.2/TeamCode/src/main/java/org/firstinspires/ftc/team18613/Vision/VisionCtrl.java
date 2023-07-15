@@ -15,14 +15,14 @@ import org.openftc.easyopencv.OpenCvWebcam;
 public class VisionCtrl {
 
     HardwareMap hardwareMap;
-    //OpenCvWebcam webcam;
-    OpenCvCamera webcam;
+    OpenCvWebcam webcam;
+    //OpenCvCamera webcam;
     PipelineColors detectorAuto;
     TrackingJunction detectorTele;
     LinearOpMode opMode;
     Telemetry telemetry;
     boolean pipelineAuto;
-
+    String webcamName;
 
     public VisionCtrl(LinearOpMode opM, HardwareMap hw, Telemetry t, boolean pipelineAuto){
 
@@ -38,29 +38,29 @@ public class VisionCtrl {
                                                 , "id"
                                                 , hardwareMap.appContext.getPackageName());
 
-        /*webcam = OpenCvCameraFactory.getInstance().createWebcam(
-                                        hardwareMap.get
-                                        (WebcamName.class, "Webcam 1")
-                                        , cameraMonitorViewId);*/
- //*/
-        webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-
         if (pipelineAuto) {
             detectorAuto = new PipelineColors();
+            webcamName = "Webcam 1";
 
         } else {
             detectorTele = new TrackingJunction();
+            webcamName = "Webcam 2";
 
         }
-        //detectorTele = new TrackingJunction();
-        //detectorAuto = new PipelineColors();
+
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(
+                                        hardwareMap.get
+                                        (WebcamName.class, webcamName)
+                                        , cameraMonitorViewId);
+ //*/
+        //webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
         initDetectionElement();
     }
 
     private void initDetectionElement() {
 
-        //webcam.setMillisecondsPermissionTimeout(2500);
+        webcam.setMillisecondsPermissionTimeout(2500);
 
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 
