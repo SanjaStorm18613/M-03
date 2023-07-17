@@ -16,7 +16,8 @@ public class ConstantsAuto {
     public ConstantsAuto(){}
 
     //------------------------HEIGHT
-    public ArrayList<ArrayList<Double[]>> getAutoHeight(boolean leftInitialPos, PipelineColors.DetectionColor colorParkArea){
+    public ArrayList<ArrayList<Double[]>> getAutoHeight(boolean leftInitialPos,
+                                                    PipelineColors.DetectionColor colorParkArea){
 
         double parkArea = 65.0, yawTurn = 0.41, drStep1 = 133.0;
 
@@ -42,29 +43,35 @@ public class ConstantsAuto {
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {yawTurn, YW}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP + 0.3, PT, 2000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP
+                                                                                + 0.3, PT, 2000.0}))
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {1.0, CL}
                                                 ,new Double[] {Constants.Claw.PITCH_UP, PT, 1000.0}
                                                 ))
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {0.0, YW}
-                                                ,new Double[] {Constants.Claw.PITCH_LOWERED, PT, 1000.0}
-                                                ,new Double[] {Constants.Claw.ELEVATOR_UP_RETRAIN, EL}
+                                                ,new Double[] {Constants.Claw.PITCH_LOWERED, PT,
+                                                                                            1000.0}
+                                                ,new Double[] {Constants.Claw.ELEVATOR_UP_RETRAIN,
+                                                                                                EL}
                                                 ,new Double[] {65. - drStep1, DR, DR_FRONT}
                                                 ))
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {parkArea, DR, DR_SIDE}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_HORIZONTAL, PT, 1000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {
+                                                    Constants.Claw.PITCH_HORIZONTAL, PT, 1000.0}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Elevator.NV_0, EL}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Elevator.NV_0,
+                                                                                            EL}))
 
         ));
     }
 
     //------------------------MID
-    public ArrayList<ArrayList<Double[]>> getAutoMid(boolean leftInitialPos, PipelineColors.DetectionColor colorParkArea){
+    public ArrayList<ArrayList<Double[]>> getAutoMid(boolean leftInitialPos,
+                                                    PipelineColors.DetectionColor colorParkArea){
 
         double parkArea = 65.0, yawTurn = 0.40, drStep1 = 67.0;
 
@@ -89,28 +96,34 @@ public class ConstantsAuto {
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {yawTurn, YW}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP + 0.3, PT, 2000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP
+                                                                                + 0.3, PT, 2000.0}))
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {1.0, CL}
                                                 ,new Double[] {Constants.Claw.PITCH_UP, PT, 1000.0}
                                                 ))
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {0.0, YW}
-                                                ,new Double[] {Constants.Claw.PITCH_LOWERED, PT, 1000.0}
-                                                ,new Double[] {Constants.Claw.ELEVATOR_UP_RETRAIN, EL}
+                                                ,new Double[] {Constants.Claw.PITCH_LOWERED, PT,
+                                                                                            1000.0}
+                                                ,new Double[] {Constants.Claw.ELEVATOR_UP_RETRAIN,
+                                                                                                EL}
                                                 //,new Double[] {5.0, DR, DR_FRONT}
                                                 ))
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {parkArea, DR, DR_SIDE}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_HORIZONTAL, PT, 3000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {
+                                                    Constants.Claw.PITCH_HORIZONTAL, PT, 3000.0}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Elevator.NV_0, EL}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Elevator.NV_0,
+                                                                                            EL}))
 
         ));
     }
 
-    public ArrayList<ArrayList<Double[]>> getAutoParkOnly(PipelineColors.DetectionColor colorParkArea){
+    public ArrayList<ArrayList<Double[]>> getAutoParkOnly(
+                                                    PipelineColors.DetectionColor colorParkArea){
 
         double parkArea = 60.0;
 
@@ -127,16 +140,19 @@ public class ConstantsAuto {
                         ,new Double[] {Constants.Elevator.NV_1, EL}
                 ))
 
-                ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Claw.PITCH_LOWERED, PT, 500.0}
+                ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Claw.PITCH_LOWERED, PT,
+                                                                                            500.0}
                         ,new Double[] {65.0, DR, DR_FRONT}
                         ,new Double[] {Constants.Claw.ELEVATOR_UP_RETRAIN, EL}
                 ))
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {parkArea, DR, DR_SIDE}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_HORIZONTAL, PT, 1000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {
+                                                    Constants.Claw.PITCH_HORIZONTAL, PT, 1000.0}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Elevator.NV_0, EL}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Elevator.NV_0,
+                                                                                            EL}))
 
         ));
     }
@@ -152,18 +168,22 @@ public class ConstantsAuto {
                 ,new ArrayList<>(Collections.singletonList(new Double[] {-80.0, DR, DR_SIDE}))
                 ,new ArrayList<>(Collections.singletonList(new Double[] {40.0, DR, DR_SIDE}))
 
-                ,new ArrayList<>(Arrays.asList(new Double[] {360.0, DR_TURN}, new Double[]{Constants.Elevator.NV_2, EL}))
+                ,new ArrayList<>(Arrays.asList(new Double[] {360.0, DR_TURN}, new Double[]{
+                                                                    Constants.Elevator.NV_2, EL}))
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {0.5, YW}))
                 ,new ArrayList<>(Collections.singletonList(new Double[] {-0.5, YW}))
                 ,new ArrayList<>(Collections.singletonList(new Double[] {0.0, YW}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_HORIZONTAL, PT, 2000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {
+                                                    Constants.Claw.PITCH_HORIZONTAL, PT, 2000.0}))
                 ,new ArrayList<>(Collections.singletonList(new Double[] {1.0, CL}))
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP, PT,500.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {
+                                                                Constants.Claw.PITCH_UP, PT,500.0}))
                 ,new ArrayList<>(Collections.singletonList(new Double[] {0.0, CL}))
 
-                ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Elevator.NV_0, EL}, new Double[] {-40.0, DR, DR_FRONT}))
+                ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Elevator.NV_0, EL},
+                                                                new Double[] {-40.0, DR, DR_FRONT}))
         ));
     }
 

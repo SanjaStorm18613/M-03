@@ -54,7 +54,8 @@ public class Arm extends Subsystem {
 
     private void updateAutomaticPos() {
         double posRangeBraco = Constants.Braco.MAX_POS - Constants.Braco.MIN_POS;
-        double posPercentElev = (elevator.getCurrentPos() / ((Constants.Elevator.NV_3) * Constants.Elevator.CONVR));
+        double posPercentElev = (elevator.getCurrentPos() / ((Constants.Elevator.NV_3)
+                                                                * Constants.Elevator.CONVERSION));
         double pos = (Math.pow(posPercentElev, 3) * posRangeBraco) + Constants.Braco.MIN_POS;
 
         pos = Math.max(controlRequirement, pos);

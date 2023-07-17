@@ -15,16 +15,13 @@ import java.util.ArrayList;
 
 public class PipelineColors extends OpenCvPipeline {
 
-    double[][] cUp = Constants.Pipeline.COLOR_UP,
-            cLw = Constants.Pipeline.COLOR_LOW;
-
     Scalar low0, up0, low1, up1, green, red, black;
     Mat input, mat, mat2, cropOrg;
     Size s;
-    MatOfPoint objtDetc;
-    ArrayList<ArrayList<MatOfPoint>> elemsArr;
+    MatOfPoint objectDetection;
+    ArrayList<ArrayList<MatOfPoint>> elementsArr;
     ArrayList<MatOfPoint> contourArr, contourObjectDetect;
-    int ObjtDetcColor = -1;
+    int ObjectDetectionColor = -1;
 
 
     public PipelineColors() {
@@ -39,53 +36,55 @@ public class PipelineColors extends OpenCvPipeline {
         black = new Scalar(0,0,0);
 
         s = new Size(3, 3);
-        elemsArr = new ArrayList<>();
+        elementsArr = new ArrayList<>();
         contourArr = new ArrayList<>();
 
-        low0 = new Scalar(cLw[0][0], cLw[0][1], cLw[0][2]);
-        up0 = new Scalar(cUp[0][0], cUp[0][1], cUp[0][2]);//green
+        low0 = new Scalar(Constants.Pipeline.AUTO_COLOR_LOW[0]);
+        up0 = new Scalar(Constants.Pipeline.AUTO_COLOR_UP[0]);//green
 
-        low1 = new Scalar(cLw[1][0], cLw[1][1], cLw[1][2]);
-        up1 = new Scalar(cUp[1][0], cUp[1][1], cUp[1][2]);//cian
+        low1 = new Scalar(Constants.Pipeline.AUTO_COLOR_LOW[1]);
+        up1 = new Scalar(Constants.Pipeline.AUTO_COLOR_UP[1]);//cian
     }
 
 
     @Override
-    public Mat processFrame(Mat orgmInpt) {
+    public Mat processFrame(Mat originalInput) {
         Point center = new Point(100,160);
 
-        cropOrg = new Mat(orgmInpt, new Rect(140,200,360,280));
+        cropOrg = new Mat(originalInput, new Rect(140,200,360,280));
 
         Imgproc.cvtColor(cropOrg, input, Imgproc.COLOR_BGR2HLS);
 
-        elemsArr.clear();
+        elementsArr.clear();
 
-        elemsArr.add(colorFilter(low0, up0));
-        elemsArr.add(colorFilter(low1, up1));
+        elementsArr.add(colorFilter(low0, up0));
+        elementsArr.add(colorFilter(low1, up1));
 
         cropOrg.copyTo(input);
 
-        ObjtDetcColor = -1;
-        objtDetc = null;
+        ObjectDetectionColor = -1;
+        objectDetection = null;
         contourObjectDetect = null;
 
         int i = 0;
-        for (ArrayList<MatOfPoint> elms : elemsArr) {
+        for (ArrayList<MatOfPoint> elms : elementsArr) {
 
             for (MatOfPoint item : elms) {
 
-                if (objtDetc == null || (Imgproc.contourArea(item) > Imgproc.contourArea(objtDetc))) {
-                    ObjtDetcColor = i;
-                    objtDetc = item;
+                if (objectDetection == null || (Imgproc.contourArea(item)
+                                                        > Imgproc.contourArea(objectDetection))) {
+                    ObjectDetectionColor = i;
+                    objectDetection = item;
                     contourObjectDetect = elms;
                 }
             }
             i++;
         }
 
-        if (objtDetc != null && Imgproc.contourArea(objtDetc) > Constants.Pipeline.TOLERANCE_AREA) {
+        if (objectDetection != null && Imgproc.contourArea(objectDetection)
+                                                            > Constants.Pipeline.TOLERANCE_AREA) {
 
-            Rect rectRange = Imgproc.boundingRect(objtDetc);
+            Rect rectRange = Imgproc.boundingRect(objectDetection);
             Point supDir = new Point(rectRange.x, rectRange.y);
             Point botEsc = new Point(rectRange.x + rectRange.width,
                     rectRange.y + rectRange.height);
@@ -93,14 +92,17 @@ public class PipelineColors extends OpenCvPipeline {
 
             Imgproc.rectangle(input, supDir, botEsc, green, 1);
             if (contourObjectDetect != null) {
-                Imgproc.drawContours(input, contourObjectDetect, contourObjectDetect.indexOf(objtDetc), red, 2);
+                Imgproc.drawContours(input, contourObjectDetect,
+                                    contourObjectDetect.indexOf(objectDetection), red, 2);
             }
-            Imgproc.putText(input, getColorDetected().toString(), supDir, Imgproc.FONT_HERSHEY_PLAIN, 1, green, 2);
+            Imgproc.putText(input, getColorDetected().toString(), supDir, Imgproc.FONT_HERSHEY_PLAIN,
+                                                                    1, green, 2);
         } else {
-            Imgproc.putText(input, "NOT FOUND/BLACK", center, Imgproc.FONT_HERSHEY_PLAIN, 1, green, 2);
+            Imgproc.putText(input, "NOT FOUND/BLACK", center, Imgproc.FONT_HERSHEY_PLAIN,
+                                                                    1, green, 2);
         }
 
-        Imgproc.resize(input, input, orgmInpt.size());
+        Imgproc.resize(input, input, originalInput.size());
 
         return input;
     }
@@ -122,18 +124,11 @@ public class PipelineColors extends OpenCvPipeline {
         return(ArrayList<MatOfPoint>) contourArr.clone();
     }
 
-    public double getcontourArea() {
-        if (objtDetc == null) {
-            return 0;
-        }
-
-        return Imgproc.contourArea(objtDetc);
-    }
-
     public DetectionColor getColorDetected() {
 
-        if (objtDetc != null && Imgproc.contourArea(objtDetc) > Constants.Pipeline.TOLERANCE_AREA) {
-            switch (ObjtDetcColor) {
+        if (objectDetection != null && Imgproc.contourArea(objectDetection)
+                                                            > Constants.Pipeline.TOLERANCE_AREA) {
+            switch (ObjectDetectionColor) {
                 case 0:
                     return DetectionColor.GREEN;
                 case 1:
@@ -144,6 +139,15 @@ public class PipelineColors extends OpenCvPipeline {
         } else {
             return DetectionColor.BLACK;
         }
+    }
+
+    public void setFilter(double[][][] newFilter) {
+        low0 = new Scalar(newFilter[0][0]);
+        up0 = new Scalar(newFilter[1][0]);
+
+        low1 = new Scalar(newFilter[0][1]);
+        up1 = new Scalar(newFilter[1][1]);
+
     }
 
     public enum DetectionColor {

@@ -16,7 +16,8 @@ public class Claw extends Subsystem {
     private final OpMode opMode;
 
     private double pAutoPos = 0,
-            angle = 0, pitchProgress = 0, pitchPos = Constants.Claw.PITCH_UP, lastPitchPos = Constants.Claw.PITCH_UP,
+            angle = 0, pitchProgress = 0, pitchPos = Constants.Claw.PITCH_UP,
+                                                            lastPitchPos = Constants.Claw.PITCH_UP,
             rollPos = Constants.Claw.ROLL_UP, elevatorControl = 0, autoPitchPos = 0.0;
 
     private boolean clawOpen = false, pBusy = false, init;
@@ -184,17 +185,18 @@ public class Claw extends Subsystem {
     }
 
     private boolean needTurning() {
-        return (pitchPos == Constants.Claw.PITCH_LOWERED || lastPitchPos == Constants.Claw.PITCH_LOWERED) && pitchPos != lastPitchPos;
+        return (pitchPos == Constants.Claw.PITCH_LOWERED || lastPitchPos
+                                    == Constants.Claw.PITCH_LOWERED) && pitchPos != lastPitchPos;
     }
 
     private void elevatorControl() {
 
         if (needTurning() && pitchProgress < 1){
-            elevatorControl = Constants.Claw.ELEVADOR_UP;
+            elevatorControl = Constants.Claw.ELEVATOR_UP;
 
         } else if (pitchPos == Constants.Claw.PITCH_LOWERED) {
             if (clawOpen){
-                elevatorControl = Constants.Claw.ELEVADOR_UP;
+                elevatorControl = Constants.Claw.ELEVATOR_UP;
 
             } else if (sClawD.getPosition() == Constants.Claw.CLAW_OPEN) {
                 elevatorControl = 0;

@@ -61,16 +61,20 @@ public class Turret extends Subsystem {
         }
 
         if (enableTracking) {
-            turret.setPower(320 - detector.getCenterTopJunction() * 0.0025);
+            turret.setPower(320 + Constants.Turret.TRACKING_CENTER_OFFSET
+                                - detector.getCenterTopJunction()
+                                * Constants.Turret.TRACKING_PROPORTION_CORRECTION);
 
         } else {
 
-            if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING - .015 && elevator.getTargetPosLowStage()) {
+            if (Math.abs(getRelativePos()) > Constants.Turret.CHASSIS_OPENING
+                                        - .015 && elevator.getTargetPosLowStage()) {
                 turret.setPower(runAllowedPoint());
 
             } else if (getNotLimit(isClockwise)) {
                 if (enable) {
-                    turret.setPower(Constants.Turret.SPEED * (isClockwise ? 1 : -1) * limitProximityPercentage);
+                    turret.setPower(Constants.Turret.SPEED * (isClockwise ? 1 : -1)
+                                                            * limitProximityPercentage);
                 } else {
                     turret.setPower(0);
                 }
@@ -128,7 +132,7 @@ public class Turret extends Subsystem {
     }
 
     public void setPos(double pos, double vel) {
-        turret.setTargetPosition((int) (pos * Constants.Turret.CONVR));
+        turret.setTargetPosition((int) (pos * Constants.Turret.CONVERSION));
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turret.setPower(vel);
     }
@@ -146,12 +150,13 @@ public class Turret extends Subsystem {
     public boolean getBusy() { return turret.isBusy(); }
 
     public boolean getForward() {
-        return !(Math.abs(turret.getCurrentPosition()) > Constants.Turret.COUNTS_PER_REVOLUTION/ 4.
-                && Math.abs(turret.getCurrentPosition()) < Constants.Turret.COUNTS_PER_REVOLUTION/ 1.5);
+        return !(Math.abs(turret.getCurrentPosition()) > Constants.Turret.COUNTS_PER_REVOLUTION / 4.
+                && Math.abs(turret.getCurrentPosition()) < Constants.Turret.COUNTS_PER_REVOLUTION
+                                                                                            / 1.5);
     }
 
     private double getRelativePos () {
-        double var = turret.getCurrentPosition() / (Constants.Turret.COUNTS_PER_REVOLUTION/ 2.);
+        double var = turret.getCurrentPosition() / (Constants.Turret.COUNTS_PER_REVOLUTION / 2.);
         var -= Math.round(var);
         return var;
     }

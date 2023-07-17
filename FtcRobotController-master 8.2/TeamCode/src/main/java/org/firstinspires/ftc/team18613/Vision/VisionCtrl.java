@@ -17,36 +17,20 @@ public class VisionCtrl {
     HardwareMap hardwareMap;
     OpenCvWebcam webcam;
     //OpenCvCamera webcam;
-    PipelineColors detectorAuto;
-    TrackingJunction detectorTele;
     LinearOpMode opMode;
     Telemetry telemetry;
-    boolean pipelineAuto;
-    String webcamName;
 
-    public VisionCtrl(LinearOpMode opM, HardwareMap hw, Telemetry t, boolean pipelineAuto){
+    public VisionCtrl(LinearOpMode opM, HardwareMap hw, Telemetry t, String webcamName){
 
         opMode = opM;
         telemetry = t;
         hardwareMap = hw;
-
-        this.pipelineAuto = pipelineAuto;
 
         int cameraMonitorViewId = opMode.hardwareMap
                                 .appContext .getResources()
                                 .getIdentifier("cameraMonitorViewId"
                                                 , "id"
                                                 , hardwareMap.appContext.getPackageName());
-
-        if (pipelineAuto) {
-            detectorAuto = new PipelineColors();
-            webcamName = "Webcam 1";
-
-        } else {
-            detectorTele = new TrackingJunction();
-            webcamName = "Webcam 2";
-
-        }
 
         webcam = OpenCvCameraFactory.getInstance().createWebcam(
                                         hardwareMap.get
@@ -81,29 +65,18 @@ public class VisionCtrl {
             }
         });
 
-        if (pipelineAuto) {
-            webcam.setPipeline(detectorAuto);
+    }
 
-        } else {
-            webcam.setPipeline(detectorTele);
+    public void setPepiline(TrackingJunction detector) {
+        webcam.setPipeline(detector);
+    }
 
-        }
-
-        //webcam.setPipeline(detectorTele);
-        //webcam.setPipeline(detectorAuto);
-
+    public void setPepiline(PipelineColors detector) {
+        webcam.setPipeline(detector);
     }
 
     public void stopDetection(){
         webcam.stopStreaming();
 
-    }
-
-    public PipelineColors getPipelineAuto() {
-        return detectorAuto;
-    }
-
-    public TrackingJunction getPipelineTele() {
-        return detectorTele;
     }
 }

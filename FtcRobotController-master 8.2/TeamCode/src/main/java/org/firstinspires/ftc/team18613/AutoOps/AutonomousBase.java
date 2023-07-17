@@ -41,8 +41,10 @@ public class AutonomousBase {
 
     public void initiation() {
 
-        VisionCtrl webcam = new VisionCtrl(opMode, opMode.hardwareMap, opMode.telemetry, true);
-        PipelineColors detector = webcam.getPipelineAuto();
+        PipelineColors detector = new PipelineColors();
+        VisionCtrl webcam = new VisionCtrl(opMode, opMode.hardwareMap, opMode.telemetry,
+                                                                            "Webcam 1");
+        webcam.setPepiline(detector);
 
         while (!opMode.isStarted() && !opMode.isStopRequested()){
             colorParkArea = detector.getColorDetected();
@@ -63,10 +65,12 @@ public class AutonomousBase {
             for (Double[] action : steps.get(0)) {
 
                 if (action[1].equals(cAuto.DR)) {
-                    drive.setMove(false, action[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.00005, action[0], 0);
+                    drive.setMove(false, action[2].equals(cAuto.DR_SIDE), 0.5,
+                                                    800, 0.00005, action[0], 0);
 
                 } else if (action[1].equals(cAuto.DR_TURN)) {
-                    drive.setMove(true, false, 0.5, 800, 0.00005, 0, action[0]);
+                    drive.setMove(true, false, 0.5, 800,
+                                                                    0.00005, 0, action[0]);
 
                 } else if (action[1].equals(cAuto.EL)) {
                     elevator.setPos(action[0], Constants.Elevator.UP_SPEED);

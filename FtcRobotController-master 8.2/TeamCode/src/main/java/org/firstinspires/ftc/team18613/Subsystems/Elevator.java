@@ -37,13 +37,13 @@ public class Elevator extends Subsystem {
     }
 
     public void periodic() {
-        double targetPos = stages[stage] + adjust * Constants.Elevator.AJUSTE;
+        double targetPos = stages[stage] + adjust * Constants.Elevator.ADJUST;
 
         targetPos = Math.max(targetPos, controlRequirement);
 
         targetPos = Math.min(Constants.Elevator.NV_3, targetPos);
         targetPos = Math.max(Constants.Elevator.NV_0, targetPos);
-        targetPos *= Constants.Elevator.CONVR;
+        targetPos *= Constants.Elevator.CONVERSION;
 
         elevator.setTargetPosition((int) targetPos);
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -56,7 +56,8 @@ public class Elevator extends Subsystem {
         }
 
         opMode.telemetry.addData("targetPos-final", targetPos);
-        opMode.telemetry.addData("getCurrentPos", getCurrentPos() / ((double) Constants.Elevator.CONVR));
+        opMode.telemetry.addData("getCurrentPos", getCurrentPos()
+                                                        / ((double) Constants.Elevator.CONVERSION));
 
     }
 
@@ -81,7 +82,7 @@ public class Elevator extends Subsystem {
     }
 
     public void adjustHeight(boolean up) {
-        double currentStage = stages[stage] + adjust * Constants.Elevator.AJUSTE;
+        double currentStage = stages[stage] + adjust * Constants.Elevator.ADJUST;
 
         if (up && currentStage < Constants.Elevator.NV_3) {
             adjust++;
@@ -92,7 +93,7 @@ public class Elevator extends Subsystem {
     }
 
     public void setPos(double pos, double vel) {
-        elevator.setTargetPosition((int) (pos * Constants.Elevator.CONVR));
+        elevator.setTargetPosition((int) (pos * Constants.Elevator.CONVERSION));
         elevator.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         elevator.setPower(vel);
     }
@@ -106,7 +107,8 @@ public class Elevator extends Subsystem {
     }
 
     public boolean getTargetPosLowStage() {
-        return elevator.getTargetPosition() < stages[1] * Constants.Elevator.CONVR * (getOnCollectionStage() ? 1.17 :1);
+        return elevator.getTargetPosition() < stages[1] * Constants.Elevator.CONVERSION
+                                                            * (getOnCollectionStage() ? 1.17 : 1);
 
     }
     public int getCurrentPos() {

@@ -42,8 +42,10 @@ public class Controller {
     private final ArrayList<Pair<Command, Integer>> onPressedRegisters = new ArrayList<>();
     private final ArrayList<Pair<Command, Integer>> onReleasedRegisters = new ArrayList<>();
     private final ArrayList<Pair<Command, Integer>> whilePressedRegisters = new ArrayList<>();
-    private final ArrayList<Pair<Function<Supplier<Float>, Command>, Integer>> stickAndTriggerRegisters = new ArrayList<>();
-    private final ArrayList<Pair<Function<SupplierPair<Float>,Command>, int[]>> sticksRegisters = new ArrayList<>();
+    private final ArrayList<Pair<Function<Supplier<Float>, Command>, Integer>>
+                                                    stickAndTriggerRegisters = new ArrayList<>();
+    private final ArrayList<Pair<Function<SupplierPair<Float>,Command>,
+                                                        int[]>> sticksRegisters = new ArrayList<>();
 
 
     private final boolean[] last_values = new boolean[18];
@@ -178,7 +180,8 @@ public class Controller {
             Function<SupplierPair<Float>,Command> fcc = i.firstValue();
             int id0 = i.secondValue()[0], id1 = i.secondValue()[1];
 
-            SupplierPair<Float> current = new SupplierPair<>(floatSupplier.get(id0), floatSupplier.get(id1));
+            SupplierPair<Float> current = new SupplierPair<>(floatSupplier.get(id0),
+                                                                            floatSupplier.get(id1));
 
             fcc.apply(current).run();
         }

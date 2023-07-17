@@ -21,8 +21,8 @@ public class DTMecanum  extends Subsystem {
 
     private boolean moveIsBusy = false, sideMove = false, internalEncoder = false;
     private double setPoint = 0, direction = 0, acc = 0, x = 0, y = 0, turn = 0, slowFactor = 0,
-            tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE, distance = 0, adjust = 0, angle = 0, dist = 0,
-            proportional = 0, maxVel = 0, timeAccel = 0;
+    tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE, distance = 0, adjust = 0, angle = 0,
+                                            dist = 0, proportional = 0, maxVel = 0, timeAccel = 0;
 
     public DTMecanum(OpMode opMode, Turret turret) {
 
@@ -131,11 +131,13 @@ public class DTMecanum  extends Subsystem {
             tankDrive(pos, turn, sideMove);
         }
 
-        moveIsBusy = (Math.abs(error) > tolerance) || (Math.abs(yawError) > Constants.DTMecanum.TOLERANCE_ANGLE);
+        moveIsBusy = (Math.abs(error) > tolerance) || (Math.abs(yawError)
+                                                            > Constants.DTMecanum.TOLERANCE_ANGLE);
 
     }
 
-    public void setMove(boolean internalEncoder, boolean sideMove, double maxVel, double timeAccel, double prop, double dist, double ang) {
+    public void setMove(boolean internalEncoder, boolean sideMove, double maxVel, double timeAccel,
+                                                            double prop, double dist, double ang) {
 
         angle = ang;
         proportional = prop;
@@ -146,10 +148,10 @@ public class DTMecanum  extends Subsystem {
         this.timeAccel = timeAccel;
 
         tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
-        distance = this.dist * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
+        distance = this.dist * Constants.DTMecanum.CONVERSION_2_EXTERNAL;
 
         if (internalEncoder) {
-            distance = this.dist * Constants.DTMecanum.CONVERTION_2_INTERNAL;
+            distance = this.dist * Constants.DTMecanum.CONVERSION_2_INTERNAL;
             proportional *= 10.;
 
         } else if (sideMove) {
@@ -208,12 +210,12 @@ public class DTMecanum  extends Subsystem {
 
     public void setValCalibration(double val){
 
-        adjust = val * Constants.DTMecanum.CONVERTION_2_EXTERNAL;
+        adjust = val * Constants.DTMecanum.CONVERSION_2_EXTERNAL;
 
         if (sideMove) {
             adjust /= 35.;
         } else if (internalEncoder) {
-            adjust = val * Constants.DTMecanum.CONVERTION_2_INTERNAL;
+            adjust = val * Constants.DTMecanum.CONVERSION_2_INTERNAL;
         }
 
     }

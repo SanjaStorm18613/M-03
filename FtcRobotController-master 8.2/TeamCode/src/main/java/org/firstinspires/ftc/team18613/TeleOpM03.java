@@ -57,33 +57,48 @@ public class TeleOpM03 extends LinearOpMode {
         waitForStart();
 
         //TURRET
-        copilot.registerAction(Controller.right, new TurnT(turret, false), Controller.Actions.WHILE_PRESSED);
+        copilot.registerAction(Controller.right, new TurnT(turret, false),
+                                                                Controller.Actions.WHILE_PRESSED);
         copilot.registerAction(Controller.right, new Stop(turret), Controller.Actions.ON_RELEASED);
 
-        copilot.registerAction(Controller.left, new TurnT(turret, true), Controller.Actions.WHILE_PRESSED);
+        copilot.registerAction(Controller.left, new TurnT(turret, true),
+                                                                Controller.Actions.WHILE_PRESSED);
         copilot.registerAction(Controller.left, new Stop(turret), Controller.Actions.ON_RELEASED);
 
         //DRIVE MECANUM
-        pilot.registerAction(Controller.right_stick_x, (Supplier<Float> val) -> new TurnD(drive, val));
-        pilot.registerAction(new int[]{Controller.left_stick_x, Controller.left_stick_y}, (SupplierPair<Float> val) -> new Move(drive, val));
-        pilot.registerAction(Controller.right_trigger, (Supplier<Float> val) -> new Slow(drive, val));
+        pilot.registerAction(Controller.right_stick_x, (Supplier<Float> val)
+                                                                        -> new TurnD(drive, val));
+        pilot.registerAction(new int[]{Controller.left_stick_x, Controller.left_stick_y},
+                                                (SupplierPair<Float> val) -> new Move(drive, val));
+        pilot.registerAction(Controller.right_trigger, (Supplier<Float> val) ->
+                                                                            new Slow(drive, val));
 
         //CLAW
-        pilot.registerAction(Controller.a, new HorizontalColect(claw), Controller.Actions.ON_PRESSED);
-        pilot.registerAction(Controller.left_bumper, new HorizontalColect(claw), Controller.Actions.ON_PRESSED);
-        pilot.registerAction(Controller.b, new LoweredFrontColect(claw), Controller.Actions.ON_PRESSED);
-        pilot.registerAction(Controller.x, new LoweredSideColect(claw), Controller.Actions.ON_PRESSED);
+        pilot.registerAction(Controller.a, new HorizontalColect(claw),
+                                                                    Controller.Actions.ON_PRESSED);
+        pilot.registerAction(Controller.left_bumper, new HorizontalColect(claw),
+                                                                    Controller.Actions.ON_PRESSED);
+        pilot.registerAction(Controller.b, new LoweredFrontColect(claw),
+                                                                    Controller.Actions.ON_PRESSED);
+        pilot.registerAction(Controller.x, new LoweredSideColect(claw),
+                                                                    Controller.Actions.ON_PRESSED);
         copilot.registerAction(Controller.b, new Retract(claw), Controller.Actions.ON_PRESSED);
-        copilot.registerAction(Controller.right_trigger_not_zero, new Drop(claw), Controller.Actions.ON_PRESSED);
-        copilot.registerAction(Controller.left_trigger, (Supplier<Float> val) -> new AngulationDrop(claw, val));
+        copilot.registerAction(Controller.right_trigger_not_zero, new Drop(claw),
+                                                                    Controller.Actions.ON_PRESSED);
+        copilot.registerAction(Controller.left_trigger, (Supplier<Float> val)
+                                                                -> new AngulationDrop(claw, val));
         copilot.registerAction(Controller.a, new InvertCone(claw), Controller.Actions.ON_PRESSED);
 
         //ELEVATOR
-        copilot.registerAction(Controller.y, new ShiftStage(elevator, true), Controller.Actions.ON_PRESSED);
-        copilot.registerAction(Controller.x, new ShiftStage(elevator, false), Controller.Actions.ON_PRESSED);
+        copilot.registerAction(Controller.y, new ShiftStage(elevator, true),
+                                                                    Controller.Actions.ON_PRESSED);
+        copilot.registerAction(Controller.x, new ShiftStage(elevator, false),
+                                                                    Controller.Actions.ON_PRESSED);
 
-        copilot.registerAction(Controller.up, new AdjustStage(elevator, true), Controller.Actions.ON_PRESSED);
-        copilot.registerAction(Controller.down, new AdjustStage(elevator, false), Controller.Actions.ON_PRESSED);
+        copilot.registerAction(Controller.up, new AdjustStage(elevator, true),
+                                                                    Controller.Actions.ON_PRESSED);
+        copilot.registerAction(Controller.down, new AdjustStage(elevator, false),
+                                                                    Controller.Actions.ON_PRESSED);
 
 
         while (opModeIsActive()) {

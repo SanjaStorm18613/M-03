@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.team18613.Vision;
 
+import org.firstinspires.ftc.team18613.Constants;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 
 public class TrackingJunction extends OpenCvPipeline {
 
-    Mat processFrame, matTrash;
+    Mat processFrame, mat;
     Scalar lowFilter, highFilter;
     ArrayList<MatOfPoint> contours, boxCont;
     RotatedRect rect;
@@ -22,14 +23,15 @@ public class TrackingJunction extends OpenCvPipeline {
     Point[] box;
     Point midPoint;
     double lastWidth, width = 0, centerTopJunction = 0;
+    boolean streamingFilter = false;
 
     public TrackingJunction() {
 
         processFrame = new Mat();
-        lowFilter = new Scalar(90, 100, 130);
-        highFilter = new Scalar(120, 250, 360);
+        lowFilter = new Scalar(Constants.Pipeline.TELE_COLOR_LOW[0]);
+        highFilter = new Scalar(Constants.Pipeline.TELE_COLOR_UP[0]);
 
-        matTrash = new Mat();
+        mat = new Mat();
         box = new Point[4];
         midPoint = new Point(0,0);
         contours = new ArrayList<>();
@@ -43,13 +45,16 @@ public class TrackingJunction extends OpenCvPipeline {
         Imgproc.cvtColor(originalFrame, processFrame, Imgproc.COLOR_BGR2HLS);
         Core.inRange(processFrame, lowFilter, highFilter, processFrame);
 
-        matTrash = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
-        Imgproc.morphologyEx(processFrame, processFrame, Imgproc.MORPH_OPEN, matTrash);
+        mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
+        Imgproc.morphologyEx(processFrame, processFrame, Imgproc.MORPH_OPEN, mat);
         Imgproc.GaussianBlur(processFrame, processFrame, new Size(3,3), 10);
 
         contours.clear();
-        Imgproc.findContours(processFrame, contours, matTrash, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-        matTrash.release();
+        Imgproc.findContours(processFrame, contours, mat, Imgproc.RETR_LIST,
+                                                                    Imgproc.CHAIN_APPROX_SIMPLE);
+        mat.release();
+
+        if (streamingFilter) return processFrame;
 
         originalFrame.copyTo(processFrame);
 
@@ -73,7 +78,8 @@ public class TrackingJunction extends OpenCvPipeline {
                 rect.points(box);
                 boxCont.clear();
                 boxCont.add(new MatOfPoint(box));
-                Imgproc.drawContours(processFrame, boxCont, 0, new Scalar(0,0,255), 2);
+                Imgproc.drawContours(processFrame, boxCont, 0, new Scalar(0,0,255),
+                                                                                        2);
 
                 if (rect.size.width > rect.size.height) {
                     midPoint = new Point((box[0].x + box[1].x)/2, (box[0].y + box[1].y)/2);
@@ -92,6 +98,16 @@ public class TrackingJunction extends OpenCvPipeline {
 
     public double getCenterTopJunction() {
         return centerTopJunction;
+    }
+
+    public void setFilter(double[][][] newFilter) {
+        lowFilter = new Scalar(newFilter[0][0]);
+        highFilter = new Scalar(newFilter[1][0]);
+
+    }
+
+    public void setStreaming(boolean streamingFilter) {
+        this.streamingFilter = streamingFilter;
     }
 
 }

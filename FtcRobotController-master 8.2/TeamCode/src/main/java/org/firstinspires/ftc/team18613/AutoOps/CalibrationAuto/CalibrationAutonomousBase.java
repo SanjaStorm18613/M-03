@@ -31,7 +31,8 @@ public class CalibrationAutonomousBase {
     boolean init = false;
     int idxActionSteps = 0;
     boolean A = true, X = true, Y = true;
-    double drAdjust = 0.0, drTurnAdjust = 0.0, elAdjust = 0.0, ywAdjust = 0.0, ptAdjust = 0.0, sizeStep;
+    double drAdjust = 0.0, drTurnAdjust = 0.0, elAdjust = 0.0, ywAdjust = 0.0, ptAdjust = 0.0,
+                                                                                        sizeStep;
 
 
     public CalibrationAutonomousBase(LinearOpMode opMode, ConstantsAuto cAuto) {
@@ -48,8 +49,10 @@ public class CalibrationAutonomousBase {
 
     public void initiation() {
 
-        VisionCtrl webcam = new VisionCtrl(opMode, opMode.hardwareMap, opMode.telemetry, true);
-        PipelineColors detector = webcam.getPipelineAuto();
+        PipelineColors detector = new PipelineColors();
+        VisionCtrl webcam = new VisionCtrl(opMode, opMode.hardwareMap, opMode.telemetry,
+                                                                            "Webcam 1");
+        webcam.setPepiline(detector);
 
         while (!opMode.isStarted() && !opMode.isStopRequested()){
             colorParkArea = detector.getColorDetected();
@@ -70,16 +73,19 @@ public class CalibrationAutonomousBase {
         for (int action = 0; action <= idxActionSteps; action++) {
 
             if (steps.get(0).get(action)[1].equals(cAuto.DR)) {
-                drive.setMove(false, steps.get(0).get(action)[2].equals(cAuto.DR_SIDE), 0.5, 800, 0.00005, steps.get(0).get(action)[0], 0);
+                drive.setMove(false, steps.get(0).get(action)[2].equals(cAuto.DR_SIDE),
+                        0.5, 800, 0.00005, steps.get(0).get(action)[0], 0);
                 drive.setValCalibration(drAdjust);
                 opMode.telemetry.addData("DRIVE +", drAdjust);
 
             } else if (steps.get(0).get(action)[1].equals(cAuto.DR_TURN)) {
-                drive.setMove(true, false, 0.5, 800, 0.00005, 0, steps.get(0).get(action)[0] + drTurnAdjust);
+                drive.setMove(true, false, 0.5, 800,
+                            0.00005, 0, steps.get(0).get(action)[0] + drTurnAdjust);
                 opMode.telemetry.addData("DRIVE TURN +", drTurnAdjust);
 
             } else if (steps.get(0).get(action)[1].equals(cAuto.EL)) {
-                elevator.setPos(steps.get(0).get(action)[0] + elAdjust, Constants.Elevator.UP_SPEED);
+                elevator.setPos(steps.get(0).get(action)[0] + elAdjust,
+                                                                    Constants.Elevator.UP_SPEED);
                 opMode.telemetry.addData("ELEVATOR +", elAdjust);
 
             } else if (steps.get(0).get(action)[1].equals(cAuto.CL)) {
@@ -87,7 +93,8 @@ public class CalibrationAutonomousBase {
 
             } else if (steps.get(0).get(action)[1].equals(cAuto.PT)) {
                 init = true;
-                claw.setPitch(steps.get(0).get(action)[0] + ptAdjust, steps.get(0).get(action)[2]);
+                claw.setPitch(steps.get(0).get(action)[0] + ptAdjust,
+                                                                    steps.get(0).get(action)[2]);
                 opMode.telemetry.addData("PITCH +", ptAdjust);
 
             } else if (steps.get(0).get(action)[1].equals(cAuto.YW)) {
