@@ -28,8 +28,8 @@ public class TrackingJunction extends OpenCvPipeline {
     public TrackingJunction() {
 
         processFrame = new Mat();
-        lowFilter = new Scalar(Constants.Pipeline.TELE_COLOR_LOW[0]);
-        highFilter = new Scalar(Constants.Pipeline.TELE_COLOR_UP[0]);
+        lowFilter = new Scalar(Constants.Pipeline.TELE_COLOR_LOW);
+        highFilter = new Scalar(Constants.Pipeline.TELE_COLOR_UP);
 
         mat = new Mat();
         box = new Point[4];
@@ -54,45 +54,45 @@ public class TrackingJunction extends OpenCvPipeline {
                                                                     Imgproc.CHAIN_APPROX_SIMPLE);
         mat.release();
 
-        if (streamingFilter) return processFrame;
+        if (!streamingFilter) {
 
-        originalFrame.copyTo(processFrame);
+            originalFrame.copyTo(processFrame);
 
-        midPoint = new Point(0,0);
-        element = null;
-        lastWidth = 0;
-        if (contours.size() > 0) {
-            for (MatOfPoint cont : contours) {
-                rect = Imgproc.minAreaRect(new MatOfPoint2f(cont.toArray()));
-                width = Math.min(rect.size.width, rect.size.height);
+            midPoint = new Point(0, 0);
+            element = null;
+            lastWidth = 0;
+            if (contours.size() > 0) {
+                for (MatOfPoint cont : contours) {
+                    rect = Imgproc.minAreaRect(new MatOfPoint2f(cont.toArray()));
+                    width = Math.min(rect.size.width, rect.size.height);
 
-                if (width > 10 && width > lastWidth) {
-                    lastWidth = width;
-                    element = cont;
+                    if (width > 10 && width > lastWidth) {
+                        lastWidth = width;
+                        element = cont;
+                    }
+
                 }
 
-            }
+                if (element != null) {
+                    rect = Imgproc.minAreaRect(new MatOfPoint2f(element.toArray()));
+                    rect.points(box);
+                    boxCont.clear();
+                    boxCont.add(new MatOfPoint(box));
+                    Imgproc.drawContours(processFrame, boxCont, 0, new Scalar(0, 0, 255),
+                            2);
 
-            if (element != null) {
-                rect = Imgproc.minAreaRect(new MatOfPoint2f(element.toArray()));
-                rect.points(box);
-                boxCont.clear();
-                boxCont.add(new MatOfPoint(box));
-                Imgproc.drawContours(processFrame, boxCont, 0, new Scalar(0,0,255),
-                                                                                        2);
+                    if (rect.size.width > rect.size.height) {
+                        midPoint = new Point((box[0].x + box[1].x) / 2, (box[0].y + box[1].y) / 2);
+                    } else {
+                        midPoint = new Point((box[1].x + box[2].x) / 2, (box[1].y + box[2].y) / 2);
+                    }
 
-                if (rect.size.width > rect.size.height) {
-                    midPoint = new Point((box[0].x + box[1].x)/2, (box[0].y + box[1].y)/2);
-                } else {
-                    midPoint = new Point((box[1].x + box[2].x)/2, (box[1].y + box[2].y)/2);
+                    Imgproc.circle(processFrame, midPoint, 5, new Scalar(0, 255, 0), -1);
+
                 }
-
-                Imgproc.circle(processFrame, midPoint, 5, new Scalar(0, 255, 0), -1);
-
             }
+            centerTopJunction = (double) midPoint.x;
         }
-        centerTopJunction = (double) midPoint.x;
-
         return processFrame;
     }
 
@@ -100,9 +100,9 @@ public class TrackingJunction extends OpenCvPipeline {
         return centerTopJunction;
     }
 
-    public void setFilter(double[][][] newFilter) {
-        lowFilter = new Scalar(newFilter[0][0]);
-        highFilter = new Scalar(newFilter[1][0]);
+    public void setFilter(double[][] newFilter) {
+        lowFilter = new Scalar(newFilter[0]);
+        highFilter = new Scalar(newFilter[1]);
 
     }
 

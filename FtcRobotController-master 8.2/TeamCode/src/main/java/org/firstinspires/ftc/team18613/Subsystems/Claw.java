@@ -149,13 +149,12 @@ public class Claw extends Subsystem {
 
     public void invertCone() {
 
-        if (!clawOpen && sPitch.getPosition() >= (Constants.Claw.PITCH_UP + .23)) {
-            if (rollPos != Constants.Claw.ROLL_UP) {
-                rollPos = Constants.Claw.ROLL_UP;
-            } else {
-                rollPos = Constants.Claw.ROLL_DOWN;
-            }
+        if (rollPos != Constants.Claw.ROLL_UP) {
+            rollPos = Constants.Claw.ROLL_UP;
+        } else {
+            rollPos = Constants.Claw.ROLL_DOWN;
         }
+
 
     }
 

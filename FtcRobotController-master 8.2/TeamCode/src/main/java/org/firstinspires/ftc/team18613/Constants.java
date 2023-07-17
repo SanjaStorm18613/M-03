@@ -4,10 +4,11 @@ public class Constants {
 
     public static class Pipeline {
 
-        public static final double[][] AUTO_COLOR_LOW = {{50, 50, 30},  {90, 70, 70}}
-                                        ,AUTO_COLOR_UP =  {{80, 180, 360}, {100, 180, 360}}
-                                        ,TELE_COLOR_LOW = {{90, 100, 130}}
-                                        ,TELE_COLOR_UP = {{120, 250, 360}};
+        public static final double[][] AUTO_COLOR_LOW = {{0, 0, 0},  {0, 0, 0}}//{{50, 50, 30},  {90, 70, 70}}
+                                        ,AUTO_COLOR_UP =  {{360, 360, 360},  {360, 360, 360}};//{{80, 180, 360}, {100, 180, 360}};
+
+        public static final double[] TELE_COLOR_LOW = {0, 0, 0}//{{90, 100, 130}}
+                                    ,TELE_COLOR_UP = {360, 360, 360};//{{120, 250, 360}};
 
         public static final int TOLERANCE_AREA = 1000;
 
@@ -37,7 +38,7 @@ public class Constants {
         public static final double NV_0 = 0
                                     ,NV_1 = 1.8
                                     ,NV_2 = 3.1
-                                    ,NV_3 = 3.9
+                                    ,NV_3 = 4.2
 
                                     ,UP_SPEED = 1
                                     ,DOWN_SPEED = .9
