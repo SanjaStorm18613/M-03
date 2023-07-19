@@ -13,7 +13,7 @@ import org.firstinspires.ftc.team18613.Subsystem;
 public class DTMecanum  extends Subsystem {
 
     private final Servo sOdmE, sOdmD;
-    private final DcMotorEx FL, FR, BL, BR, eLeft, eRight;
+    private final DcMotorEx FL, FR, BL, BR, eRight;
     private final Gyro gyro;
     private final ElapsedTime accTime;
     private final Turret turret;
@@ -38,13 +38,13 @@ public class DTMecanum  extends Subsystem {
 
         setDownEncoderServo(false);
 
-        eLeft = opMode.hardwareMap.get(DcMotorEx.class, "encE");
+        //eLeft = opMode.hardwareMap.get(DcMotorEx.class, "encE");
         eRight = opMode.hardwareMap.get(DcMotorEx.class, "encD");
 
-        eLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //eLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         eRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        eLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        //eLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         eRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //Cria motores
@@ -163,7 +163,7 @@ public class DTMecanum  extends Subsystem {
     }
 
     public void resetEnc() {
-        eLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //eLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         eRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

@@ -22,7 +22,7 @@ public class TrackingJunction extends OpenCvPipeline {
     MatOfPoint element;
     Point[] box;
     Point midPoint;
-    double lastWidth, width = 0, centerTopJunction = 0;
+    double lastWidth, width = 0, centerTopJunction = 0, size = 0;
     boolean streamingFilter = false;
 
     public TrackingJunction() {
@@ -45,8 +45,9 @@ public class TrackingJunction extends OpenCvPipeline {
         Imgproc.cvtColor(originalFrame, processFrame, Imgproc.COLOR_BGR2HLS);
         Core.inRange(processFrame, lowFilter, highFilter, processFrame);
 
-        mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3));
+        mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(6,6));
         Imgproc.morphologyEx(processFrame, processFrame, Imgproc.MORPH_OPEN, mat);
+        Imgproc.dilate(processFrame, processFrame, mat);
         Imgproc.GaussianBlur(processFrame, processFrame, new Size(3,3), 10);
 
         contours.clear();
@@ -61,14 +62,20 @@ public class TrackingJunction extends OpenCvPipeline {
             midPoint = new Point(0, 0);
             element = null;
             lastWidth = 0;
+            double height = 0;
+            centerTopJunction = 0;
+
             if (contours.size() > 0) {
                 for (MatOfPoint cont : contours) {
-                    rect = Imgproc.minAreaRect(new MatOfPoint2f(cont.toArray()));
-                    width = Math.min(rect.size.width, rect.size.height);
+                    if (Imgproc.contourArea(cont) > 1000) {
+                        rect = Imgproc.minAreaRect(new MatOfPoint2f(cont.toArray()));
+                        width = Math.min(rect.size.width, rect.size.height);
+                        height = Math.max(rect.size.width, rect.size.height);
 
-                    if (width > 10 && width > lastWidth) {
-                        lastWidth = width;
-                        element = cont;
+                        if ((width > 40 && width > lastWidth) || height > 300) {
+                            lastWidth = width;
+                            element = cont;
+                        }
                     }
 
                 }
@@ -88,16 +95,24 @@ public class TrackingJunction extends OpenCvPipeline {
                     }
 
                     Imgproc.circle(processFrame, midPoint, 5, new Scalar(0, 255, 0), -1);
-
+                    size = rect.size.height * rect.size.width;
+                    centerTopJunction = midPoint.x;
                 }
             }
-            centerTopJunction = (double) midPoint.x;
         }
         return processFrame;
     }
 
     public double getCenterTopJunction() {
         return centerTopJunction;
+    }
+
+    public boolean getDetected() {
+        return element != null;
+    }
+
+    public double getArea(){
+        return 0;
     }
 
     public void setFilter(double[][] newFilter) {

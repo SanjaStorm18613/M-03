@@ -2,6 +2,8 @@ package org.firstinspires.ftc.team18613;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.team18613.Commands.Turret.DisableTracking;
 import org.firstinspires.ftc.team18613.Commands.Turret.EnableTracking;
@@ -20,11 +22,15 @@ public class TeleTracking extends LinearOpMode {
     VisionCtrl webcam;
     TrackingJunction detector;
 
+    DcMotor RSL;
     Turret turret;
     Elevator elevator;
     public static Controller pilot, copilot;
 
     public void runOpMode() {
+
+        RSL = hardwareMap.get(DcMotor.class, "RSL");
+        RSL.setDirection(DcMotorSimple.Direction.FORWARD);
 
         detector = new TrackingJunction();
         webcam = new VisionCtrl(this, hardwareMap, telemetry, "Webcam 2");
@@ -36,11 +42,8 @@ public class TeleTracking extends LinearOpMode {
         pilot = new Controller(gamepad1);
         copilot = new Controller(gamepad2);
 
-        waitForStart();
-        //webcam.stopDetection();
-
         pilot.registerAction(Controller.left_bumper, new EnableTracking(turret),
-                                                                    Controller.Actions.ON_PRESSED);
+                                                                    Controller.Actions.WHILE_PRESSED);
         pilot.registerAction(Controller.left_bumper, new DisableTracking(turret),
                                                                     Controller.Actions.ON_RELEASED);
 
@@ -52,12 +55,27 @@ public class TeleTracking extends LinearOpMode {
                                                                 Controller.Actions.WHILE_PRESSED);
         pilot.registerAction(Controller.left, new Stop(turret), Controller.Actions.ON_RELEASED);
 
+        while (!isStarted() && !isStopRequested()) {
+
+            telemetry.addData("erro", detector.getDetected() ? turret.getTrackingError() : 0);
+            telemetry.addData("velocidade", turret.trackingCorrection());
+            //telemetry.addData("area", detector.getArea());
+            telemetry.update();
+
+        }
+
         while (opModeIsActive()) {
 
             pilot.updateCommands();
             elevator.removeControl();
             turret.periodic();
 
+            telemetry.addData("erro",detector.getDetected() ? turret.getTrackingError() : 0);
+            telemetry.addData("velocidade", turret.trackingCorrection());
+            //telemetry.addData("whidth", detector.getArea());
+            telemetry.update();
+
         }
+        webcam.stopDetection();
     }
 }

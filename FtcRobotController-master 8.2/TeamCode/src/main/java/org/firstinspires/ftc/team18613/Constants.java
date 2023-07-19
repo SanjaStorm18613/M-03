@@ -4,11 +4,11 @@ public class Constants {
 
     public static class Pipeline {
 
-        public static final double[][] AUTO_COLOR_LOW = {{0, 0, 0},  {0, 0, 0}}//{{50, 50, 30},  {90, 70, 70}}
-                                        ,AUTO_COLOR_UP =  {{360, 360, 360},  {360, 360, 360}};//{{80, 180, 360}, {100, 180, 360}};
+        public static final double[][] AUTO_COLOR_LOW = {{50, 50, 30},  {90, 70, 70}}
+                                        ,AUTO_COLOR_UP =  {{80, 180, 360}, {100, 180, 360}};
 
-        public static final double[] TELE_COLOR_LOW = {0, 0, 0}//{{90, 100, 130}}
-                                    ,TELE_COLOR_UP = {360, 360, 360};//{{120, 250, 360}};
+        public static final double[] TELE_COLOR_LOW = {75, 70, 120}
+                                    ,TELE_COLOR_UP = {130, 290, 360};
 
         public static final int TOLERANCE_AREA = 1000;
 
@@ -74,6 +74,9 @@ public class Constants {
 
         public static final double SPEED = 1
                                     ,CHASSIS_OPENING = .15
-                                    ,TRACKING_PROPORTION_CORRECTION = 0.0025;
+                                    ,TRACKING_P_CORRECTION = 0.0035
+                                    ,TRACKING_D_CORRECTION = 0.005
+                                    ,RSL_POWER = 0.25;
+
     }
 }

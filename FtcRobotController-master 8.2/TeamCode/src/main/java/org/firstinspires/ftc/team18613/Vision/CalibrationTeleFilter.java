@@ -32,11 +32,11 @@ public class CalibrationTeleFilter extends LinearOpMode {
         while (!isStarted() && !isStopRequested()) {
 
             if (gamepad1.dpad_right && RIGHT) {
-                if (idValue > 3) idValue = 0;
+                if (idValue > 1) idValue = 0;
                 else idValue++;
             }
             if (gamepad1.dpad_left && LEFT) {
-                if (idValue < 1) idValue = 3;
+                if (idValue < 1) idValue = 2;
                 else idValue--;
             }
 
