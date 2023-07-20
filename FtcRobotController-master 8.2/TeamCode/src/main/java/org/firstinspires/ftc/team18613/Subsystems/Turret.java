@@ -16,7 +16,7 @@ public class Turret extends Subsystem {
     private final Elevator elevator;
     private final OpMode opMode;
     TrackingJunction detector;
-    double lastTrackingCorrection;
+    double lastError, integral = 0;
     ElapsedTime time, blinkTime;
     boolean init = true, blinkStatus = false;
 
@@ -52,6 +52,9 @@ public class Turret extends Subsystem {
     public Turret(OpMode opMode, Elevator elev) {
 
         this.opMode = opMode;
+        RSL = opMode.hardwareMap.get(DcMotor.class, "RSL");
+        RSL.setDirection(DcMotorSimple.Direction.FORWARD);
+
         turret = opMode.hardwareMap.get(DcMotor.class, "Yaw");
 
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -61,17 +64,21 @@ public class Turret extends Subsystem {
         turret.setDirection(DcMotorSimple.Direction.REVERSE);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+
         this.elevator = elev;
+
+        time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        time.reset();
+
+        blinkTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        blinkTime.reset();
 
     }
 
     public void periodic() {
-        double limitProximityPercentage, trackingCorrection, erro;
+        double limitProximityPercentage;
 
-        if (init) {
-            time.reset();
-            init = false;
-        }
+
 
         if (elevator.getTargetPosLowStage()) {
             limitProximityPercentage = (0.15 - Math.abs(getRelativePos())) * 18;
@@ -79,7 +86,12 @@ public class Turret extends Subsystem {
             limitProximityPercentage = 1;
         }
 
-        if (enableTracking && detector.getDetected() && detector.getCenterTopJunction() != 0) {
+        if (enableTracking && detector.getDetected() && detector.getCenterJunction() != 0) {
+            if (init) {
+                time.reset();
+                init = false;
+            }
+
             turret.setPower(trackingCorrection());
 
             if (Math.abs(getTrackingError()) > 20) {
@@ -88,11 +100,13 @@ public class Turret extends Subsystem {
                     blinkStatus = !blinkStatus;
                     blinkTime.reset();
                 }
-                RSL.setPower(blinkStatus ? Constants.Turret.RSL_POWER : 0);
+
+                if (blinkStatus) RSL.setPower(Constants.Turret.RSL_POWER * (1-blinkTime.time()/1000.0));
+                else RSL.setPower(0);
 
             } else {
                 turret.setPower(0);
-                RSL.setPower(Constants.Turret.RSL_POWER);
+                RSL.setPower(Constants.Turret.RSL_POWER * 2);
             }
 
         } else {
@@ -111,8 +125,8 @@ public class Turret extends Subsystem {
             }
 
             RSL.setPower(0);
+            init = true;
         }
-        time.reset();
     }
 
     public void enable(boolean isClockwise) {
@@ -136,11 +150,35 @@ public class Turret extends Subsystem {
     }
 
     public double trackingCorrection() {
-        return Math.signum(getTrackingError()) * Math.pow(Math.abs(getTrackingError())/320.0, 2);
+        double error, correction;
+        error = getTrackingError();
+        correction = Math.signum(error) * Math.pow(Math.abs(error)/320.0, 2);
+
+        if (Math.abs(error) < (lastError/2.) && detector.getCenterJunction() != 0 && detector.getDetected()) {
+            lastError = Math.abs(error);
+            time.reset();
+        }
+
+        integral = Constants.Turret.TRACKING_CORRECTION_I * error * (Math.round(time.time() * 100)/100.);
+
+        if (Math.abs(error) < 80) {
+            correction += integral;
+        } else {
+            time.reset();
+        }
+
+        return correction;
+    }
+
+    public double getIntegral() {
+        return integral;
+    }
+    public double getTime(){
+        return time.time();
     }
 
     public double getTrackingError(){
-        if (detector.getDetected()) return (320 + Constants.Turret.TRACKING_CENTER_OFFSET - detector.getCenterTopJunction());
+        if (detector.getDetected()) return (320 - Constants.Turret.TRACKING_CENTER_OFFSET - detector.getCenterJunction());
         else return 0.0;
     }
 

@@ -22,15 +22,11 @@ public class TeleTracking extends LinearOpMode {
     VisionCtrl webcam;
     TrackingJunction detector;
 
-    DcMotor RSL;
     Turret turret;
     Elevator elevator;
     public static Controller pilot, copilot;
 
     public void runOpMode() {
-
-        RSL = hardwareMap.get(DcMotor.class, "RSL");
-        RSL.setDirection(DcMotorSimple.Direction.FORWARD);
 
         detector = new TrackingJunction();
         webcam = new VisionCtrl(this, hardwareMap, telemetry, "Webcam 2");
@@ -55,12 +51,18 @@ public class TeleTracking extends LinearOpMode {
                                                                 Controller.Actions.WHILE_PRESSED);
         pilot.registerAction(Controller.left, new Stop(turret), Controller.Actions.ON_RELEASED);
 
-        while (!isStarted() && !isStopRequested()) {
+        while (!isStarted()) {
 
             telemetry.addData("erro", detector.getDetected() ? turret.getTrackingError() : 0);
             telemetry.addData("velocidade", turret.trackingCorrection());
-            //telemetry.addData("area", detector.getArea());
+            telemetry.addData("integral", turret.getIntegral());
+            telemetry.addData("time", turret.getTime());
             telemetry.update();
+
+            if (isStopRequested()) {
+                webcam.stopDetection();
+                break;
+            }
 
         }
 
@@ -72,7 +74,8 @@ public class TeleTracking extends LinearOpMode {
 
             telemetry.addData("erro",detector.getDetected() ? turret.getTrackingError() : 0);
             telemetry.addData("velocidade", turret.trackingCorrection());
-            //telemetry.addData("whidth", detector.getArea());
+            telemetry.addData("integral", turret.getIntegral());
+            telemetry.addData("time", turret.getTime());
             telemetry.update();
 
         }

@@ -15,26 +15,30 @@ import java.util.ArrayList;
 
 public class PipelineColors extends OpenCvPipeline {
 
-    Scalar low0, up0, low1, up1, green, red, black;
-    Mat input, mat, mat2, cropOrg;
-    Size s;
-    MatOfPoint objectDetection;
-    ArrayList<ArrayList<MatOfPoint>> elementsArr;
-    ArrayList<MatOfPoint> contourArr, contourObjectDetect;
-    int ObjectDetectionColor = -1;
-    boolean streamingFilter = false;
+    private final Mat input;
+    private final Mat mat2;
+    private Mat cropOrg;
+
+    private final Size s;
+    private MatOfPoint objectDetection;
+    private Scalar low0, up0, low1, up1;
+    private final Scalar green, red;
+
+    private final ArrayList<ArrayList<MatOfPoint>> elementsArr;
+    private final ArrayList<MatOfPoint> contourArr;
+
+    private int ObjectDetectionColor = -1;
+    private boolean streamingFilter = false;
 
 
     public PipelineColors() {
 
-        mat = new Mat();
         mat2 = new Mat();
         input = new Mat();
         cropOrg = new Mat();
 
         green = new Scalar(0, 255, 0);
         red = new Scalar(255, 0, 0);
-        black = new Scalar(0,0,0);
 
         s = new Size(3, 3);
         elementsArr = new ArrayList<>();
@@ -55,7 +59,6 @@ public class PipelineColors extends OpenCvPipeline {
         cropOrg = new Mat(originalInput, new Rect(140,200,320,240));
 
         Imgproc.cvtColor(cropOrg, input, Imgproc.COLOR_BGR2HLS);
-        //Imgproc.cvtColor(originalInput, input, Imgproc.COLOR_BGR2HLS);
 
         elementsArr.clear();
 
@@ -67,7 +70,7 @@ public class PipelineColors extends OpenCvPipeline {
 
             ObjectDetectionColor = -1;
             objectDetection = null;
-            contourObjectDetect = null;
+            ArrayList<MatOfPoint> contourObjectDetect = null;
 
             int i = 0;
             for (ArrayList<MatOfPoint> elms : elementsArr) {
@@ -94,12 +97,9 @@ public class PipelineColors extends OpenCvPipeline {
 
 
                 Imgproc.rectangle(input, supDir, botEsc, green, 1);
-                if (contourObjectDetect != null) {
-                    Imgproc.drawContours(input, contourObjectDetect,
-                            contourObjectDetect.indexOf(objectDetection), red, 2);
-                }
-                Imgproc.putText(input, getColorDetected().toString(), supDir, Imgproc.FONT_HERSHEY_PLAIN,
-                        1, green, 2);
+                Imgproc.drawContours(input, contourObjectDetect, contourObjectDetect.indexOf(objectDetection), red, 2);
+                Imgproc.putText(input, getColorDetected().toString(), supDir, Imgproc.FONT_HERSHEY_PLAIN,1, green, 2);
+
             } else {
                 Imgproc.putText(input, "NOT FOUND/BLACK", center, Imgproc.FONT_HERSHEY_PLAIN,
                         1, green, 2);

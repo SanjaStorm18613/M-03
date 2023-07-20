@@ -15,15 +15,19 @@ import java.util.ArrayList;
 
 public class TrackingJunction extends OpenCvPipeline {
 
-    Mat processFrame, mat;
-    Scalar lowFilter, highFilter;
-    ArrayList<MatOfPoint> contours, boxCont;
-    RotatedRect rect;
-    MatOfPoint element;
-    Point[] box;
-    Point midPoint;
-    double lastWidth, width = 0, centerTopJunction = 0, size = 0;
-    boolean streamingFilter = false;
+    private final Mat processFrame;
+    private Mat mat;
+
+    private Scalar lowFilter, highFilter;
+    private RotatedRect rect;
+    private MatOfPoint element;
+
+    private final Point[] box;
+    private Point midPoint;
+
+    private final ArrayList<MatOfPoint> contours, boxCont;
+    private double centerJunction = 0, lastCenterJunction = 0;
+    private boolean streamingFilter = false, detected = false;
 
     public TrackingJunction() {
 
@@ -45,10 +49,20 @@ public class TrackingJunction extends OpenCvPipeline {
         Imgproc.cvtColor(originalFrame, processFrame, Imgproc.COLOR_BGR2HLS);
         Core.inRange(processFrame, lowFilter, highFilter, processFrame);
 
-        mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(6,6));
+        /*mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(20,20));
+        Imgproc.morphologyEx(processFrame, processFrame, Imgproc.MORPH_OPEN, mat);*/
+
+        mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(10,10));
+        Imgproc.erode(processFrame, processFrame, mat);
+
+        mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(15,15));
         Imgproc.morphologyEx(processFrame, processFrame, Imgproc.MORPH_OPEN, mat);
+
+        mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5,5));
+        Imgproc.morphologyEx(processFrame, processFrame, Imgproc.MORPH_CLOSE, mat);
+
+        mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(20,20));
         Imgproc.dilate(processFrame, processFrame, mat);
-        Imgproc.GaussianBlur(processFrame, processFrame, new Size(3,3), 10);
 
         contours.clear();
         Imgproc.findContours(processFrame, contours, mat, Imgproc.RETR_LIST,
@@ -59,20 +73,18 @@ public class TrackingJunction extends OpenCvPipeline {
 
             originalFrame.copyTo(processFrame);
 
+            double lastWidth = 0, height;
             midPoint = new Point(0, 0);
             element = null;
-            lastWidth = 0;
-            double height = 0;
-            centerTopJunction = 0;
 
             if (contours.size() > 0) {
                 for (MatOfPoint cont : contours) {
                     if (Imgproc.contourArea(cont) > 1000) {
+                        height = Imgproc.boundingRect(cont).height;
                         rect = Imgproc.minAreaRect(new MatOfPoint2f(cont.toArray()));
-                        width = Math.min(rect.size.width, rect.size.height);
-                        height = Math.max(rect.size.width, rect.size.height);
+                        double width = Math.min(rect.size.width, rect.size.height);
 
-                        if ((width > 40 && width > lastWidth) || height > 300) {
+                        if (width > 40 && width > lastWidth && height > 300) {
                             lastWidth = width;
                             element = cont;
                         }
@@ -81,6 +93,7 @@ public class TrackingJunction extends OpenCvPipeline {
                 }
 
                 if (element != null) {
+                    detected = true;
                     rect = Imgproc.minAreaRect(new MatOfPoint2f(element.toArray()));
                     rect.points(box);
                     boxCont.clear();
@@ -95,25 +108,28 @@ public class TrackingJunction extends OpenCvPipeline {
                     }
 
                     Imgproc.circle(processFrame, midPoint, 5, new Scalar(0, 255, 0), -1);
-                    size = rect.size.height * rect.size.width;
-                    centerTopJunction = midPoint.x;
+                    centerJunction = Math.signum(midPoint.x) * (Math.abs(midPoint.x) + Math.abs(lastCenterJunction)) / 2.;
+                    lastCenterJunction = centerJunction;
+                } else {
+                    detected = false;
+                    centerJunction = 0;
                 }
             }
         }
         return processFrame;
     }
 
-    public double getCenterTopJunction() {
-        return centerTopJunction;
+    public double getCenterJunction() {
+        return Math.round(centerJunction * 100)/100.;
     }
 
     public boolean getDetected() {
-        return element != null;
+        return detected;
     }
 
-    public double getArea(){
+    /*public double getArea(){
         return 0;
-    }
+    }*/
 
     public void setFilter(double[][] newFilter) {
         lowFilter = new Scalar(newFilter[0]);

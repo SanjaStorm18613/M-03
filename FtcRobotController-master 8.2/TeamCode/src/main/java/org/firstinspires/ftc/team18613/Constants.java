@@ -7,7 +7,7 @@ public class Constants {
         public static final double[][] AUTO_COLOR_LOW = {{50, 50, 30},  {90, 70, 70}}
                                         ,AUTO_COLOR_UP =  {{80, 180, 360}, {100, 180, 360}};
 
-        public static final double[] TELE_COLOR_LOW = {75, 70, 120}
+        public static final double[] TELE_COLOR_LOW = {75, 140, 40}
                                     ,TELE_COLOR_UP = {130, 290, 360};
 
         public static final int TOLERANCE_AREA = 1000;
@@ -70,13 +70,12 @@ public class Constants {
         public static final int LIMIT = 1760
                                 ,CONVERSION = 400
                                 ,COUNTS_PER_REVOLUTION = 1600
-                                ,TRACKING_CENTER_OFFSET = 0;
+                                ,TRACKING_CENTER_OFFSET = 25;
 
         public static final double SPEED = 1
                                     ,CHASSIS_OPENING = .15
-                                    ,TRACKING_P_CORRECTION = 0.0035
-                                    ,TRACKING_D_CORRECTION = 0.005
-                                    ,RSL_POWER = 0.25;
+                                    ,TRACKING_CORRECTION_I = 0.000005
+                                    ,RSL_POWER = 0.2;
 
     }
 }
