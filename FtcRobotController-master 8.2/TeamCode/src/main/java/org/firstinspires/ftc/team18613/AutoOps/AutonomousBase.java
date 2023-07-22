@@ -9,6 +9,7 @@ import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
 import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
 import org.firstinspires.ftc.team18613.Vision.PipelineColors;
+import org.firstinspires.ftc.team18613.Vision.TrackingJunction;
 import org.firstinspires.ftc.team18613.Vision.VisionCtrl;
 
 import java.util.ArrayList;
@@ -32,8 +33,6 @@ public class AutonomousBase {
         elevator = new Elevator(opMode);
         arm = new Arm(opMode, elevator);
         claw = new Claw(opMode, elevator, arm);
-        turret = new Turret(opMode, elevator);
-        drive = new DTMecanum(opMode, turret);
 
         this.cAuto = cAuto;
         this.opMode = opMode;
@@ -41,20 +40,27 @@ public class AutonomousBase {
 
     public void initiation() {
 
-        PipelineColors detector = new PipelineColors();
-        VisionCtrl webcam = new VisionCtrl(opMode, opMode.hardwareMap, opMode.telemetry,
-                                                                            "Webcam 1");
-        webcam.setPepiline(detector);
+        PipelineColors detectorAuto = new PipelineColors();
+        VisionCtrl webcam = new VisionCtrl(opMode, true);
+        webcam.setPepiline(detectorAuto);
 
         while (!opMode.isStarted() && !opMode.isStopRequested()){
-            colorParkArea = detector.getColorDetected();
+            colorParkArea = detectorAuto.getColorDetected();
             opMode.telemetry.addData("COR DETECTADA", colorParkArea);
             opMode.telemetry.update();
         }
 
-        drive.setDownEncoderServo(false);
 
         webcam.stopDetection();
+
+        TrackingJunction detectorTele = new TrackingJunction();
+        webcam = new VisionCtrl(opMode, false);
+        webcam.setPepiline(detectorTele);
+
+        turret = new Turret(opMode, elevator, detectorTele);
+        drive = new DTMecanum(opMode, turret);
+
+        drive.setDownEncoderServo(false);
 
     }
 
@@ -69,8 +75,7 @@ public class AutonomousBase {
                                                     800, 0.00005, action[0], 0);
 
                 } else if (action[1].equals(cAuto.DR_TURN)) {
-                    drive.setMove(true, false, 0.5, 800,
-                                                                    0.00005, 0, action[0]);
+                    drive.setMove(true, false, 0.5, 800,0.00005, 0, action[0]);
 
                 } else if (action[1].equals(cAuto.EL)) {
                     elevator.setPos(action[0], Constants.Elevator.UP_SPEED);
@@ -85,12 +90,14 @@ public class AutonomousBase {
                 } else if (action[1].equals(cAuto.YW)) {
                     turret.setPos(action[0], .9);
 
+                } else if (action[1].equals(cAuto.YW_DT)) {
+                    //turret.setInitTracker(action[0]);
                 }
             }
         }
 
-        if (steps.size() != 0 && !turret.getBusy() && !claw.getBusy()
-                && !elevator.getBusy() && !drive.getBusy()) {
+        if (steps.size() != 0 && !turret.getBusy() && !claw.getBusy() && !elevator.getBusy()
+                && !drive.getBusy() /*&& !turret.getTrackerBusy()*/) {
             steps.remove(0);
         }
 

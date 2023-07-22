@@ -10,6 +10,7 @@ import org.firstinspires.ftc.team18613.Subsystems.DTMecanum;
 import org.firstinspires.ftc.team18613.Subsystems.Elevator;
 import org.firstinspires.ftc.team18613.Subsystems.Turret;
 import org.firstinspires.ftc.team18613.Vision.PipelineColors;
+import org.firstinspires.ftc.team18613.Vision.TrackingJunction;
 import org.firstinspires.ftc.team18613.Vision.VisionCtrl;
 
 import java.util.ArrayList;
@@ -31,8 +32,7 @@ public class CalibrationAutonomousBase {
     boolean init = false;
     int idxActionSteps = 0;
     boolean A = true, X = true, Y = true;
-    double drAdjust = 0.0, drTurnAdjust = 0.0, elAdjust = 0.0, ywAdjust = 0.0, ptAdjust = 0.0,
-                                                                                        sizeStep;
+    double drAdjust = 0.0, drTurnAdjust = 0.0, elAdjust = 0.0, ywAdjust = 0.0, ptAdjust = 0.0, sizeStep;
 
 
     public CalibrationAutonomousBase(LinearOpMode opMode, ConstantsAuto cAuto) {
@@ -40,8 +40,6 @@ public class CalibrationAutonomousBase {
         elevator = new Elevator(opMode);
         arm = new Arm(opMode, elevator);
         claw = new Claw(opMode, elevator, arm);
-        turret = new Turret(opMode, elevator);
-        drive = new DTMecanum(opMode, turret);
 
         this.cAuto = cAuto;
         this.opMode = opMode;
@@ -50,8 +48,7 @@ public class CalibrationAutonomousBase {
     public void initiation() {
 
         PipelineColors detector = new PipelineColors();
-        VisionCtrl webcam = new VisionCtrl(opMode, opMode.hardwareMap, opMode.telemetry,
-                                                                            "Webcam 1");
+        VisionCtrl webcam = new VisionCtrl(opMode, true);
         webcam.setPepiline(detector);
 
         while (!opMode.isStarted() && !opMode.isStopRequested()){
@@ -60,9 +57,17 @@ public class CalibrationAutonomousBase {
             opMode.telemetry.update();
         }
 
-        drive.setDownEncoderServo(false);
 
         webcam.stopDetection();
+
+        TrackingJunction detectorTele = new TrackingJunction();
+        webcam = new VisionCtrl(opMode, false);
+        webcam.setPepiline(detectorTele);
+
+        turret = new Turret(opMode, elevator, detectorTele);
+        drive = new DTMecanum(opMode, turret);
+
+        drive.setDownEncoderServo(false);
 
     }
 
@@ -101,7 +106,11 @@ public class CalibrationAutonomousBase {
                 turret.setPos(steps.get(0).get(action)[0] + ywAdjust, .9);
                 opMode.telemetry.addData("YAW +", ywAdjust);
 
+            } else if (steps.get(0).get(action)[1].equals(cAuto.YW_DT)) {
+                turret.setInitTracker(steps.get(0).get(action)[0]);
+
             }
+
         }
 
         if (opMode.gamepad1.x && X){
@@ -117,7 +126,7 @@ public class CalibrationAutonomousBase {
             if (idxActionSteps < steps.get(0).size()-1) {
                 idxActionSteps++;
             } else if (steps.size() > 1 && !turret.getBusy() && !claw.getBusy()
-                    && !elevator.getBusy() && !drive.getBusy()) {
+                    && !elevator.getBusy() && !drive.getBusy() && !turret.getTrackerBusy()) {
 
                 steps.remove(0);
                 idxActionSteps = 0;

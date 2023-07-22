@@ -9,7 +9,7 @@ import java.util.Collections;
 
 public class ConstantsAuto {
 
-    public final Double DR = 0.0, DR_TURN = 1.0, EL = 2.0, CL = 3.0, PT = 4.0, YW = 5.0,
+    public final Double DR = 0.0, DR_TURN = 1.0, EL = 2.0, CL = 3.0, PT = 4.0, YW = 5.0, YW_DT = 6.0,
                         DR_FRONT = 0.0, DR_SIDE = 0.1;
 
 
@@ -43,12 +43,19 @@ public class ConstantsAuto {
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {yawTurn, YW}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP
+                /*,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP
                                                                                 + 0.3, PT, 2000.0}))
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {1.0, CL}
                                                 ,new Double[] {Constants.Claw.PITCH_UP, PT, 1000.0}
-                                                ))
+                                                ))*/
+
+                ,new ArrayList<>(Arrays.asList(new Double[] {Constants.Claw.PITCH_UP + 0.3, PT, 4000.0}
+                                                ,new Double[]{4000.0, YW_DT}))
+
+                ,new ArrayList<>(Arrays.asList(new Double[] {1.0, CL}
+                        ,new Double[] {Constants.Claw.PITCH_UP, PT, 1000.0}
+                ))
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {0.0, YW}
                                                 ,new Double[] {Constants.Claw.PITCH_LOWERED, PT,
@@ -60,11 +67,9 @@ public class ConstantsAuto {
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {parkArea, DR, DR_SIDE}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {
-                                                    Constants.Claw.PITCH_HORIZONTAL, PT, 1000.0}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_HORIZONTAL, PT, parkArea == 0. ? 0. : 3000.0}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Elevator.NV_0,
-                                                                                            EL}))
+                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Elevator.NV_0, EL}))
 
         ));
     }

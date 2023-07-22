@@ -22,7 +22,7 @@ public class CalibrationTeleFilter extends LinearOpMode {
     public void runOpMode() {
         detector = new TrackingJunction();
 
-        webcam = new VisionCtrl(this, hardwareMap, telemetry, "Webcam 2");
+        webcam = new VisionCtrl(this, false);
         webcam.setPepiline(detector);
 
         detector.setStreaming(true);
@@ -91,6 +91,7 @@ public class CalibrationTeleFilter extends LinearOpMode {
                 }
 
             telemetry.update();
+            sleep(1000);
         }
     }
 }

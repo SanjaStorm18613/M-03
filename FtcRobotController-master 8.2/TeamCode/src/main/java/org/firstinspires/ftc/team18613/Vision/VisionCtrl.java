@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.FocusControl;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -14,27 +15,23 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 public class VisionCtrl {
 
-    HardwareMap hardwareMap;
-    OpenCvWebcam webcam;
-    //OpenCvCamera webcam;
-    LinearOpMode opMode;
-    Telemetry telemetry;
+    private final OpenCvWebcam webcam;
+    private final LinearOpMode opMode;
 
-    public VisionCtrl(LinearOpMode opM, HardwareMap hw, Telemetry t, String webcamName){
+    public VisionCtrl(LinearOpMode opM, boolean webcamAuto){
 
+        //OpenCvCamera webcam;
         opMode = opM;
-        telemetry = t;
-        hardwareMap = hw;
 
-        int cameraMonitorViewId = opMode.hardwareMap
+        int cameraMonitorViewId = opM.hardwareMap
                                 .appContext .getResources()
                                 .getIdentifier("cameraMonitorViewId"
                                                 , "id"
-                                                , hardwareMap.appContext.getPackageName());
+                                                , opMode.hardwareMap.appContext.getPackageName());
 
         webcam = OpenCvCameraFactory.getInstance().createWebcam(
-                                        hardwareMap.get
-                                        (WebcamName.class, webcamName)
+                                        opMode.hardwareMap.get
+                                        (WebcamName.class, webcamAuto ? "Webcam 1" : "Webcam 2")
                                         , cameraMonitorViewId);
  //*/
         //webcam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
@@ -51,17 +48,12 @@ public class VisionCtrl {
             @Override
             public void onOpened() {
                 webcam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
-                /*
-                ExposureControl ec = webcam.getExposureControl();
-                ec.setMode(ExposureControl.Mode.Manual);
-                ec.setExposure(1, TimeUnit.MILLISECONDS);
 
-                 */
             }
 
             @Override
             public void onError(int errorCode) {
-                telemetry.addData("Error while opening camera: ", errorCode);
+                opMode.telemetry.addData("Error while opening camera: ", errorCode);
             }
         });
 
@@ -76,7 +68,12 @@ public class VisionCtrl {
     }
 
     public void stopDetection(){
+        webcam.pauseViewport();
         webcam.stopStreaming();
+        webcam.closeCameraDevice();
 
+    }
+    public void stopViewport() {
+        webcam.pauseViewport();
     }
 }

@@ -2,8 +2,6 @@ package org.firstinspires.ftc.team18613;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.team18613.Commands.Turret.DisableTracking;
 import org.firstinspires.ftc.team18613.Commands.Turret.EnableTracking;
@@ -29,7 +27,7 @@ public class TeleTracking extends LinearOpMode {
     public void runOpMode() {
 
         detector = new TrackingJunction();
-        webcam = new VisionCtrl(this, hardwareMap, telemetry, "Webcam 2");
+        webcam = new VisionCtrl(this, false);
         webcam.setPepiline(detector);
 
         elevator = new Elevator(this);
@@ -51,20 +49,16 @@ public class TeleTracking extends LinearOpMode {
                                                                 Controller.Actions.WHILE_PRESSED);
         pilot.registerAction(Controller.left, new Stop(turret), Controller.Actions.ON_RELEASED);
 
-        while (!isStarted()) {
+        while (!isStarted() && !isStopRequested()) {
 
             telemetry.addData("erro", detector.getDetected() ? turret.getTrackingError() : 0);
             telemetry.addData("velocidade", turret.trackingCorrection());
             telemetry.addData("integral", turret.getIntegral());
-            telemetry.addData("time", turret.getTime());
+            telemetry.addData("time", turret.getTimeIntegral());
             telemetry.update();
 
-            if (isStopRequested()) {
-                webcam.stopDetection();
-                break;
-            }
-
         }
+        webcam.stopViewport();
 
         while (opModeIsActive()) {
 
@@ -75,7 +69,7 @@ public class TeleTracking extends LinearOpMode {
             telemetry.addData("erro",detector.getDetected() ? turret.getTrackingError() : 0);
             telemetry.addData("velocidade", turret.trackingCorrection());
             telemetry.addData("integral", turret.getIntegral());
-            telemetry.addData("time", turret.getTime());
+            telemetry.addData("time", turret.getTimeIntegral());
             telemetry.update();
 
         }

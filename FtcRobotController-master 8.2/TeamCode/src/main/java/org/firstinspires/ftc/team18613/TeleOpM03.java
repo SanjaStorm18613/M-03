@@ -2,9 +2,7 @@ package org.firstinspires.ftc.team18613;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.team18613.Commands.Claw.AngulationDrop;
 import org.firstinspires.ftc.team18613.Commands.Claw.Drop;
 import org.firstinspires.ftc.team18613.Commands.Claw.HorizontalColect;
@@ -53,7 +51,7 @@ public class TeleOpM03 extends LinearOpMode {
         copilot = new Controller(gamepad2);
 
         detector = new TrackingJunction();
-        webcam = new VisionCtrl(this, hardwareMap, telemetry, "Webcam 2");
+        webcam = new VisionCtrl(this, false);
         webcam.setPepiline(detector);
 
         elevator = new Elevator(this);
@@ -62,19 +60,15 @@ public class TeleOpM03 extends LinearOpMode {
         turret = new Turret(this, elevator, detector);
         drive = new DTMecanum (this, turret);
 
-        while (!isStarted()) {
+        while (!isStarted() && !isStopRequested()) {
 
             telemetry.addData("erro", detector.getDetected() ? turret.getTrackingError() : 0);
             telemetry.addData("velocidade", turret.trackingCorrection());
             telemetry.addData("integral", turret.getIntegral());
-            telemetry.addData("time", turret.getTime());
+            telemetry.addData("time", turret.getTimeIntegral());
             telemetry.update();
-
-            if (isStopRequested()) {
-                webcam.stopDetection();
-                break;
-            }
         }
+        webcam.stopViewport();
 
         //TURRET
         copilot.registerAction(Controller.right, new TurnT(turret, false), Controller.Actions.WHILE_PRESSED);

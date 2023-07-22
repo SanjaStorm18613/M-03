@@ -23,7 +23,7 @@ public class CalibrationAutoFilter extends LinearOpMode {
     public void runOpMode() {
         detector = new PipelineColors();
 
-        webcam = new VisionCtrl(this, hardwareMap, telemetry, "Webcam 1");
+        webcam = new VisionCtrl(this, true);
         webcam.setPepiline(detector);
 
         detector.setStreaming(true);
@@ -100,6 +100,7 @@ public class CalibrationAutoFilter extends LinearOpMode {
                 }
 
             telemetry.update();
+            sleep(1000);
         }
     }
 }

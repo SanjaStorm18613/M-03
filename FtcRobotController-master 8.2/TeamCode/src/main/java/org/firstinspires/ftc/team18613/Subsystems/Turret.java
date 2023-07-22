@@ -16,9 +16,9 @@ public class Turret extends Subsystem {
     private final Elevator elevator;
     private final OpMode opMode;
     TrackingJunction detector;
-    double lastError, integral = 0;
-    ElapsedTime time, blinkTime;
-    boolean init = true, blinkStatus = false;
+    double lastError = 0, integral = 0;
+    ElapsedTime timeIntegral, blinkTime, timeLimitDetection;
+    boolean init = true, blinkStatus = false, trackerIsBusy = true;
 
     private boolean enable = false, isClockwise = true, enableTracking = false;
 
@@ -32,7 +32,6 @@ public class Turret extends Subsystem {
 
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        turret.setTargetPosition(5);
 
         turret.setDirection(DcMotorSimple.Direction.REVERSE);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -41,11 +40,15 @@ public class Turret extends Subsystem {
         this.elevator = elev;
 
         this.detector = detector;
-        time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        time.reset();
+
+        timeIntegral = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        timeIntegral.reset();
 
         blinkTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         blinkTime.reset();
+
+        timeLimitDetection = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        timeLimitDetection.reset();
 
     }
 
@@ -59,7 +62,6 @@ public class Turret extends Subsystem {
 
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        turret.setTargetPosition(5);
 
         turret.setDirection(DcMotorSimple.Direction.REVERSE);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -67,8 +69,8 @@ public class Turret extends Subsystem {
 
         this.elevator = elev;
 
-        time = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-        time.reset();
+        timeIntegral = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        timeIntegral.reset();
 
         blinkTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         blinkTime.reset();
@@ -76,9 +78,8 @@ public class Turret extends Subsystem {
     }
 
     public void periodic() {
+
         double limitProximityPercentage;
-
-
 
         if (elevator.getTargetPosLowStage()) {
             limitProximityPercentage = (0.15 - Math.abs(getRelativePos())) * 18;
@@ -88,13 +89,13 @@ public class Turret extends Subsystem {
 
         if (enableTracking && detector.getDetected() && detector.getCenterJunction() != 0) {
             if (init) {
-                time.reset();
+                timeIntegral.reset();
                 init = false;
             }
 
             turret.setPower(trackingCorrection());
 
-            if (Math.abs(getTrackingError()) > 20) {
+            if (Math.abs(getTrackingError()) > Constants.Turret.TRACKING_ERROR_TOLERANCE) {
 
                 if (blinkTime.time() > 1000) {
                     blinkStatus = !blinkStatus;
@@ -156,15 +157,15 @@ public class Turret extends Subsystem {
 
         if (Math.abs(error) < (lastError/2.) && detector.getCenterJunction() != 0 && detector.getDetected()) {
             lastError = Math.abs(error);
-            time.reset();
+            timeIntegral.reset();
         }
 
-        integral = Constants.Turret.TRACKING_CORRECTION_I * error * (Math.round(time.time() * 100)/100.);
+        integral = Constants.Turret.TRACKING_CORRECTION_I * error * (Math.round(timeIntegral.time()));
 
         if (Math.abs(error) < 80) {
             correction += integral;
         } else {
-            time.reset();
+            timeIntegral.reset();
         }
 
         return correction;
@@ -173,8 +174,8 @@ public class Turret extends Subsystem {
     public double getIntegral() {
         return integral;
     }
-    public double getTime(){
-        return time.time();
+    public double getTimeIntegral(){
+        return timeIntegral.time();
     }
 
     public double getTrackingError(){
@@ -209,9 +210,52 @@ public class Turret extends Subsystem {
     }
 
     public void setPos(double pos, double vel) {
-        turret.setTargetPosition((int) (pos * Constants.Turret.CONVERSION));
-        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turret.setPower(vel);
+        /*turret.setTargetPosition((int) (pos * Constants.Turret.CONVERSION));
+        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
+        turret.setPower(Math.min((int) (pos * Constants.Turret.CONVERSION - turret.getCurrentPosition()), 1) * 0.0083 * vel);
+    }
+
+    public void setInitTracker(double limitTime) {
+
+        if (init) timeLimitDetection.reset();
+
+        if (detector.getDetected() && detector.getCenterJunction() != 0
+                && Math.abs(getTrackingError()) < Constants.Turret.TRACKING_ERROR_TOLERANCE
+                && timeLimitDetection.time() <= limitTime) {
+
+            trackerIsBusy = true;
+
+            if (init) {
+                timeIntegral.reset();
+                init = false;
+            }
+
+            turret.setPower(trackingCorrection());
+
+            if (Math.abs(getTrackingError()) > Constants.Turret.TRACKING_ERROR_TOLERANCE) {
+
+                if (blinkTime.time() > 1000) {
+                    blinkStatus = !blinkStatus;
+                    blinkTime.reset();
+                }
+
+                if (blinkStatus)
+                    RSL.setPower(Constants.Turret.RSL_POWER * (1 - blinkTime.time() / 1000.0));
+                else RSL.setPower(0);
+
+            } else {
+                turret.setPower(0);
+                RSL.setPower(Constants.Turret.RSL_POWER * 2);
+            }
+
+        } else {
+
+            turret.setPower(0);
+            RSL.setPower(0);
+            init = true;
+            trackerIsBusy = false;
+
+        }
     }
 
     private boolean getNotLimit(boolean isClockwise) {
@@ -224,7 +268,13 @@ public class Turret extends Subsystem {
 
     }
 
-    public boolean getBusy() { return turret.isBusy(); }
+    public boolean getBusy() {
+        return turret.isBusy();
+    }
+
+    public boolean getTrackerBusy() {
+        return trackerIsBusy;
+    }
 
     public boolean getForward() {
         return !(Math.abs(turret.getCurrentPosition()) > Constants.Turret.COUNTS_PER_REVOLUTION / 4.
