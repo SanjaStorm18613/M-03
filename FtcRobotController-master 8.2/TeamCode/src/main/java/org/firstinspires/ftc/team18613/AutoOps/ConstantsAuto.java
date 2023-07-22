@@ -10,7 +10,7 @@ import java.util.Collections;
 public class ConstantsAuto {
 
     public final Double DR = 0.0, DR_TURN = 1.0, EL = 2.0, CL = 3.0, PT = 4.0, YW = 5.0, YW_DT = 6.0,
-                        DR_FRONT = 0.0, DR_SIDE = 0.1;
+                        DR_FRONT = 0.1, DR_SIDE = 0.2;
 
 
     public ConstantsAuto(){}

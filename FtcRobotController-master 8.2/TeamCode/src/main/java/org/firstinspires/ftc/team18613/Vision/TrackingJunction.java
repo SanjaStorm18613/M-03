@@ -85,10 +85,11 @@ public class TrackingJunction extends OpenCvPipeline {
                     if (Imgproc.contourArea(cont) > 1000) {
                         height = Imgproc.boundingRect(cont).height;
                         rotatedRect = Imgproc.minAreaRect(new MatOfPoint2f(cont.toArray()));
-                        double width = Math.min(rotatedRect.size.width, rotatedRect.size.height);
+                        double realWidth = Math.min(rotatedRect.size.width, rotatedRect.size.height);
+                        double realHeight = Math.max(rotatedRect.size.width, rotatedRect.size.height);
 
-                        if (width > 40 && width > lastWidth && height > 300) {
-                            lastWidth = width;
+                        if (realWidth > 40 && realWidth > lastWidth && height > 250 && realWidth * 2 <= realHeight) {
+                            lastWidth = realWidth;
                             element = cont;
                         }
                     }

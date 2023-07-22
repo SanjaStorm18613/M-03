@@ -91,15 +91,18 @@ public class AutonomousBase {
                     turret.setPos(action[0], .9);
 
                 } else if (action[1].equals(cAuto.YW_DT)) {
-                    //turret.setInitTracker(action[0]);
+                    turret.setInitTracker(action[0]);
                 }
             }
         }
 
         if (steps.size() != 0 && !turret.getBusy() && !claw.getBusy() && !elevator.getBusy()
-                && !drive.getBusy() /*&& !turret.getTrackerBusy()*/) {
+                && !drive.getBusy() && !turret.getTrackerBusy()) {
             steps.remove(0);
         }
+
+        opMode.telemetry.addData("det", turret.getTrackerBusy());
+        opMode.telemetry.update();
 
         if (init) {
             arm.periodic();

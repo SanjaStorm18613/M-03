@@ -74,7 +74,7 @@ public class Constants {
 
         public static final double SPEED = 1
                                     ,CHASSIS_OPENING = .15
-                                    ,TRACKING_CORRECTION_I = 0.000005
+                                    ,TRACKING_CORRECTION_I = 0.000006
                                     ,RSL_POWER = 0.2
                                     ,TRACKING_ERROR_TOLERANCE = 20;
 

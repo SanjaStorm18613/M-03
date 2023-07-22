@@ -16,9 +16,9 @@ public class Turret extends Subsystem {
     private final Elevator elevator;
     private final OpMode opMode;
     TrackingJunction detector;
-    double lastError = 0, integral = 0;
+    double lastError = 0, integral = 0, erro = 0;
     ElapsedTime timeIntegral, blinkTime, timeLimitDetection;
-    boolean init = true, blinkStatus = false, trackerIsBusy = true;
+    boolean init = true, blinkStatus = false, trackerIsBusy = false;
 
     private boolean enable = false, isClockwise = true, enableTracking = false;
 
@@ -210,17 +210,21 @@ public class Turret extends Subsystem {
     }
 
     public void setPos(double pos, double vel) {
-        /*turret.setTargetPosition((int) (pos * Constants.Turret.CONVERSION));
-        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
-        turret.setPower(Math.min((int) (pos * Constants.Turret.CONVERSION - turret.getCurrentPosition()), 1) * 0.0083 * vel);
+        /*turret.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turret.setTargetPosition((int) (pos * Constants.Turret.CONVERSION));
+        turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turret.setPower(vel);*/
+        erro = pos * Constants.Turret.CONVERSION - turret.getCurrentPosition();
+        turret.setPower(Math.signum(erro) * Math.min(Math.abs(erro * 0.0083), vel));
     }
 
     public void setInitTracker(double limitTime) {
+        //turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         if (init) timeLimitDetection.reset();
 
         if (detector.getDetected() && detector.getCenterJunction() != 0
-                && Math.abs(getTrackingError()) < Constants.Turret.TRACKING_ERROR_TOLERANCE
+                && Math.abs(getTrackingError()) > Constants.Turret.TRACKING_ERROR_TOLERANCE
                 && timeLimitDetection.time() <= limitTime) {
 
             trackerIsBusy = true;
@@ -269,7 +273,7 @@ public class Turret extends Subsystem {
     }
 
     public boolean getBusy() {
-        return turret.isBusy();
+        return Math.abs(erro) > 10;
     }
 
     public boolean getTrackerBusy() {
