@@ -228,7 +228,7 @@ public class Claw extends Subsystem {
         }
         pAutoPos = pos;
 
-        if (time.time() > t * 0.8) {
+        if (time.time() >= t * 0.8) {
             autoPitchPos = pos;
 
         }

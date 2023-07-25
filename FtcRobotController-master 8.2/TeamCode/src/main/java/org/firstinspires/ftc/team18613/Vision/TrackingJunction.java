@@ -88,7 +88,7 @@ public class TrackingJunction extends OpenCvPipeline {
                         double realWidth = Math.min(rotatedRect.size.width, rotatedRect.size.height);
                         double realHeight = Math.max(rotatedRect.size.width, rotatedRect.size.height);
 
-                        if (realWidth > 40 && realWidth > lastWidth && height > 250 && realWidth * 2 <= realHeight) {
+                        if (realWidth > 40 && realWidth > lastWidth && height > 300 && realWidth * 2 <= realHeight) {
                             lastWidth = realWidth;
                             element = cont;
                         }
@@ -125,7 +125,7 @@ public class TrackingJunction extends OpenCvPipeline {
     }
 
     public double getCenterJunction() {
-        return Math.round(centerJunction);
+        return centerJunction;
     }
 
     public boolean getDetected() {

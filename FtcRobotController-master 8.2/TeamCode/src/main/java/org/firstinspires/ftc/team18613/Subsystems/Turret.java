@@ -16,9 +16,9 @@ public class Turret extends Subsystem {
     private final Elevator elevator;
     private final OpMode opMode;
     TrackingJunction detector;
-    double lastError = 0, integral = 0, erro = 0;
+    double lastError = 0, integral = 0, erro = 0, autoPos = 0, autoVel = 0;
     ElapsedTime timeIntegral, blinkTime, timeLimitDetection;
-    boolean init = true, blinkStatus = false, trackerIsBusy = false;
+    boolean init = true, blinkStatus = false, trackerIsBusy = false, useSetPos = false;
 
     private boolean enable = false, isClockwise = true, enableTracking = false;
 
@@ -153,14 +153,14 @@ public class Turret extends Subsystem {
     public double trackingCorrection() {
         double error, correction;
         error = getTrackingError();
-        correction = Math.signum(error) * Math.pow(Math.abs(error)/320.0, 2);
+        correction = Math.signum(error) * Math.pow(Math.abs(error)/300.0, 2);
 
         if (Math.abs(error) < (lastError/2.) && detector.getCenterJunction() != 0 && detector.getDetected()) {
             lastError = Math.abs(error);
             timeIntegral.reset();
         }
 
-        integral = Constants.Turret.TRACKING_CORRECTION_I * error * (Math.round(timeIntegral.time()));
+        integral = Constants.Turret.TRACKING_CORRECTION_I * error * (timeIntegral.time());
 
         if (Math.abs(error) < 80) {
             correction += integral;
@@ -214,19 +214,34 @@ public class Turret extends Subsystem {
         turret.setTargetPosition((int) (pos * Constants.Turret.CONVERSION));
         turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turret.setPower(vel);*/
-        erro = pos * Constants.Turret.CONVERSION - turret.getCurrentPosition();
-        turret.setPower(Math.signum(erro) * Math.min(Math.abs(erro * 0.0083), vel));
+
+        autoPos = pos;
+        autoVel = vel;
+        useSetPos = true;
+    }
+
+    public void autoPeriodic() {
+        if (useSetPos) {
+            erro = autoPos * Constants.Turret.CONVERSION - turret.getCurrentPosition();
+            turret.setPower(Math.signum(erro) * Math.min(Math.abs(erro * 0.01), autoVel));
+        } else {
+            erro = 0;
+        }
+
     }
 
     public void setInitTracker(double limitTime) {
         //turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        useSetPos = false;
+        double trackingError = getTrackingError();
 
         if (init) timeLimitDetection.reset();
 
         if (detector.getDetected() && detector.getCenterJunction() != 0
-                && Math.abs(getTrackingError()) > Constants.Turret.TRACKING_ERROR_TOLERANCE
+                && Math.abs(trackingError) > Constants.Turret.TRACKING_ERROR_TOLERANCE
                 && timeLimitDetection.time() <= limitTime) {
 
+            erro = 0;
             trackerIsBusy = true;
 
             if (init) {
@@ -236,7 +251,7 @@ public class Turret extends Subsystem {
 
             turret.setPower(trackingCorrection());
 
-            if (Math.abs(getTrackingError()) > Constants.Turret.TRACKING_ERROR_TOLERANCE) {
+            if (Math.abs(trackingError) > Constants.Turret.TRACKING_ERROR_TOLERANCE) {
 
                 if (blinkTime.time() > 1000) {
                     blinkStatus = !blinkStatus;
@@ -249,7 +264,13 @@ public class Turret extends Subsystem {
 
             } else {
                 turret.setPower(0);
-                RSL.setPower(Constants.Turret.RSL_POWER * 2);
+                if (Math.abs(trackingError) > Constants.Turret.TRACKING_ERROR_TOLERANCE) {
+                    RSL.setPower(0);
+
+                } else {
+                    RSL.setPower(Constants.Turret.RSL_POWER * 2);
+
+                }
             }
 
         } else {
@@ -274,6 +295,7 @@ public class Turret extends Subsystem {
 
     public boolean getBusy() {
         return Math.abs(erro) > 10;
+
     }
 
     public boolean getTrackerBusy() {

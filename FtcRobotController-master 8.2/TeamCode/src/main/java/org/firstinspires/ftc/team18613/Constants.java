@@ -29,7 +29,7 @@ public class Constants {
     public static class Braco {
 
         public static final double MIN_POS = .2
-                                    ,MAX_POS = .72;
+                                    ,MAX_POS = .71;
 
     }
 
@@ -38,7 +38,7 @@ public class Constants {
         public static final double NV_0 = 0
                                     ,NV_1 = 1.8
                                     ,NV_2 = 3.1
-                                    ,NV_3 = 4.2
+                                    ,NV_3 = 3.75
 
                                     ,UP_SPEED = 1
                                     ,DOWN_SPEED = .9
@@ -74,7 +74,7 @@ public class Constants {
 
         public static final double SPEED = 1
                                     ,CHASSIS_OPENING = .15
-                                    ,TRACKING_CORRECTION_I = 0.000006
+                                    ,TRACKING_CORRECTION_I = 0.000004
                                     ,RSL_POWER = 0.2
                                     ,TRACKING_ERROR_TOLERANCE = 20;
 
