@@ -19,11 +19,11 @@ public class ConstantsAuto {
     public ArrayList<ArrayList<Double[]>> getAutoHeight(boolean leftInitialPos,
                                                     PipelineColors.DetectionColor colorParkArea){
 
-        double parkArea = 65.0, yawTurn = 0.41, drStep1 = 140.0;
+        double parkArea = 65.0, yawTurn = 0.41, drStep1 = 143.0;
 
         if (leftInitialPos) {
-            yawTurn = -0.42;
-            drStep1 = 132.0;
+            yawTurn = -0.40;
+            drStep1 = 140.0;
 
         }
 
@@ -43,13 +43,6 @@ public class ConstantsAuto {
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {yawTurn, YW}))
                 //------------------------HEIGHT
-
-                /*,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP
-                                                                                + 0.3, PT, 2000.0}))
-
-                ,new ArrayList<>(Arrays.asList(new Double[] {1.0, CL}
-                                                ,new Double[] {Constants.Claw.PITCH_UP, PT, 1000.0}
-                                                ))*/
 
                 ,new ArrayList<>(Arrays.asList(new Double[]{4000.0, YW_DT}
                                                 ,new Double[] {Constants.Claw.PITCH_UP + 0.3, PT, 4000.0}))
@@ -79,11 +72,11 @@ public class ConstantsAuto {
     public ArrayList<ArrayList<Double[]>> getAutoMid(boolean leftInitialPos,
                                                     PipelineColors.DetectionColor colorParkArea){
 
-        double parkArea = 65.0, yawTurn = 0.40, drStep1 = 63.0;
+        double parkArea = 65.0, yawTurn = 0.40, drStep1 = 67.0;
 
         if (leftInitialPos) {
             yawTurn = -0.40;
-            drStep1 = 64.0;
+            drStep1 = 65.0;
 
         }
 
@@ -102,7 +95,8 @@ public class ConstantsAuto {
 
                 ,new ArrayList<>(Collections.singletonList(new Double[] {yawTurn, YW}))
 
-                ,new ArrayList<>(Collections.singletonList(new Double[] {Constants.Claw.PITCH_UP + 0.3, PT, 2000.0}))
+                ,new ArrayList<>(Arrays.asList(new Double[]{4000.0, YW_DT}
+                                                ,new Double[] {Constants.Claw.PITCH_UP + 0.3, PT, 4000.0}))
                 //------------------------MID
 
                 ,new ArrayList<>(Arrays.asList(new Double[] {1.0, CL}

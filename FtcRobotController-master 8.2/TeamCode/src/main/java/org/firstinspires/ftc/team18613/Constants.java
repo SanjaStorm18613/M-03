@@ -7,8 +7,8 @@ public class Constants {
         public static final double[][] AUTO_COLOR_LOW = {{50, 50, 30},  {90, 70, 70}}
                                         ,AUTO_COLOR_UP =  {{80, 180, 360}, {100, 180, 360}};
 
-        public static final double[] TELE_COLOR_LOW = {75, 90, 40}
-                                    ,TELE_COLOR_UP = {130, 290, 360};
+        public static final double[] TELE_COLOR_LOW = {75, 40, 40}
+                                    ,TELE_COLOR_UP = {130, 230, 360};
 
         public static final int TOLERANCE_AREA = 1000;
 
@@ -20,8 +20,8 @@ public class Constants {
         public static final double SPEED = .7
                                     ,ACCELERATION = 1500 //Tempo para atingir setpoint de velocidade
                                     ,PRECISION = 0.25
-                                    ,TOLERANCE_DISTANCE = 500
-                                    ,TOLERANCE_ANGLE = 3
+                                    ,TOLERANCE_DISTANCE = 800
+                                    ,TOLERANCE_ANGLE = 3.5
                                     ,CONVERSION_2_EXTERNAL = 725
                                     ,CONVERSION_2_INTERNAL = 30;
     }
@@ -38,7 +38,7 @@ public class Constants {
         public static final double NV_0 = 0
                                     ,NV_1 = 1.8
                                     ,NV_2 = 3.1
-                                    ,NV_3 = 3.75
+                                    ,NV_3 = 3.74
 
                                     ,UP_SPEED = 1
                                     ,DOWN_SPEED = .9
@@ -70,13 +70,13 @@ public class Constants {
         public static final int LIMIT = 1760
                                 ,CONVERSION = 400
                                 ,COUNTS_PER_REVOLUTION = 1600
-                                ,TRACKING_CENTER_OFFSET = 25;
+                                ,TRACKING_CENTER_OFFSET = 12;
 
         public static final double SPEED = 1
                                     ,CHASSIS_OPENING = .15
-                                    ,TRACKING_CORRECTION_I = 0.000004
+                                    ,TRACKING_CORRECTION_I = 0.000008
                                     ,RSL_POWER = 0.2
-                                    ,TRACKING_ERROR_TOLERANCE = 20;
+                                    ,TRACKING_ERROR_TOLERANCE = 13;
 
     }
 }

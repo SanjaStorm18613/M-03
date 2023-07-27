@@ -56,7 +56,7 @@ public class PipelineColors extends OpenCvPipeline {
     public Mat processFrame(Mat originalInput) {
         Point center = new Point(100,160);
 
-        cropOrg = new Mat(originalInput, new Rect(140,200,320,240));
+        cropOrg = new Mat(originalInput, new Rect(70,100,160,120));
 
         Imgproc.cvtColor(cropOrg, input, Imgproc.COLOR_BGR2HLS);
 

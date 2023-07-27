@@ -69,6 +69,9 @@ public class CalibrationAutonomousBase {
 
         drive.setDownEncoderServo(false);
 
+        webcam.stopViewport();
+
+
     }
 
     public void execution() {
@@ -80,13 +83,13 @@ public class CalibrationAutonomousBase {
 
                 if (steps.get(0).get(action)[1].equals(cAuto.DR)) {
                     drive.setMove(false, steps.get(0).get(action)[2].equals(cAuto.DR_SIDE),
-                            0.5, 800, 0.00005, steps.get(0).get(action)[0], 0);
+                            0.5, 800, 0.00004, steps.get(0).get(action)[0],0.02,  0);
                     drive.setValCalibration(drAdjust);
                     opMode.telemetry.addData("DRIVE +", drAdjust);
 
                 } else if (steps.get(0).get(action)[1].equals(cAuto.DR_TURN)) {
                     drive.setMove(true, false, 0.5, 800,
-                            0.00005, 0, steps.get(0).get(action)[0] + drTurnAdjust);
+                            0.00004, 0,0.02,  steps.get(0).get(action)[0] + drTurnAdjust);
                     opMode.telemetry.addData("DRIVE TURN +", drTurnAdjust);
 
                 } else if (steps.get(0).get(action)[1].equals(cAuto.EL)) {
@@ -113,11 +116,11 @@ public class CalibrationAutonomousBase {
                 }
             }
 
-            opMode.telemetry.addData("turret", !turret.getBusy());
-            opMode.telemetry.addData("claw", !claw.getBusy());
-            opMode.telemetry.addData("elevator", !elevator.getBusy());
-            opMode.telemetry.addData("drive", !drive.getBusy());
-            opMode.telemetry.addData("det", !turret.getTrackerBusy());
+            opMode.telemetry.addData("detec", turret.getTrackerBusy());
+            opMode.telemetry.addData("drive", drive.getBusy());
+            opMode.telemetry.addData("elevator", elevator.getBusy());
+            opMode.telemetry.addData("claw", claw.getBusy());
+            opMode.telemetry.addData("turret", turret.getBusy());
             opMode.telemetry.update();
 
             if ((opMode.gamepad1.a && A) || (opMode.gamepad1.y && Y)){
@@ -181,8 +184,8 @@ public class CalibrationAutonomousBase {
         if (init) {
             arm.periodic();
             claw.autoPeriodic();
-            drive.autoPeriodic();
             turret.autoPeriodic();
+            drive.autoPeriodic();
 
         }
 

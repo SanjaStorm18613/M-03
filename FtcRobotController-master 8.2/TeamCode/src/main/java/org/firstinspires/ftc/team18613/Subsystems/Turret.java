@@ -16,8 +16,9 @@ public class Turret extends Subsystem {
     private final Elevator elevator;
     private final OpMode opMode;
     TrackingJunction detector;
-    double lastError = 0, integral = 0, erro = 0, autoPos = 0, autoVel = 0;
-    ElapsedTime timeIntegral, blinkTime, timeLimitDetection;
+    double lastError = 0, integral = 0, erro = 0, autoPos = 0, autoVel = 0, lastTrackingError = 0, sumPositions = 0;
+    int cont = 0;
+    ElapsedTime timeIntegral, blinkTime, timeLimitDetection, timeTrackingError;
     boolean init = true, blinkStatus = false, trackerIsBusy = false, useSetPos = false;
 
     private boolean enable = false, isClockwise = true, enableTracking = false;
@@ -49,6 +50,9 @@ public class Turret extends Subsystem {
 
         timeLimitDetection = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
         timeLimitDetection.reset();
+
+        timeTrackingError = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        timeTrackingError.reset();
 
     }
 
@@ -87,7 +91,7 @@ public class Turret extends Subsystem {
             limitProximityPercentage = 1;
         }
 
-        if (enableTracking && detector.getDetected() && detector.getCenterJunction() != 0) {
+        if (enableTracking && detector.getDetected()) {
             if (init) {
                 timeIntegral.reset();
                 init = false;
@@ -153,16 +157,16 @@ public class Turret extends Subsystem {
     public double trackingCorrection() {
         double error, correction;
         error = getTrackingError();
-        correction = Math.signum(error) * Math.pow(Math.abs(error)/300.0, 2);
+        correction = Math.signum(error) * Math.pow(Math.abs(error)/150.0, 2);
 
-        if (Math.abs(error) < (lastError/2.) && detector.getCenterJunction() != 0 && detector.getDetected()) {
+        if (Math.abs(error) < (lastError/2.) && detector.getDetected()) {
             lastError = Math.abs(error);
             timeIntegral.reset();
         }
 
         integral = Constants.Turret.TRACKING_CORRECTION_I * error * (timeIntegral.time());
 
-        if (Math.abs(error) < 80) {
+        if (Math.abs(error) < 40) {
             correction += integral;
         } else {
             timeIntegral.reset();
@@ -179,7 +183,7 @@ public class Turret extends Subsystem {
     }
 
     public double getTrackingError(){
-        if (detector.getDetected()) return (320 - Constants.Turret.TRACKING_CENTER_OFFSET - detector.getCenterJunction());
+        if (detector.getDetected()) return (160 - Constants.Turret.TRACKING_CENTER_OFFSET - detector.getCenterJunction());
         else return 0.0;
     }
 
@@ -224,61 +228,60 @@ public class Turret extends Subsystem {
         if (useSetPos) {
             erro = autoPos * Constants.Turret.CONVERSION - turret.getCurrentPosition();
             turret.setPower(Math.signum(erro) * Math.min(Math.abs(erro * 0.01), autoVel));
+
+            RSL.setPower(0);
+            trackerIsBusy = false;
+
         } else {
-            erro = 0;
+            if (trackerIsBusy) erro = 0;
+            else turret.setPower(0);
+
         }
 
     }
 
     public void setInitTracker(double limitTime) {
         //turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        useSetPos = false;
         double trackingError = getTrackingError();
 
         if (init) timeLimitDetection.reset();
 
-        if (detector.getDetected() && detector.getCenterJunction() != 0
-                && Math.abs(trackingError) > Constants.Turret.TRACKING_ERROR_TOLERANCE
-                && timeLimitDetection.time() <= limitTime) {
+        useSetPos = !detector.getDetected();
 
+        if (detector.getDetected() && timeLimitDetection.time() <= limitTime) {
+            //RSL.setPower(Constants.Turret.RSL_POWER * 2);
             erro = 0;
-            trackerIsBusy = true;
 
             if (init) {
                 timeIntegral.reset();
+                timeTrackingError.reset();
+                sumPositions = 0;
+                cont = 0;
                 init = false;
             }
 
             turret.setPower(trackingCorrection());
 
-            if (Math.abs(trackingError) > Constants.Turret.TRACKING_ERROR_TOLERANCE) {
+            if (blinkTime.time() > 1000) {
+                blinkStatus = !blinkStatus;
+                blinkTime.reset();
+            }
 
-                if (blinkTime.time() > 1000) {
-                    blinkStatus = !blinkStatus;
-                    blinkTime.reset();
-                }
+            trackerIsBusy = Math.abs(trackingError) > Constants.Turret.TRACKING_ERROR_TOLERANCE;
 
-                if (blinkStatus)
-                    RSL.setPower(Constants.Turret.RSL_POWER * (1 - blinkTime.time() / 1000.0));
+            if (trackerIsBusy) {
+                if (blinkStatus) RSL.setPower(Constants.Turret.RSL_POWER * (1 - blinkTime.time() / 1000.0));
                 else RSL.setPower(0);
 
             } else {
-                turret.setPower(0);
-                if (Math.abs(trackingError) > Constants.Turret.TRACKING_ERROR_TOLERANCE) {
-                    RSL.setPower(0);
-
-                } else {
-                    RSL.setPower(Constants.Turret.RSL_POWER * 2);
-
-                }
+                RSL.setPower(Constants.Turret.RSL_POWER * 2);
             }
 
-        } else {
 
-            turret.setPower(0);
+        } else {
             RSL.setPower(0);
-            init = true;
             trackerIsBusy = false;
+            init = true;
 
         }
     }

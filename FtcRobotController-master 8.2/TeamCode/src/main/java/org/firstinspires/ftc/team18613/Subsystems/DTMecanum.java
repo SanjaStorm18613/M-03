@@ -22,7 +22,7 @@ public class DTMecanum  extends Subsystem {
     private boolean moveIsBusy = false, sideMove = false, internalEncoder = false;
     private double setPoint = 0, direction = 0, acc = 0, x = 0, y = 0, turn = 0, slowFactor = 0,
     tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE, distance = 0, adjust = 0, angle = 0,
-                                            dist = 0, proportional = 0, maxVel = 0, timeAccel = 0;
+                                            dist = 0, proportional = 0, maxVel = 0, timeAccel = 0, angularProp = 0;
 
     public DTMecanum(OpMode opMode, Turret turret) {
 
@@ -120,7 +120,7 @@ public class DTMecanum  extends Subsystem {
         pos = Math.signum(pos) * Math.min(maxVel, Math.abs(pos));
         pos *= acT;
 
-        turn = yawError * proportional;
+        turn = yawError * angularProp;
         turn = Math.signum(turn) * Math.min(maxVel, Math.abs(turn));
         turn *= acT;
 
@@ -137,15 +137,16 @@ public class DTMecanum  extends Subsystem {
     }
 
     public void setMove(boolean internalEncoder, boolean sideMove, double maxVel, double timeAccel,
-                                                            double prop, double dist, double ang) {
+                                                            double linearProp, double dist, double angularProp, double ang) {
 
         angle = ang;
-        proportional = prop;
+        proportional = linearProp;
         this.dist = dist;
         this.sideMove = sideMove;
         this.internalEncoder = internalEncoder;
         this.maxVel = maxVel;
         this.timeAccel = timeAccel;
+        this.angularProp = angularProp;
 
         tolerance = Constants.DTMecanum.TOLERANCE_DISTANCE;
         distance = this.dist * Constants.DTMecanum.CONVERSION_2_EXTERNAL;

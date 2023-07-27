@@ -62,6 +62,8 @@ public class AutonomousBase {
 
         drive.setDownEncoderServo(false);
 
+        webcam.stopViewport();
+
     }
 
     public void execution() {
@@ -72,10 +74,10 @@ public class AutonomousBase {
 
                 if (action[1].equals(cAuto.DR)) {
                     drive.setMove(false, action[2].equals(cAuto.DR_SIDE), 0.5,
-                                                    800, 0.00004, action[0], 0);
+                                                    800, 0.00004, action[0],0.02, 0);
 
                 } else if (action[1].equals(cAuto.DR_TURN)) {
-                    drive.setMove(true, false, 0.5, 800,0.00004, 0, action[0]);
+                    drive.setMove(true, false, 0.5, 800,0.00004, 0,0.02,  action[0]);
 
                 } else if (action[1].equals(cAuto.EL)) {
                     elevator.setPos(action[0], Constants.Elevator.UP_SPEED);
@@ -96,20 +98,21 @@ public class AutonomousBase {
             }
         }
 
+        opMode.telemetry.addData("detec", turret.getTrackerBusy());
+        opMode.telemetry.addData("drive", drive.getBusy());
+        opMode.telemetry.addData("elevator", elevator.getBusy());
+        opMode.telemetry.addData("claw", claw.getBusy());
+        opMode.telemetry.addData("turret", turret.getBusy());
+        opMode.telemetry.update();
+
         if (init) {
             arm.periodic();
             claw.autoPeriodic();
-            drive.autoPeriodic();
             turret.autoPeriodic();
+            drive.autoPeriodic();
 
         }
 
-        opMode.telemetry.addData("turret", !turret.getBusy());
-        opMode.telemetry.addData("claw", !claw.getBusy());
-        opMode.telemetry.addData("elevator", !elevator.getBusy());
-        opMode.telemetry.addData("drive", !drive.getBusy());
-        opMode.telemetry.addData("det", turret.getTrackerBusy());
-        opMode.telemetry.update();
 
         if (steps.size() != 0 && !turret.getBusy() && !claw.getBusy() && !elevator.getBusy()
                 && !drive.getBusy() && !turret.getTrackerBusy()) {

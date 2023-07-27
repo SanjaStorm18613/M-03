@@ -173,7 +173,7 @@ public class Claw extends Subsystem {
 
     private void velPitchUpdate() {
 
-        if (init || !pBusy && needTurning()){
+        if (init || (!pBusy && needTurning())){
             time.reset();
             pitchProgress = 0;
             pBusy =  true;
@@ -216,7 +216,8 @@ public class Claw extends Subsystem {
                 || collectState < 2
                 || pitchProgress < 1)
                 || ((!clawOpen && sClawD.getPosition() == Constants.Claw.CLAW_OPEN)
-                && (elevator.getCurrentPos() < 70));
+                && (elevator.getCurrentPos() < 70)
+                || clawOpen);
 
     }
 
